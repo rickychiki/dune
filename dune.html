@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dune helper</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#e74c3c">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(reg => console.log('SW registered:', reg))
+        .catch(err => console.log('SW registration failed:', err));
+    }
+  </script>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    /* ================= 全域 ================= */
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      /* 滿螢幕高度 */
+      overflow: hidden;
+      /* 網頁本身不滾動 */
+    }
+
+    body {
+      font-family: "Noto Sans TC", Arial, sans-serif;
+      background-color: #111;
+      color: #eee;
+      margin: 0;
+      padding: 10px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 24px 32px;
+      margin: 6px 4px;
+      font-size: 32px;
+      font-weight: 600;
+      background: #2c2c2c;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    button.active {
+      outline: 2px solid #fff;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 12px 8px;
+      font-weight: 700;
+    }
+
+    /* ================= Setup ================= */
+    #setup {
+      height: 100vh;
+      /* 滿螢幕高度 */
+      overflow-y: auto;
+      /* 內容超過時可垂直捲動 */
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .player-setup {
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-group button {
+      flex: 1 1 auto;
+      min-width: 72px;
+    }
+
+    /* ================= 玩家卡片 ================= */
+    .player-card {
+      border: 3px solid transparent;
+      border-radius: 16px;
+      padding: 24px;
+      margin: 10px;
+      background: #1c1c1c;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .player-card .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+    }
+
+    .player-card h3 {
+      margin: 4px 0 8px;
+      font-size: 36px;
+    }
+
+    .player-card div {
+      font-size: 36px;
+    }
+
+
+    .player-card.first {
+      border-color: #f1c40f;
+      box-shadow: 0 0 0 16px rgba(255, 255, 255, 0.4);
+    }
+
+    /* ================= 回合 ================= */
+    #roundDiv {
+      text-align: center;
+      padding: 12px;
+    }
+
+    #roundDiv img {
+      margin-top: 8px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ================= 事件 ================= */
+    #eventDiv {
+      margin: 12px;
+      padding: 12px;
+      background: #1e1e1e;
+      border-radius: 16px;
+      overflow-y: auto;
+      max-height: 30vh;
+    }
+
+    #eventDiv h3 {
+      margin-bottom: 10px;
+    }
+
+    #eventTimeline {
+      overflow-y: auto;
+      max-height: 40vh;
+      /* Timeline 高度固定，可捲動 */
+      border-top: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      padding: 5px;
+    }
+
+    /* ================= 控制 ================= */
+    .btn-group {
+      justify-content: center;
+      margin: 12px;
+    }
+
+    .btn-group button {
+      min-width: 80px;
+    }
+
+    /* ================= cardList ================= */
+    #cardList {
+      display: flex;
+      flex-direction: column;
+      /* 垂直堆疊 */
+      gap: 5px;
+      /* 卡片之間的間距 */
+      padding: 5px;
+    }
+
+    #cardList div.cardItem {
+      width: 100%;
+      /* 橫向佔滿整個容器 */
+      box-sizing: border-box;
+      /* 包括 padding/border 在內 */
+      padding: 60px;
+      background-color: #f2f2f2;
+      color: #000;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 48px;
+      /* 手機可讀大小 */
+    }
+
+    #cardList div.cardItem:hover {
+      background-color: #ddd;
+    }
+
+
+    /* ================= Timeline ================= */
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 12px;
+    }
+
+    ul li {
+      background: #1c1c1c;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    /* ================= 輔助 ================= */
+    img {
+      max-width: 100%;
+    }
+
+    button[style*="background"] {
+      color: #000;
+      font-weight: 700;
+    }
+
+    /* ================= 桌面補強 ================= */
+    @media (min-width: 768px) {
+      body {
+        /* max-width: 520px; */
+        margin: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <script src="./data/conflict.js"></script>
+  <script src="./data/imperium.js"></script>
+  <script src="./data/leader.js"></script>
+  <script src="./main.js"></script>
+</body>
+
+</html>
