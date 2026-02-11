@@ -1,4 +1,4 @@
-name,no,expansion,cost_persuasion,landsraad,city,spice_trade,emperor,spacing_guild,bene _gesserit,fremen,spy,acquire effect,agent effect,discard effect,trash effect,reveal AND/OR,reveal Persuasion,reveal Sword,reveal Water,reveal Spice,reveal Troop,reveal Solari,reveal Spy,reveal Intrigue,reveal effect
+name,no,expansion,cost_persuasion,landsraad,city,spice_trade,emperor,spacing_guild,bene_gesserit,fremen,spy,acquire effect,agent effect,discard effect,trash effect,reveal AND/OR,reveal Persuasion,reveal Sword,reveal Water,reveal Spice,reveal Troop,reveal Solari,reveal Spy,reveal Intrigue,reveal effect
 Sardaukar Soldier,1,Uprising,1,-,1,-,2,-,-,-,-,,,,1 Intrigue,AND,1,1,,,,,,,
 Smuggler's Harvester,2,Uprising,1,-,-,1,-,2,-,-,-,,If you sent an Agent to a Maker board space this turn you gain 1 spice.,,,AND,1,,,,,,,,
 Space-time Folding,3,Uprising,1,-,-,-,-,3,-,-,-,,When you send an agent you may discard card from your hand to draw card. If you discarded a Spacing Guild card you must draw one more card.,,,AND,1,,,,,,,,

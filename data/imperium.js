@@ -63,7 +63,9 @@ window.imperium = [
       "city",
       "spice_trade"
     ],
-    "tag": [],
+    "tag": [
+      "bene_gesserit"
+    ],
     "type": "imperium"
   },
   {
@@ -103,7 +105,9 @@ window.imperium = [
     "location": [
       "landsraad"
     ],
-    "tag": [],
+    "tag": [
+      "bene_gesserit"
+    ],
     "type": "imperium"
   },
   {
@@ -130,6 +134,7 @@ window.imperium = [
       "city"
     ],
     "tag": [
+      "bene_gesserit",
       "fremen"
     ],
     "type": "imperium"
@@ -197,8 +202,12 @@ window.imperium = [
     "name": "Bene Gesserit Operative",
     "expanision": "Uprising",
     "cost": "3",
-    "location": [],
-    "tag": [],
+    "location": [
+      "bene_gesserit"
+    ],
+    "tag": [
+      "bene_gesserit"
+    ],
     "type": "imperium"
   },
   {
@@ -208,9 +217,12 @@ window.imperium = [
     "expanision": "Uprising",
     "cost": "3",
     "location": [
-      "city"
+      "city",
+      "bene_gesserit"
     ],
-    "tag": [],
+    "tag": [
+      "bene_gesserit"
+    ],
     "type": "imperium"
   },
   {
@@ -306,6 +318,7 @@ window.imperium = [
     "location": [
       "emperor",
       "spacing_guild",
+      "bene_gesserit",
       "fremen"
     ],
     "tag": [
@@ -444,9 +457,11 @@ window.imperium = [
     "expanision": "Uprising",
     "cost": "4",
     "location": [
+      "bene_gesserit",
       "fremen"
     ],
     "tag": [
+      "bene_gesserit",
       "fremen"
     ],
     "type": "imperium"
@@ -462,7 +477,9 @@ window.imperium = [
       "city",
       "spice_trade"
     ],
-    "tag": [],
+    "tag": [
+      "bene_gesserit"
+    ],
     "type": "imperium"
   },
   {
@@ -474,9 +491,12 @@ window.imperium = [
     "location": [
       "emperor",
       "spacing_guild",
+      "bene_gesserit",
       "fremen"
     ],
-    "tag": [],
+    "tag": [
+      "bene_gesserit"
+    ],
     "type": "imperium"
   },
   {
@@ -529,10 +549,12 @@ window.imperium = [
     "expanision": "Uprising",
     "cost": "5",
     "location": [
-      "emperor"
+      "emperor",
+      "bene_gesserit"
     ],
     "tag": [
-      "emperor"
+      "emperor",
+      "bene_gesserit"
     ],
     "type": "imperium"
   },
@@ -595,6 +617,7 @@ window.imperium = [
     "location": [
       "emperor",
       "spacing_guild",
+      "bene_gesserit",
       "fremen"
     ],
     "tag": [
@@ -654,10 +677,12 @@ window.imperium = [
     "expanision": "Uprising",
     "cost": "6",
     "location": [
-      "emperor"
+      "emperor",
+      "bene_gesserit"
     ],
     "tag": [
-      "emperor"
+      "emperor",
+      "bene_gesserit"
     ],
     "type": "imperium"
   },
@@ -730,6 +755,7 @@ window.imperium = [
     "location": [
       "emperor",
       "spacing_guild",
+      "bene_gesserit",
       "fremen"
     ],
     "tag": [],

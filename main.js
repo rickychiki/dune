@@ -40,7 +40,7 @@ function initGameUI() {
 
     c.append("button")
         .attr("class", "main-btn")
-        .text("開始遊戲")
+        .text("Start Game")
         .on("click", startFromSetup);
 
     renderSetupPlayers();
@@ -62,7 +62,7 @@ function renderSetupPlayers() {
     setupPlayers.forEach((p, i) => {
         const row = div.append("div").attr("class", "player-setup");
 
-        row.append("h3").text(`玩家 ${i + 1}（座次 ${i + 1}）`);
+        row.append("h3").text(`Player ${i + 1} (Seat ${i + 1})`);
 
         // Leader buttons
         const lb = row.append("div").attr("class", "btn-group");
@@ -103,7 +103,7 @@ function renderPlayerButtons() {
     const d = d3.select("#playerButtons").html("");
 
     if (setupPlayers.length === 3) {
-        d.append("button").text("➕ 加入玩家").on("click", () => {
+        d.append("button").text("➕ Add Player").on("click", () => {
             // 可用 leaders / colors
             const usedLeaders = setupPlayers.map(p => p.leaderNo);
             const usedColors = setupPlayers.map(p => p.color);
@@ -112,7 +112,7 @@ function renderPlayerButtons() {
             const availColors = COLORS.filter(c => !usedColors.includes(c.value));
 
             if (availLeaders.length === 0 || availColors.length === 0) {
-                alert("沒有可用 leader 或顏色");
+                alert("no leader or color available");
                 return;
             }
 
@@ -126,7 +126,7 @@ function renderPlayerButtons() {
 
 
     if (setupPlayers.length === 4) {
-        d.append("button").text("➖ 移除玩家").on("click", () => {
+        d.append("button").text("➖ Remove Player").on("click", () => {
             setupPlayers.pop();
             renderSetupPlayers();
         });
@@ -186,7 +186,7 @@ function renderGame() {
     // Round
     const r = b.append("div");
     const card = conflictDeck[currentRound - 1];
-    r.append("h2").text(`回合 ${currentRound} - ${card ? card.name + " " + card.level : "error"}`);
+    r.append("h2").text(`Round ${currentRound} - ${card ? card.name + " " + card.level : "error"}`);
 
     // Player cards
     const pc = b.append("div");
@@ -203,15 +203,15 @@ function renderGame() {
     });
 
     // Event area
-    b.append("div").attr("id", "eventDiv").append("h3").text("點玩家新增事件");
+    b.append("div").attr("id", "eventDiv").append("h3").text("click player to add event");
 
     // Controls
     const ctl = b.append("div").attr("class", "btn-group");
     ctl.append("button").text("◀").on("click", prevRound);
     ctl.append("button").text("▶").on("click", nextRound);
-    ctl.append("button").text("修改").on("click", () => { edit = !edit; });
-    ctl.append("button").text("匯出").on("click", exportData);
-    ctl.append("button").text("結束").on("click", initGameUI);
+    ctl.append("button").text("edit").on("click", () => { edit = !edit; });
+    ctl.append("button").text("export").on("click", exportData);
+    ctl.append("button").text("end game").on("click", initGameUI);
 
     renderTimeline();
     saveGame();
@@ -229,10 +229,10 @@ function renderEventTypeButtons() {
     d.append("h3").text(p.name);
 
     d.append("button").text("➕ VP").on("click", () => renderVPInput());
-    d.append("button").text("⭐ 能力").on("click", () => renderPermInput());
-    d.append("button").text("⚔️ 戰鬥").on("click", () => renderBattleInput());
-    d.append("button").text("🎴 買牌").on("click", () => renderBuyCardInput());
-    d.append("button").text("取消").on("click", resetEventDraft);
+    d.append("button").text("⭐ Ability").on("click", () => renderPermInput());
+    d.append("button").text("⚔️ Battle").on("click", () => renderBattleInput());
+    d.append("button").text("🎴 Buy Card").on("click", () => renderBuyCardInput());
+    d.append("button").text("Cancel").on("click", resetEventDraft);
 }
 
 // VP
@@ -241,19 +241,19 @@ function renderVPInput() {
     const p = players.find(pl => pl.id === eventDraft.playerId);
 
     const d = d3.select("#eventDiv").html(""); // 清空
-    d.append("h3").text(`${p.name} VP 變更`);
+    d.append("h3").text(`${p.name} VP Change`);
 
     // ===== 原因按鈕 =====
     const reasons = [
-        { text: "得到2影響力", vp: 1 },
-        { text: "得到同盟", vp: 1 },
+        { text: "reach 2 influence", vp: 1 },
+        { text: "gain Alliance", vp: 1 },
         { text: "spice must flow", vp: 1 },
         { text: "combat", vp: 1 },
         { text: "battle icon", vp: 1 },
         { text: "intrigue", vp: 1 },
         { text: "imperium", vp: 1 },
-        { text: "失去2影響力", vp: -1 },
-        { text: "失去同盟", vp: -1 }
+        { text: "lose 2 influence", vp: -1 },
+        { text: "lose Alliance", vp: -1 }
     ];
 
     const reasonDiv = d.append("div").attr("id", "vpReasonBtns").style("margin-top", "5px");
@@ -276,7 +276,7 @@ function renderVPInput() {
     });
 
     // ===== 取消按鈕 =====
-    d.append("button").text("取消").style("margin-top", "5px").on("click", resetEventDraft);
+    d.append("button").text("Cancel").style("margin-top", "5px").on("click", resetEventDraft);
 
     // ===== 處理 faction 顯示 =====
     // 影響力 / 同盟 / 失去2影響力 / 失去同盟 → 選 faction
@@ -286,7 +286,7 @@ function renderVPInput() {
         eventDraft.vpChange = vpVal;
         eventDraft.reason = rText;
 
-        if (["得到2影響力", "得到同盟", "失去2影響力", "失去同盟"].includes(rText)) {
+        if (["reach 2 influence", "gain Alliance", "lose 2 influence", "lose Alliance"].includes(rText)) {
             factionDiv.style("display", "block");
         } else {
             factionDiv.style("display", "none");
@@ -332,12 +332,11 @@ function renderBuyCardInput() {
     const p = players.find(pl => pl.id === pid);
 
     const d = d3.select("#eventDiv").html(""); // 清空
-    d.append("h3").text(`玩家 ${p.name} 買牌`);
+    d.append("h3").text(`${p.name} Buy Card`);
 
     // ===== 成本按鈕 =====
     const costs = [...new Set(window.imperium.map(c => c.cost))].sort((a, b) => a - b);
     const costDiv = d.append("div").attr("id", "costButtons");
-    costDiv.append("span").text("說服力: ");
     costs.forEach(c => {
         costDiv.append("button")
             .text(c)
@@ -351,7 +350,7 @@ function renderBuyCardInput() {
     // ===== 搜尋欄 =====
     d.append("input")
         .attr("id", "cardSearch")
-        .attr("placeholder", "輸入名稱 / 地點 / 標籤")
+        .attr("placeholder", "Enter name / location / tag")
         .style("margin-top", "5px")
         .style("width", "100%")
         .on("input", filterCards);
@@ -362,7 +361,7 @@ function renderBuyCardInput() {
     filterCards(); // 初始顯示全部
 
     // 取消按鈕
-    d.append("button").text("取消").on("click", resetEventDraft);
+    d.append("button").text("Cancel").on("click", resetEventDraft);
 }
 
 function filterCards() {
@@ -379,7 +378,7 @@ function filterCards() {
         .forEach(c => {
             listDiv.append("div")
                 .attr('class', 'cardItem')
-                .text(`${c.name} (${c.cost})`)
+                .text(`${c.name}`)
                 .style("cursor", "pointer")
                 .style("padding", "5px")
                 .style("border-bottom", "1px solid #ccc")
@@ -413,7 +412,7 @@ function renderPermInput() {
     const p = players.find(pl => pl.id === eventDraft.playerId);
 
     const d = d3.select("#eventDiv").html(""); // 清空
-    d.append("h3").text(`${p.name} 永久效果`);
+    d.append("h3").text(`${p.name} Permanent Effect`);
 
     const abilities = [
         ["swordmaster", "⚔️", "personal"],
@@ -446,7 +445,7 @@ function renderPermInput() {
             }
         }
     });
-    d.append("button").text("取消").on("click", resetEventDraft);
+    d.append("button").text("Cancel").on("click", resetEventDraft);
 }
 
 function commitPerm(k) {
@@ -484,18 +483,53 @@ function commitPerm(k) {
 }
 
 // Battle
+// ===== Battle =====
 function renderBattleInput() {
-    const d = d3.select("#eventDiv").html("<h3>戰鬥排名</h3>");
+    const d = d3.select("#eventDiv").html("");
+    d.append("h3").text("Battle Ranking");
+
     let rank = [];
+
+    // 顯示目前選擇狀態
+    const status = d.append("div")
+        .attr("id", "battleStatus")
+        .style("margin", "8px 8px")
+        .text("Choose rank 1");
+
+    // 玩家按鈕區
+    const btnDiv = d.append("div")
+        .attr("id", "battleButtons");
+
     players.forEach(p => {
-        d.append("button").text(p.name).on("click", () => {
-            if (rank.includes(p.id)) return;
-            rank.push(p.id);
-            if (rank.length === 3) commitBattle(rank);
-        });
+        const btn = btnDiv.append("button")
+            .text(p.name)
+            .style("margin", "4px")
+            .on("click", function () {
+
+                if (rank.includes(p.id)) return;
+
+                rank.push(p.id);
+
+                // 視覺反饋
+                d3.select(this)
+                    .style("opacity", "0.5")
+                    .text(`${rank.length}. ${p.name}`);
+
+                if (rank.length < 3) {
+                    status.text(`Choose rank ${rank.length + 1}`);
+                } else {
+                    status.text("Selection complete");
+                    setTimeout(() => commitBattle(rank), 300);
+                }
+            });
     });
-    d.append("button").text("取消").on("click", resetEventDraft);
+
+    d.append("button")
+        .text("Cancel")
+        .style("margin-top", "10px")
+        .on("click", resetEventDraft);
 }
+
 function commitBattle(r) {
     events.push({ type: "battle", round: currentRound, ranking: r });
     finishEvent();
@@ -516,12 +550,24 @@ function resetEventDraft() {
 function renderTimeline() {
     const ul = d3.select("body").append("ul").attr("id", "eventTimeline");
     [...events].reverse().forEach(e => {
-        let t = `回合${e.round} `;
+        let t = `Round ${e.round} `;
         if (e.type === "vpChange") t += `${findP(e.playerId)} VP ${e.value} ${e.reason}${e.faction ? " (" + e.faction + ")" : ""}`;
-        if (e.type === "permanent") t += `${findP(e.playerId)} ${e.value ? "得到" : "失去"} ${e.ability}`;
-        if (e.type === "battle") t += `戰鬥結束`;
+        if (e.type === "permanent") t += `${findP(e.playerId)} ${e.value ? "gain" : "lose"} ${e.ability}`;
+        if (e.type === "battle") {
+            if (e.ranking && e.ranking.length) {
+                const medals = ["🥇", "🥈", "🥉"];
+                const names = e.ranking.map((pid, i) => {
+                    return `${medals[i]} ${findP(pid)}`;
+                });
+                t += names.join(" ");
+
+            } else {
+                t += "Battle ended";
+            }
+        }
+
         if (e.type === "buyCard") {
-            t += `${findP(e.playerId)} 買牌 ${e.card.name} (成本: ${e.card.cost})`;
+            t += `${findP(e.playerId)} Buy card ${e.card.name} (Persuasion: ${e.card.cost})`;
         };
         ul.append("li").text(t);
     });
