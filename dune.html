@@ -167,6 +167,38 @@
       font-size: 36px;
     }
 
+    #timelineSection {
+      display: flex;
+      flex-direction: column;
+      height: 40vh;
+      /* timeline 區高度 */
+      border-top: 1px solid #ccc;
+    }
+
+    #timelineFilters {
+      display: flex;
+      overflow-x: auto;
+      /* 橫向滑動 */
+      gap: 6px;
+      padding: 6px;
+      background: #111;
+    }
+
+    #timelineFilters button {
+      flex: 0 0 auto;
+      /* 不壓縮 */
+      padding: 8px 12px;
+      font-size: 48px;
+      border-radius: 20px;
+      border: none;
+      background: #333;
+      color: white;
+    }
+
+    #timelineFilters button.active {
+      background: #e74c3c;
+    }
+
     /* ================= 控制 ================= */
     .btn-group {
       justify-content: center;
@@ -206,7 +238,7 @@
     }
 
     #cardSearch {
-font-size: 48px;
+      font-size: 48px;
     }
 
     #battleStatus {
@@ -250,7 +282,6 @@ font-size: 48px;
 </head>
 
 <body>
-
 
   <script src="./data/conflict.js"></script>
   <script src="./data/imperium.js"></script>

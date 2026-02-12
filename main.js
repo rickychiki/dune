@@ -548,31 +548,123 @@ function resetEventDraft() {
 
 // ================= Timeline =================
 function renderTimeline() {
-    const ul = d3.select("body").append("ul").attr("id", "eventTimeline");
-    [...events].reverse().forEach(e => {
+
+    let ul = d3.select("#eventTimeline");
+
+    if (ul.empty()) {
+        ul = d3.select("body")
+            .append("ul")
+            .attr("id", "eventTimeline");
+    }
+
+    ul.html("");
+
+    // ===== 篩選 =====
+    let filtered = events;
+
+    if (timelineFilter.type === "playerVP") {
+        filtered = events.filter(e =>
+            e.type === "vpChange" &&
+            e.playerId === timelineFilter.playerId
+        );
+    }
+
+    if (timelineFilter.type === "battle") {
+        filtered = events.filter(e => e.type === "battle");
+    }
+
+    // ===== 原本邏輯保持 =====
+    [...filtered].reverse().forEach(e => {
+
         let t = `Round ${e.round} `;
-        if (e.type === "vpChange") t += `${findP(e.playerId)} VP ${e.value} ${e.reason}${e.faction ? " (" + e.faction + ")" : ""}`;
-        if (e.type === "permanent") t += `${findP(e.playerId)} ${e.value ? "gain" : "lose"} ${e.ability}`;
+
+        if (e.type === "vpChange")
+            t += `${findP(e.playerId)} VP ${e.value} ${e.reason}${e.faction ? " (" + e.faction + ")" : ""}`;
+
+        if (e.type === "permanent")
+            t += `${findP(e.playerId)} ${e.value ? "gain" : "lose"} ${e.ability}`;
+
         if (e.type === "battle") {
             if (e.ranking && e.ranking.length) {
                 const medals = ["🥇", "🥈", "🥉"];
-                const names = e.ranking.map((pid, i) => {
-                    return `${medals[i]} ${findP(pid)}`;
-                });
+                const names = e.ranking.map((pid, i) =>
+                    `${medals[i]} ${findP(pid)}`
+                );
                 t += names.join(" ");
-
             } else {
                 t += "Battle ended";
             }
         }
 
-        if (e.type === "buyCard") {
+        if (e.type === "buyCard")
             t += `${findP(e.playerId)} Buy card ${e.card.name} (Persuasion: ${e.card.cost})`;
-        };
+
         ul.append("li").text(t);
     });
+    renderTimelineFilters();
 }
+
 const findP = id => players.find(p => p.id === id).name;
+
+let timelineFilter = {
+    type: "all",
+    playerId: null
+};
+
+function renderTimelineFilters() {
+
+    let f = d3.select("#timelineFilters");
+
+    if (f.empty()) {
+        f = d3.select("body")
+            .insert("div", "#eventTimeline")
+            .attr("id", "timelineFilters");
+    }
+
+    f.html("");
+
+    function addBtn(text, isActive, onClick) {
+        f.append("button")
+            .text(text)
+            .classed("active", isActive)
+            .on("click", onClick);
+    }
+
+    // ===== All =====
+    addBtn(
+        "All",
+        timelineFilter.type === "all",
+        () => {
+            timelineFilter = { type:"all", playerId:null };
+            renderTimeline();
+        }
+    );
+
+    // ===== Battle =====
+    addBtn(
+        "Battle",
+        timelineFilter.type === "battle",
+        () => {
+            timelineFilter = { type:"battle", playerId:null }
+            renderTimeline();
+        }
+    );
+
+    // ===== Players =====
+    players.forEach(p => {
+        addBtn(
+            p.name,
+            timelineFilter.type === "playerVP" &&
+            timelineFilter.playerId === p.id,
+            () => {
+                timelineFilter = { type:"playerVP", playerId:p.id };
+                renderTimeline();
+            }
+        );
+    });
+}
+
+
 
 // ================= Round =================
 function nextRound() {
