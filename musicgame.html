@@ -1,128 +1,228 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-HK">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gyro Hitster</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港 Hitster</title>
 
-<style>
-body{
-  background:#111;
-  color:white;
-  text-align:center;
-  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
-  margin:0;
-  padding:40px 20px;
-}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
 
-h2{
-  font-size:24px;
-  margin-bottom:30px;
-}
+        .card {
+            width: 350px;
+            height: 500px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
 
-.bigButton{
-  width:100%;
-  max-width:400px;
-  padding:20px;
-  font-size:22px;
-  font-weight:bold;
-  border-radius:20px;
-  border:none;
-  background:#1DB954;
-  color:white;
-  margin:15px auto;
-  display:block;
-  box-shadow:0 6px 20px rgba(29,185,84,0.4);
-  transition:0.15s;
-}
+        .inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
 
-.bigButton:active{
-  transform:scale(0.96);
-}
+        .card.flipped .inner {
+            transform: rotateY(180deg);
+        }
 
-#playerContainer{
-  margin-top:30px;
-}
+        .side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
-#status{
-  margin-top:20px;
-  font-size:18px;
-  opacity:0.8;
-}
-</style>
+        .back {
+            background: #1db954;
+        }
+
+        .front {
+            background: #222;
+            transform: rotateY(180deg);
+        }
+
+        .block {
+            width: 300px;
+            height: 352px;
+            position: absolute;
+            background-color: #1db954;
+            top: 0;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>🎵 香港 Hitster</h2>
+    <h2>🎵 香港 Hitster</h2>
 
-<button class="bigButton" onclick="unlock()">
-🔓 點我開始遊戲
-</button>
+    <div class="card" onclick="flipCard()" id="card">
+        <div class="inner">
 
-<p id="status">請先點擊開始</p>
+            <!-- 背面 -->
+            <div class="side back" id="back">
+                <h3>🎧 聽歌猜年份</h3>
+                <div id="spotifyEmbed"></div>
+                <p>點擊卡片翻面</p>
+            </div>
 
-<div id="playerContainer"></div>
+            <!-- 正面 -->
+            <div class="side front" id="front">
+                <h3 id="trackName"></h3>
+                <p id="artistName"></p>
+                <h2 id="releaseYear"></h2>
+            </div>
 
-<script>
+        </div>
+    </div>
 
-let unlocked = false;
-let showing = false;
-let threshold = 150;
+    <button onclick="newSong()">🎲 隨機下一首</button>
 
-const trackId = "5RLv04XXxe0Nc4W7DTBJGT"; // 風繼續吹
+    <script>
+        let drawnList = [];
+        const tracks = [
+            { name: "啼笑姻緣", date: "1974-01-01", artist: "仙杜拉", uri: "57aO81iUdc4mN0HTozCy4v" },
+            { name: "大丈夫", date: "1976-01-01", artist: "關正傑", uri: "063EMCL7s2F27g77pS6QAp" },
+            { name: "打雀英雄傳", date: "1976-12-01", artist: "許冠傑", uri: "45xAgFEdLmkkX95ZZeIVnW" }, // Sam Hui → 許冠傑
+            { name: "問我 - 電影跳灰歌曲", date: "1977-01-01", artist: "陳麗斯", uri: "2qe8ySQMI0qSSNfX7zpx8F" },
+            { name: "倚天屠龍記", date: "1978-01-01", artist: "鄭少秋", uri: "2V5S7Cmj6luYYk84ytnZAF" }, // Adam Cheng → 鄭少秋
+            { name: "獅子山下", date: "1979-01-01", artist: "羅文", uri: "4A0CIlThNadCi66UBkfcUQ" }, // Roman Tam → 羅文
+            { name: "上海灘", date: "1980-04-17", artist: "葉麗儀", uri: "0NMzmmXi6DCUo8tijwHvCe" }, // Frances Yip → 葉麗儀
+            { name: "舊夢不須記", date: "1981-01-01", artist: "Annabelle Lui", uri: "5L05QWKGIh3n5fn3jDX3bx" },
+            { name: "敢愛敢做", date: "1983-01-01", artist: "林子祥;凌 雨", uri: "5k72u9OHqyTDMylqpG0izJ" }, // George Lam;David Ling Jr → 林子祥;凌 雨
+            { name: "風繼續吹", date: "1983-01-01", artist: "張國榮", uri: "5RLv04XXxe0Nc4W7DTBJGT" }, // Leslie Cheung → 張國榮
+            { name: "愛的根源", date: "1984-01-01", artist: "譚詠麟", uri: "62yGFIECSRxKYs5SkRnow0" }, // Alan Tam → 譚詠麟
+            { name: "愛情陷阱", date: "1985-01-01", artist: "譚詠麟", uri: "70NTN85LdxAtRy8Xk9gAWC" },
+            { name: "有誰共鳴", date: "1986-01-01", artist: "張國榮", uri: "67EvFED20jCOsM5Q1pghz7" },
+            { name: "似水流年", date: "1987-07-01", artist: "梅艷芳", uri: "5xFg4BKKJBYn7G5riBetam" }, // Anita Mui → 梅艷芳
+            { name: "祝福", date: "1988-06-08", artist: "葉蒨文", uri: "7B0041g5usOOgGNy9OKHFA" }, // Sally Yeh → 葉蒨文
+            { name: "千千闋歌", date: "1989-01-01", artist: "陳慧嫻", uri: "42suymP38HAIBl0wiDfpst" }, // Priscilla Chan → 陳慧嫻
+            { name: "秋去秋來", date: "1990-01-01", artist: "葉蒨文", uri: "0BxldYrUwS4A5YiaWMoilw" },
+            { name: "每天愛你多一些", date: "1991-01-01", artist: "張學友", uri: "7uzJKRRrTqxUOeTtwQMd36" }, // Jacky Cheung → 張學友
+            { name: "容易受傷的女人", date: "1992-01-01", artist: "王菲", uri: "5g0IODsL7hiPxExwKNjIPo" }, // Faye Wong → 王菲
+            { name: "海闊天空", date: "1992-07-31", artist: "Beyond", uri: "77uktQePd9IdeMPVWlu1cO" },
+            { name: "愛的根源 - 電影《君子好逑》主題曲", date: "1984-01-01", artist: "譚詠麟", uri: "62yGFIECSRxKYs5SkRnow0" }, // Alan Tam → 譚詠麟
+            { name: "愛情陷阱", date: "1985-01-01", artist: "譚詠麟", uri: "70NTN85LdxAtRy8Xk9gAWC" }, // Alan Tam → 譚詠麟
+            { name: "有誰共鳴", date: "1986-01-01", artist: "張國榮", uri: "67EvFED20jCOsM5Q1pghz7" }, // Leslie Cheung → 張國榮
+            { name: "似水流年", date: "1987-07-01", artist: "梅艷芳", uri: "5xFg4BKKJBYn7G5riBetam" }, // Anita Mui → 梅艷芳
+            { name: "祝福", date: "1988-06-08", artist: "葉蒨文", uri: "7B0041g5usOOgGNy9OKHFA" }, // Sally Yeh → 葉蒨文
+            { name: "千千闋歌", date: "1989-01-01", artist: "陳慧嫻", uri: "42suymP38HAIBl0wiDfpst" }, // Priscilla Chan → 陳慧嫻
+            { name: "秋去秋來", date: "1990-01-01", artist: "葉蒨文", uri: "0BxldYrUwS4A5YiaWMoilw" }, // Sally Yeh → 葉蒨文
+            { name: "每天愛你多一些", date: "1991-01-01", artist: "張學友", uri: "7uzJKRRrTqxUOeTtwQMd36" }, // Jacky Cheung → 張學友
+            { name: "容易受傷的女人", date: "1992-01-01", artist: "王菲", uri: "5g0IODsL7hiPxExwKNjIPo" }, // Faye Wong → 王菲
+            { name: "海闊天空", date: "1992-07-31", artist: "Beyond", uri: "77uktQePd9IdeMPVWlu1cO" },
+            { name: "讓我跟你走", date: "1994-01-01", artist: "彭羚", uri: "4EJbc0mCVfmSDey2BIgdqj" }, // Cass Phang → 彭羚
+            { name: "(你沒有)好結果", date: "1995-01-01", artist: "李香琴", uri: "3UQHNNRpCERK0SuB36Kwgo" }, // Amanda Lee → 李香琴
+            { name: "甘心替代你（電影《古惑仔3之隻手遮天》插曲）", date: "1996-07-13", artist: "鄭伊健", uri: "5vnxboQXsHVOVynymx0Wvv" }, // Ekin Cheng → 鄭伊健
+            { name: "明知故犯", date: "1997-01-01", artist: "許美靜", uri: "0pnmUYIstjsVeJQj3wEHGI" }, // Mavis Hee → 許美靜
+            { name: "纏綿遊戲", date: "1998-01-01", artist: "梁漢文", uri: "4yhUfsNcXp1HlCRoZ4hHtg" }, // Edmond Leung → 梁漢文
+            { name: "眼睛想旅行", date: "1999-05-26", artist: "黎明", uri: "42LP9sxEZ4tqHLgBzApBKR" }, // Leon Lai → 黎明
+            { name: "活著Viva", date: "2000-11-01", artist: "謝霆鋒", uri: "4qmUx3yvJOt9Jktzr6Kvh0" }, // Nicholas Tse → 謝霆鋒
+            { name: "祝君好", date: "2001-02-20", artist: "謝霆鋒", uri: "6bZxiol0nxTfofgGJDtY6g" }, // Chilam → 謝霆鋒
+            { name: "心急人上", date: "2002-01-01", artist: "曲奇", uri: "3ef2t7aXjqDzXmPckk4BTd" },
+            { name: "心淡", date: "2003-03-25", artist: "容祖兒", uri: "0Eum5dQqpUDgwJiUucG3QU" }, // Joey Yung → 容祖兒
+            { name: "思覺失調", date: "2004-01-01", artist: "劉俊謙", uri: "3H9gYJcdtqeUiM8WX8YrZz" }, // Wilfred Lau → 劉俊謙
+            { name: "大哥", date: "2005-11-25", artist: "衛蘭", uri: "2HR81zMSX5uRGIVO5oerjr" }, // Janice Vidal → 衛蘭
+            { name: "命硬", date: "2006-08-01", artist: "羅志祥", uri: "331aol4yMUVA93MsVBZV9R" }, // Justin Lo → 羅志祥
+            { name: "愛在記憶中找你", date: "2007-11-23", artist: "林峯", uri: "5h6R8U3G3GLZc6nMsrxBV4" }, // Raymond Lam → 林峯
+            { name: "櫻花樹下", date: "2008-01-01", artist: "張敬軒", uri: "2FgDWCqMCIAATvqr9ozeYm" }, // Hins Cheung → 張敬軒
+            { name: "你瞞我瞞", date: "2009-12-24", artist: "陳柏宇", uri: "1eId3TVzGrwv73YAWAVQMX" }, // Jason Chan → 陳柏宇
+            { name: "陀飛輪", date: "2010-01-01", artist: "陳奕迅", uri: "0pmGleExiQyd0HxV5kAOwK" }, // Eason Chan → 陳奕迅
+            { name: "天梯", date: "2011-01-01", artist: "C AllStar", uri: "6hj8n3puSrVaEnKQa6hbWK" },
+            { name: "人非草木", date: "2012-01-01", artist: "吳若希", uri: "7pJH3YXNRUvq0ctKirL13A" }, // Kary Ng → 吳若希
+            { name: "紅綠燈", date: "2013-08-02", artist: "鄭欣宜", uri: "3Pj9gTUfcQEBe1glNWNwF9" }, // Stephanie Cheng → 鄭欣宜
+            { name: "無盡", date: "2014-05-16", artist: "Supper Moment", uri: "6TNz79kvUVVQSM2EhZQVq" },
+            { name: "你是你本身的傳奇", date: "2015-12-16", artist: "方皓玟", uri: "5uMkdWf1H6JEcpcdnPOSZM" }, // Charmaine Fong → 方皓玟
+            { name: "月球下的人", date: "2016-04-18", artist: "李佳薇", uri: "2FsrKLHO91CaT8vvY85DD6" }, // Gin Lee → 李佳薇
+            { name: "如果我是陳奕迅", date: "2017-04-13", artist: "陳奕迅", uri: "30P5j4FOcHC3nhMyU0XPRj" }, // Mr. → 陳奕迅
+            { name: "自我感覺還好", date: "2018-06-21", artist: "李佳薇", uri: "6nleraWfe1a0blQZksgIYa" }, // Gin Lee → 李佳薇
+            { name: "下一位前度", date: "2019-01-11", artist: "林家謙", uri: "3i4wtaYK77lWNjkm5cLo7" }, // Terence Lam → 林家謙
+            { name: "別為我好", date: "2020-03-31", artist: "許廷鏗", uri: "7mjD9lnV1pLw36tPcyPHF5" }, // Angela Hui → 許廷鏗
+            { name: "記憶棉", date: "2021-10-22", artist: "張天賦", uri: "1ZrnCyms7CBYsCvkkVIkt8" }, // MC 張天賦 → 張天賦
+            { name: "留一天與你喘息", date: "2022-02-14", artist: "陳卓賢", uri: "6flgMTTqhbJSNryAPCYcvA" }, // Ian → 陳卓賢
+            { name: "Better", date: "2023-04-21", artist: "Tyson Yoshi", uri: "6DzauanLiNjTSk0ykjRufq" },
+            { name: "黑玻璃", date: "2024-01-04", artist: "Kaho Hung", uri: "6eK3D9wcJhv7RDtpsqPBXs" },
+            { name: "Heartbreaker", date: "2025-03-05", artist: "盧瀚霆", uri: "4oIwqUDqcKyF8M5bmFY8Ax" } // Anson Lo → 盧瀚霆
+        ];
 
-function unlock(){
-  unlocked = true;
-  document.getElementById("status").innerText = "請翻轉手機播放";
-  enableGyro();
-}
+        let current = null;
 
-function enableGyro(){
-  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-    DeviceOrientationEvent.requestPermission()
-      .then(response => {
-        if (response === 'granted') {
-          startGyro();
-        }
-      });
-  } else {
-    startGyro();
-  }
-}
+        function newSong() {
+            const card = document.getElementById("card");
 
-function startGyro(){
-  window.addEventListener("deviceorientation", function(event){
+            // 1️⃣ 如果卡片已翻面，先翻回去
+            if (card.classList.contains("flipped")) {
+                card.classList.remove("flipped");
+            }
+            setTimeout(() => {
+                // 過濾掉已抽過的歌曲
+                const available = tracks.filter(track => !drawnList.includes(track.uri));
 
-    if(!unlocked) return;
+                if (available.length === 0) {
+                    alert("所有歌曲已抽完，重新開始！");
+                    drawnList = [];
+                    return newSong(); // 重新抽
+                }
 
-    let beta = event.beta;
+                // 隨機抽
+                current = available[Math.floor(Math.random() * available.length)];
 
-    // 翻到背面 → 建立 iframe + autoplay
-    if(Math.abs(beta) > threshold && !showing){
-      document.getElementById("playerContainer").innerHTML =
-      `<iframe
-        src="https://open.spotify.com/embed/track/${trackId}?autoplay=1"
-        width="100%"
-        height="152"
+                // 記錄已抽過
+                drawnList.push(current.uri);
+
+
+                document.getElementById("trackName").innerText = current.name;
+                document.getElementById("artistName").innerText = current.artist;
+                document.getElementById("releaseYear").innerText = current.date.substring(0, 4);
+
+                document.getElementById("spotifyEmbed").innerHTML = `
+    <iframe style="
+        width:100%;
+        height:352px;
+        border-radius:12px;"
+        src="https://open.spotify.com/embed/track/${current.uri}"
         frameborder="0"
-        allow="autoplay; encrypted-media">
-      </iframe>`;
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+    </iframe>
+    <div class ="block"></div>
+`;
+            }, 800); // 0.8s =
+        }
 
-      document.getElementById("status").innerText = "▶ 播放中";
-      showing = true;
-    }
+        function flipCard() {
+            document.getElementById("card").classList.toggle("flipped");
+        }
 
-    // 翻回來 → 刪除 iframe（停止播放）
-    if(Math.abs(beta) < 30 && showing){
-      document.getElementById("playerContainer").innerHTML = "";
-      document.getElementById("status").innerText = "已停止";
-      showing = false;
-    }
+        newSong();
 
-  });
-}
-
-</script>
+    </script>
 
 </body>
+
 </html>
