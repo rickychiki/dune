@@ -56,7 +56,7 @@ window.leader = [
   },
   {
     "no": "6",
-    "img": "./image/lady_jessica/reverend_mother_jessica.png",
+    "img": "./image/lady_jessica.png",
     "name": "Lady Jessica",
     "expanision": "Uprising",
     "abilitiy": "-",

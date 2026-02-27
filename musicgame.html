@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gyro Spotify Hitster</title>
+
+<style>
+body{
+  background:#111;
+  color:white;
+  text-align:center;
+  font-family:Arial;
+  padding-top:40px;
+}
+
+#playerContainer{
+  width:320px;
+  height:80px;
+  margin:auto;
+  position:relative;
+  overflow:hidden;
+  display:none;
+}
+
+/* 遮住上方歌名 */
+#mask{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:45px;
+  background:#111;
+  z-index:2;
+}
+
+iframe{
+  position:absolute;
+  top:-45px; /* 把標題往上推 */
+  left:0;
+}
+
+button{
+  padding:10px 20px;
+  margin:10px;
+}
+</style>
+</head>
+<body>
+
+<h2>🎵 翻轉手機播放</h2>
+
+<button onclick="enableGyro()">啟用感應器</button>
+
+<p id="status">請翻轉手機</p>
+
+<div id="playerContainer">
+  <div id="mask"></div>
+  <iframe 
+    src="https://open.spotify.com/embed/track/5RLv04XXxe0Nc4W7DTBJGT?utm_source=generator&autoplay=1"
+    width="320" 
+    height="152" 
+    frameborder="0"
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+  </iframe>
+</div>
+
+<script>
+
+let threshold = 150;
+let showing = false;
+
+function enableGyro(){
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    DeviceOrientationEvent.requestPermission()
+      .then(response => {
+        if (response === 'granted') {
+          startGyro();
+        }
+      });
+  } else {
+    startGyro();
+  }
+}
+
+function startGyro(){
+  window.addEventListener("deviceorientation", function(event){
+    let beta = event.beta;
+
+    // 翻到背面
+    if(Math.abs(beta) > threshold && !showing){
+      document.getElementById("playerContainer").style.display="block";
+      document.getElementById("status").innerText="▶ 播放中";
+      showing = true;
+    }
+
+    // 翻回正面
+    if(Math.abs(beta) < 30 && showing){
+      document.getElementById("playerContainer").style.display="none";
+      document.getElementById("status").innerText="已停止";
+      showing = false;
+    }
+
+  });
+}
+
+</script>
+
+</body>
+</html>
