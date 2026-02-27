@@ -1,0 +1,56 @@
+name,no,type,connect,uprising,base,ix,immortality,bloodline
+conspire,1,emperor,-,-,4 paySpice THEN 5 gainSolari + 2 gainTroop + 1 drawIntrigue + 1 gainEmperorInfluence,-,-,-
+wealth,2,emperor,-,-,2 gainSolari + 1 gainEmperorInfluence,-,-,-
+sardaukar,3,emperor,-,4 paySpice THEN 4 gainTroop + 1 drawIntrigue + 1 gainEmperorInfluence,-,-,-,-
+dutiful service,4,emperor,-,1 gainContract + 1 gainEmperorInfluence,-,-,-,-
+heighliner,5,spacingGuild,-,5 paySpice THEN 5 gainTroop + 1 gainSpacingGuildInfluence + combat,6 paySpice THEN 5 gainTroop + 2 gainWater + 1 gainSpacingGuildInfluence + combat,-,-,-
+foldspace,6,spacingGuild,-,-,1 gainFoldspace + 1 gainSpacingGuildInfluence,-,-,-
+deliver supplies,7,spacingGuild,-,1 gainWater + 1 gainSpacingGuildInfluence,-,-,-,-
+selective breeding,8,beneGesserit,-,-,2 paySpice + 1 trashCard THEN 2 drawCard + 1 gainSpacingGuildInfluence,-,-,-
+secrets,9,beneGesserit,-,1 drawIntrigue + 1 stealIntrigue + 1 gainBeneGesseritInfluence,1 drawIntrigue + 1 stealIntrigue + 1 gainBeneGesseritInfluence,-,-,-
+espionage,10,beneGesserit,-,1 paySpice THEN 1 drawCard + 1 placeSpy + 1 gainSpacingGuildInfluence,-,-,-,-
+hardy warriors,11,fremen,-,-,1 payWater THEN  2 gainTroop + 1 gainFremenInfluence + combat,-,-,-
+stillsuits,12,fremen,-,-,1 gainWater + 1 gainFremenInfluence + combat,-,-,-
+desert tactics,13,fremen,-,1 payWater THEN 1 gainTroop + 1 trashCard + 1 gainFremenInfluence + combat,-,-,-,-
+fremkit,14,fremen,-,1 drawCard + 1 gainFremenInfluence + combat,-,-,-,-
+mentat,15,landsraad,-,-,2 paySolari THEN gainMentat,-,-,-
+high council,16,landsraad,-,IF noHighCouncil 5 paySolari THEN gainHighCouncil AND IF haveHighCouncil 5 paySolari THEN 2 spice + 1 drawIntrigue + 3 gainTroop,IF noHighCouncil 5 paySolari THEN gainHighCouncil,-,-,-
+swordmaster,17,landsraad,-,IF firstSwordmaster 8 paySolari THEN gainSwordmaster AND IF secondSwordmaster 6 paySolari THEN gainSwordmaster,IF noSwordmaster 8 paySolari THEN gainSwordmaster,-,-,-
+rally troops,18,landsraad,-,-,4 paySolari THEN 4 gainTroop,null,-,-
+hall of oratory,19,landsraad,-,-,1 gainTroop + 1 gainPersuasion,null,-,-
+dreadnought,20,landsraad,-,-,-,3 paySolari THEN 1 gainDreadnought AND buyTech,-,-
+tech negotiation,21,landsraad,-,-,-,1 gainPersuasion + discountBuyTech OR 1 gainPersuasion + 1 discountTechToken,-,-
+imperial privilege,22,landsraad,-,IF 2 emperorInfluence 3 paySolari THEN returnAgent + 1 drawCard + (1 trashIntrigue THEN 1 drawIntrigue),-,-,-,-
+assembly hall,23,landsraad,-,1 drawIntrigue + 1 gainPersuasion,-,null,-,-
+gather support,24,landsraad,-,2 gainTroop OR 2 paySolari THEN 2 gainTroop + 1 gainWater,-,null,-,-
+arrakeen,25,city,-,1 gainTroop + 1 drawCard + combat,1 gainTroop + 1 drawCard + combat,-,-,-
+carthag,26,city,-,-,1 gainTroop + 1 drawIntrigue + combat,-,-,-
+research station,27,city,-,2 payWater THEN 2 drawCard + 2 gainTroop + combat,2 payWater THEN 3 drawCard + combat,-,2 payWater THEN 2 drawCard + 1 research + combat,-
+sietch tabr,28,city,-,IF 2 fremenInfluence gainMakerHook + 1 gainTroop + 1 gainWater + combat OR IF 2 fremenInfluence 1 gainWater + 1 breakWall + combat,IF 2 fremenInfluence 1 gainTroop + 1 gainWater + combat,-,-,-
+spice refinery,29,city,-,2 gainSolari + combat OR 1 paySpice THEN 4 gainSolari + combat,-,-,-,-
+imperial basin,30,spice trade,-,1 gainSpice + gainMakerSpice + combat,1 gainSpice + gainMakerSpice + combat,-,-,-
+hagga basin,31,spice trade,-,1 payWater THEN 2 gainSpice + gainMakerSpice + combat OR IF haveMakerHook 1 summonSandworm + gainMakerSpice + combat,1 payWater THEN 2 gainSpice + gainMakerSpice + combat,-,-,-
+the great flat,32,spice trade,-,-,2 payWater THEN 3 gainSpice + gainMakerSpice + combat,-,-,-
+sell melange,33,spice trade,-,-,2 paySpice THEN 6 gainSolari OR 3 paySpice THEN 8 gainSolari OR 4 paySpice THEN 10 gainSolari OR 5 paySpice THEN 12 gainSolari,null,-,-
+secure contract,34,spice trade,-,-,3 gainSolari,null,-,-
+smuggling,35,spice trade,-,-,-,1 gainSolari + 1 moveFreighter,-,-
+interstellar shipping,36,spice trade,-,-,-,IF 2 spacingGuildnfluence 2 moveFreighter,-,-
+deep desert,37,spice trade,-,3 payWater THEN 4 gainSpice + gainMakerSpice + combat OR IF haveMakerHook 2 summonSandworm + gainMakerSpice + combat,-,-,-,-
+shipping,38,spice trade,-,IF 2 spacingGuildInfluence 3 paySpice THEN 5 gainSolari + 1 gainAnyInfluence,-,-,-,-
+accept contract,39,spice trade,-,1 gainContract + 1 drawCard,-,-,-,-
+tuek's sietch,40,spice trade,-,-,-,-,-,1 gainSpice + gainMakerSpice + combat OR 1 drawCard + gainMakerSpice + combat
+spy post,101,spy post,"3, 4",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,102,spy post,"5, 7",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,103,spy post,"9, 10",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,104,spy post,"13, 14",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,105,spy post,"16, 17, 22",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,106,spy post,"23, 24",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,107,spy post,"25, 29",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,108,spy post,"27, 29",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,109,spy post,"27, 28",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,110,spy post,30,infiltrate OR gatherIntelligence,-,-,-,-
+spy post,111,spy post,31,infiltrate OR gatherIntelligence,-,-,-,-
+spy post,112,spy post,37,infiltrate OR gatherIntelligence,-,-,-,-
+spy post,113,spy post,"38, 39",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,114,spy post,"20, 21",infiltrate OR gatherIntelligence,-,-,-,-
+spy post,115,spy post,"35, 36",infiltrate OR gatherIntelligence,-,-,-,-

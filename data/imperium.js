@@ -1,9 +1,7 @@
 window.imperium = [
   {
-    "no": "1",
-    "img": "./image/sardaukar_soldier.png",
     "name": "Sardaukar Soldier",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "1",
     "location": [
       "city"
@@ -11,294 +9,885 @@ window.imperium = [
     "tag": [
       "emperor"
     ],
-    "type": "imperium"
+    "trashEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawIntrigue",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "2",
-    "img": "./image/smuggler's_harvester.png",
     "name": "Smuggler's Harvester",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "1",
     "location": [
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 1,
+        "condition": "sentAgentToMaker",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "3",
-    "img": "./image/space-time_folding.png",
     "name": "Space-time Folding",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "1",
     "location": [
-      "spacing_guild"
+      "spacingGuild"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "nestedAction",
+        "subSteps": [
+          {
+            "group": 1,
+            "branch": 0,
+            "type": "discardCard",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          },
+          {
+            "group": 2,
+            "branch": 0,
+            "type": "drawCard",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          }
+        ]
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": "discardSpacingGuildCard",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "4",
-    "img": "./image/unswerving_loyalty.png",
     "name": "Unswerving Loyalty",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "1",
     "location": [],
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainTroop",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "deployOrRetreatTroop",
+        "amount": 1,
+        "condition": "fremenBond",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "5",
-    "img": "./image/weirding_woman.png",
     "name": "Weirding Woman",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "1",
     "location": [
       "city",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
-      "bene_gesserit"
+      "beneGesserit"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "returnThisCardToHand",
+        "amount": 1,
+        "condition": "anotherBeneCardInPlay",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "6",
-    "img": "./image/desert_survival.png",
     "name": "Desert Survival",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "2",
     "location": [
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "7",
-    "img": "./image/fedaykin_stilltent.png",
     "name": "Fedaykin Stilltent",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "2",
     "location": [
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainTroop",
+        "amount": 1,
+        "condition": "sentAgentToMaker",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainWater",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "8",
-    "img": "./image/hidden_missive.png",
     "name": "Hidden Missive",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "2",
     "location": [
       "landsraad"
     ],
     "tag": [
-      "bene_gesserit"
+      "beneGesserit"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainTroop",
+        "amount": 1,
+        "condition": "beneGesseritInfluence",
+        "conditionValue": 2
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": "beneGesseritInfluence",
+        "conditionValue": 2
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "9",
-    "img": "./image/imperial_spymaster.png",
     "name": "Imperial Spymaster",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "2",
     "location": [
-      "emperor"
+      "emperor",
+      "spy"
     ],
     "tag": [
       "emperor"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawIntrigue",
+        "amount": 1,
+        "condition": "recallSpyThisTurn",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "10",
-    "img": "./image/maker_keeper.png",
     "name": "Maker Keeper",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "2",
     "location": [
       "city"
     ],
     "tag": [
-      "bene_gesserit",
+      "beneGesserit",
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainWater",
+        "amount": 1,
+        "condition": "beneGesseritInfluence",
+        "conditionValue": 2
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 1,
+        "condition": "fremenInfluence",
+        "conditionValue": 2
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "11",
-    "img": "./image/reliable_informant.png",
     "name": "Reliable Informant",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "2",
     "location": [
-      "spacing_guild"
+      "spacingGuild"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": "onSpacingGuildBeneGesseritFremen",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSolari",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "12",
-    "img": "./image/spy_network.png",
     "name": "Spy Network",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "2",
     "location": [],
     "tag": [
       "emperor",
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "nestedAction",
+        "subSteps": [
+          {
+            "group": 1,
+            "branch": 0,
+            "type": "recallSpy",
+            "amount": 1,
+            "condition": "spyOnBoard",
+            "conditionValue": 2
+          },
+          {
+            "group": 2,
+            "branch": 0,
+            "type": "drawIntrigue",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          }
+        ]
+      }
+    ]
   },
   {
-    "no": "13",
-    "img": "./image/undercover_asset.png",
     "name": "Undercover Asset",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "2",
     "location": [
       "landsraad",
       "city",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
       "emperor",
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "ignoreInfluenceRequirement",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 1,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "14",
-    "img": "./image/wheels_within_wheels.png",
     "name": "Wheels Within Wheels",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "2",
-    "location": [],
+    "location": [
+      "spy"
+    ],
     "tag": [
       "emperor",
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSolari",
+        "amount": 2,
+        "condition": "emperorInfluence",
+        "conditionValue": 2
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 1,
+        "condition": "spacingGuildInfluence",
+        "conditionValue": 2
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "15",
-    "img": "./image/bene_gesserit_operative.png",
     "name": "Bene Gesserit Operative",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "3",
     "location": [
-      "bene_gesserit"
+      "beneGesserit"
     ],
     "tag": [
-      "bene_gesserit"
+      "beneGesserit"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": "spyOnBoard",
+        "conditionValue": 2
+      }
+    ]
   },
   {
-    "no": "16",
-    "img": "./image/branching_path.png",
     "name": "Branching Path",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "3",
     "location": [
       "city",
-      "bene_gesserit"
+      "beneGesserit"
     ],
     "tag": [
-      "bene_gesserit"
+      "beneGesserit"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashIntrigue",
+        "amount": 1,
+        "condition": "beneGesseritAlliance",
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "17",
-    "img": "./image/calculus_of_power.png",
     "name": "Calculus of Power",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "3",
     "location": [
-      "city"
+      "city",
+      "spy"
     ],
     "tag": [
       "emperor"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "nestedAction",
+        "subSteps": [
+          {
+            "group": 1,
+            "branch": 0,
+            "type": "trashAnotherEmperorCardInPlay",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          },
+          {
+            "group": 2,
+            "branch": 0,
+            "type": "gainSword",
+            "amount": 3,
+            "condition": null,
+            "conditionValue": null
+          }
+        ]
+      }
+    ]
   },
   {
-    "no": "18",
-    "img": "./image/cargo_runner.png",
     "name": "Cargo Runner",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "3",
     "location": [
       "landsraad",
       "city",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": "completedContract",
+        "conditionValue": 2
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": "completedContract",
+        "conditionValue": 4
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "19",
-    "img": "./image/covert_operation.png",
     "name": "Covert Operation",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "3",
-    "location": [],
+    "location": [
+      "spy"
+    ],
     "tag": [],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "opponentDiscardCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "20",
-    "img": "./image/dangerous_rhetoric.png",
     "name": "Dangerous Rhetoric",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "3",
     "location": [
-      "landsraad"
+      "landsraad",
+      "spy"
     ],
     "tag": [],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainAnyInfluence",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashThisCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "21",
-    "img": "./image/double_agent.png",
     "name": "Double Agent",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "3",
     "location": [
       "landsraad",
       "city",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
       "emperor",
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeDeepCoverSpy",
+        "amount": 1,
+        "condition": "onAgentSpace",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "22",
-    "img": "./image/ecological_testing_station.png",
     "name": "Ecological Testing Station",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "3",
     "location": [
       "city",
@@ -307,57 +896,200 @@ window.imperium = [
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "payWater",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainWater",
+        "amount": 1,
+        "condition": "fremenBond",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "23",
-    "img": "./image/guild_envoy.png",
     "name": "Guild Envoy",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "3",
     "location": [
       "emperor",
-      "spacing_guild",
-      "bene_gesserit",
+      "spacingGuild",
+      "beneGesserit",
       "fremen"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "discardCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 2,
+        "condition": "discardSpacingGuildCard",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "24",
-    "img": "./image/guild_spy.png",
     "name": "Guild Spy",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "3",
-    "location": [],
-    "tag": [
-      "spacing_guild"
+    "location": [
+      "spy"
     ],
-    "type": "imperium"
+    "tag": [
+      "spacingGuild"
+    ],
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "nestedAction",
+        "subSteps": [
+          {
+            "group": 1,
+            "branch": 0,
+            "type": "discardCard",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          },
+          {
+            "group": 2,
+            "branch": 0,
+            "type": "drawCard",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          }
+        ]
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawIntrigue",
+        "amount": 1,
+        "condition": "discardSpacingGuildCard",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainEachFactionInfluenceSpyOn",
+        "amount": 1,
+        "condition": "acquireTheSpiceMustFlow",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "25",
-    "img": "./image/maula_pistol.png",
     "name": "Maula Pistol",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "3",
     "location": [
       "city",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "26",
-    "img": "./image/northern_watermaster.png",
     "name": "Northern Watermaster",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "3",
     "location": [
       "city"
@@ -365,13 +1097,38 @@ window.imperium = [
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainWater",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 2,
+        "condition": "fremenBond",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "27",
-    "img": "./image/rebel_supplier.png",
     "name": "Rebel Supplier",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "3",
     "location": [
       "city"
@@ -379,37 +1136,114 @@ window.imperium = [
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainTroop",
+        "amount": 2,
+        "condition": "recallSpyThisTurn",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "28",
-    "img": "./image/paracompass.png",
     "name": "Paracompass",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "4",
     "location": [
       "city"
     ],
     "tag": [],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSolari",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": "haveHighCouncil",
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": "haveSwordmaster",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "29",
-    "img": "./image/public_spectacle.png",
     "name": "Public Spectacle",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "4",
-    "location": [],
+    "location": [
+      "spy"
+    ],
     "tag": [
       "emperor"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainAnyInfluence",
+        "amount": 1,
+        "condition": "recallSpyThisTurn",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "30",
-    "img": "./image/sardaukar_coordination.png",
     "name": "Sardaukar Coordination",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "4",
     "location": [
       "landsraad",
@@ -418,218 +1252,767 @@ window.imperium = [
     "tag": [
       "emperor"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "deployRecruitTroop",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": "eachRevealEmperorCard",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "31",
-    "img": "./image/shishakli.png",
     "name": "Shishakli",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "4",
     "location": [
       "city",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainFremenInfluence",
+        "amount": 1,
+        "condition": "fremenBond",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "32",
-    "img": "./image/smuggler's_haven.png",
     "name": "Smuggler's Haven",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "4",
     "location": [
-      "spice_trade",
-      "spacing_guild"
+      "spiceTrade",
+      "spacingGuild"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "paySpice",
+        "amount": 4,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "gainVictoryPoint",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 2,
+        "condition": "spyOnMaker",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "33",
-    "img": "./image/southern_elders.png",
     "name": "Southern Elders",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "4",
     "location": [
-      "bene_gesserit",
+      "beneGesserit",
       "fremen"
     ],
     "tag": [
-      "bene_gesserit",
+      "beneGesserit",
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainTroop",
+        "amount": 2,
+        "condition": "anotherBeneCardInPlay",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainWater",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": "fremenBond",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "34",
-    "img": "./image/tread_in_darkness.png",
     "name": "Tread in Darkness",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "4",
     "location": [
       "landsraad",
       "city",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
-      "bene_gesserit"
+      "beneGesserit"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashCard",
+        "amount": 1,
+        "condition": "anotherBeneCardInPlay",
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": "anotherBeneCardInPlay",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "35",
-    "img": "./image/truthtrance.png",
     "name": "Truthtrance",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "4",
     "location": [
       "emperor",
-      "spacing_guild",
-      "bene_gesserit",
+      "spacingGuild",
+      "beneGesserit",
       "fremen"
     ],
     "tag": [
-      "bene_gesserit"
+      "beneGesserit"
     ],
-    "type": "imperium"
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "36",
-    "img": "./image/captured_mentat.png",
     "name": "Captured Mentat",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "5",
     "location": [
       "landsraad",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "discardCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "drawIntrigue",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "nestedAction",
+        "subSteps": [
+          {
+            "group": 1,
+            "branch": 0,
+            "type": "lostAnyInfluence",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          },
+          {
+            "group": 2,
+            "branch": 0,
+            "type": "gainAnyInfluence",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          }
+        ]
+      }
+    ]
   },
   {
-    "no": "37",
-    "img": "./image/chani,_clever_tactician.png",
     "name": "Chani, Clever Tactician",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "5",
     "location": [
       "city",
-      "spice_trade",
+      "spiceTrade",
       "fremen"
     ],
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawIntrigue",
+        "amount": 1,
+        "condition": "unitInConflict",
+        "conditionValue": 3
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "nestedAction",
+        "subSteps": [
+          {
+            "group": 1,
+            "branch": 0,
+            "type": "retreatTroop",
+            "amount": 2,
+            "condition": null,
+            "conditionValue": null
+          },
+          {
+            "group": 2,
+            "branch": 0,
+            "type": "gainSword",
+            "amount": 4,
+            "condition": null,
+            "conditionValue": null
+          }
+        ]
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": "fremenBond",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "38",
-    "img": "./image/delivery_agreement.png",
     "name": "Delivery Agreement",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "5",
     "location": [
       "city"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "discardCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "takeContract",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 1,
+        "type": "trashThisCard",
+        "amount": 1,
+        "condition": "completedContract",
+        "conditionValue": 4
+      },
+      {
+        "group": 2,
+        "branch": 1,
+        "type": "gainVictoryPoint",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "39",
-    "img": "./image/in_high_places.png",
     "name": "In High Places",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "5",
     "location": [
       "emperor",
-      "bene_gesserit"
+      "beneGesserit"
     ],
     "tag": [
       "emperor",
-      "bene_gesserit"
+      "beneGesserit"
     ],
-    "type": "imperium"
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": "anotherBeneCardInPlay",
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": "anotherBeneCardInPlay",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "nestedAction",
+        "subSteps": [
+          {
+            "group": 1,
+            "branch": 0,
+            "type": "recallSpy",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          },
+          {
+            "group": 2,
+            "branch": 0,
+            "type": "gainPersuasion",
+            "amount": 3,
+            "condition": null,
+            "conditionValue": null
+          }
+        ]
+      }
+    ]
   },
   {
-    "no": "40",
-    "img": "./image/leadership.png",
     "name": "Leadership",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "5",
     "location": [
-      "spice_trade",
+      "spiceTrade",
       "fremen"
     ],
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": "eachSandwormInConflict",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 1,
+        "condition": "eachRevealSwordCard",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "41",
-    "img": "./image/spacing_guild's_favor.png",
     "name": "Spacing Guild's Favor",
-    "expanision": "Uprising",
+    "numberOfCopy": "2",
     "cost": "5",
     "location": [
-      "spice_trade",
-      "spacing_guild"
+      "spiceTrade",
+      "spacingGuild"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "discardEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "nestedAction",
+        "subSteps": [
+          {
+            "group": 1,
+            "branch": 0,
+            "type": "paySpice",
+            "amount": 3,
+            "condition": null,
+            "conditionValue": null
+          },
+          {
+            "group": 2,
+            "branch": 0,
+            "type": "gainAnyInfluence",
+            "amount": 1,
+            "condition": null,
+            "conditionValue": null
+          }
+        ]
+      }
+    ]
   },
   {
-    "no": "42",
-    "img": "./image/strike_fleet.png",
     "name": "Strike Fleet",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "5",
-    "location": [],
+    "location": [
+      "spy"
+    ],
     "tag": [],
-    "type": "imperium"
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainTroop",
+        "amount": 3,
+        "condition": "recallSpyThisTurn",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 3,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "43",
-    "img": "./image/subversive_advisor.png",
     "name": "Subversive Advisor",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "5",
-    "location": [],
+    "location": [
+      "spy"
+    ],
     "tag": [],
-    "type": "imperium"
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "placeSpy",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSameInfluence",
+        "amount": 1,
+        "condition": "sentAgentToFaction",
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashThisCard",
+        "amount": 1,
+        "condition": "sentAgentToFaction",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "44",
-    "img": "./image/theacherous_maneuver.png",
     "name": "Theacherous Maneuver",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "5",
     "location": [
       "emperor",
-      "spacing_guild",
-      "bene_gesserit",
+      "spacingGuild",
+      "beneGesserit",
       "fremen"
     ],
     "tag": [
       "emperor"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashThisCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashEmperorCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "gainSameInfluence",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawIntrigue",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "45",
-    "img": "./image/corrinth_city.png",
     "name": "Corrinth City",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "6",
     "location": [
       "landsraad",
@@ -638,104 +2021,347 @@ window.imperium = [
     "tag": [
       "emperor"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "discardCard",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "paySolari",
+        "amount": 5,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "gainVictoryPoint",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSolari",
+        "amount": 5,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 1,
+        "type": "paySolari",
+        "amount": 5,
+        "condition": "noHighCouncil",
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 1,
+        "type": "gainHighCouncil",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "46",
-    "img": "./image/desert_power.png",
     "name": "Desert Power",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "6",
     "location": [
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 2,
+        "condition": "sentAgentToMaker",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 1,
+        "type": "payWater",
+        "amount": 1,
+        "condition": "haveMakerHook",
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 1,
+        "type": "summonSandworm",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "47",
-    "img": "./image/junction_headquaters.png",
     "name": "Junction Headquaters",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "6",
     "location": [
       "landsraad",
       "city",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "trashIntrigue",
+        "amount": 1,
+        "condition": "spacingGuildAlliance",
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "paySpice",
+        "amount": 2,
+        "condition": "spacingGuildAlliance",
+        "conditionValue": null
+      },
+      {
+        "group": 2,
+        "branch": 0,
+        "type": "gainVictoryPoint",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainWater",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainTroop",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "48",
-    "img": "./image/price_is_no_object.png",
     "name": "Price is No Object",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "6",
     "location": [
       "emperor",
-      "bene_gesserit"
+      "beneGesserit"
     ],
     "tag": [
       "emperor",
-      "bene_gesserit"
+      "beneGesserit"
     ],
-    "type": "imperium"
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSolari",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "acquireCardUsingSolari",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSolari",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "49",
-    "img": "./image/priority_contracts.png",
     "name": "Priority Contracts",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "6",
     "location": [
       "landsraad",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "takeContract",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 1,
+        "type": "trashThisCard",
+        "amount": 1,
+        "condition": "completedContract",
+        "conditionValue": 4
+      },
+      {
+        "group": 2,
+        "branch": 1,
+        "type": "gainVictoryPoint",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "50",
-    "img": "./image/stilgar,_the_devoted.png",
     "name": "Stilgar, The Devoted",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "6",
     "location": [
       "city",
-      "spice_trade",
+      "spiceTrade",
       "fremen"
     ],
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainTroop",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": "eachFremenCard",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "51",
-    "img": "./image/interstellar_trade.png",
     "name": "Interstellar Trade",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "7",
     "location": [
       "landsraad",
       "city",
-      "spice_trade"
+      "spiceTrade"
     ],
     "tag": [],
-    "type": "imperium"
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "takeContract",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainAnyInfluence",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 1,
+        "condition": "eachCompletedContract",
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "52",
-    "img": "./image/long_live_the_fighters.png",
     "name": "Long Live the Fighters",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "7",
     "location": [
       "city",
@@ -744,38 +2370,212 @@ window.imperium = [
     "tag": [
       "fremen"
     ],
-    "type": "imperium"
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "lookAtTopCardDrawTrashDiscard",
+        "amount": 3,
+        "condition": "deckHasCard",
+        "conditionValue": 3
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 3,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "53",
-    "img": "./image/overthrow.png",
     "name": "Overthrow",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "8",
     "location": [
       "emperor",
-      "spacing_guild",
-      "bene_gesserit",
+      "spacingGuild",
+      "beneGesserit",
       "fremen"
     ],
     "tag": [],
-    "type": "imperium"
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawIntrigue",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSameInfluence",
+        "amount": 1,
+        "condition": "sendAgentToFaction",
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSword",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainTroop",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   },
   {
-    "no": "54",
-    "img": "./image/steersman.png",
     "name": "Steersman",
-    "expanision": "Uprising",
+    "numberOfCopy": "1",
     "cost": "8",
     "location": [
       "landsraad",
       "city",
-      "spice_trade",
-      "spacing_guild"
+      "spiceTrade",
+      "spacingGuild"
     ],
     "tag": [
-      "spacing_guild"
+      "spacingGuild"
     ],
-    "type": "imperium"
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpacingGuildInfluence",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "returnAgent",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      },
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
+  },
+  {
+    "name": "Prepare The Way",
+    "numberOfCopy": "8",
+    "cost": "2",
+    "location": [
+      "landsraad",
+      "city"
+    ],
+    "tag": [
+      "beneGesserit"
+    ],
+    "agentEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "drawCard",
+        "amount": 1,
+        "condition": "beneGesseritInfluence",
+        "conditionValue": 2
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainPersuasion",
+        "amount": 2,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
+  },
+  {
+    "name": "The Spice Must Flow",
+    "numberOfCopy": "10",
+    "cost": "9",
+    "location": [],
+    "tag": [
+      "spacingGuild"
+    ],
+    "acquireEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainVictoryPoint",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ],
+    "revealEffect": [
+      {
+        "group": 1,
+        "branch": 0,
+        "type": "gainSpice",
+        "amount": 1,
+        "condition": null,
+        "conditionValue": null
+      }
+    ]
   }
 ];

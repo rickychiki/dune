@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Card Viewer Demo - IndexedDB</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; }
+  #cards { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  #cards img { width: 100px; height: auto; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<h1>Card Viewer Demo (IndexedDB)</h1>
+<input type="file" id="zipInput" accept=".zip">
+<p id="status"></p>
+<div id="cards"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const status = document.getElementById('status');
+const cardsDiv = document.getElementById('cards');
+const zipInput = document.getElementById('zipInput');
+
+// IndexedDB setup
+let db;
+const request = indexedDB.open("CardDB", 1);
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  if(!db.objectStoreNames.contains("cards")){
+    db.createObjectStore("cards", { keyPath: "name" });
+  }
+};
+
+request.onsuccess = e => {
+  db = e.target.result;
+  loadCardsFromDB();
+};
+
+request.onerror = e => {
+  console.error("IndexedDB error", e);
+};
+
+// 保存 Blob 到 IndexedDB
+function saveCardToDB(name, blob){
+  // 這裡直接存原始 blob，不要轉成 URL
+  const tx = db.transaction("cards", "readwrite");
+  const store = tx.objectStore("cards");
+  const request = store.put({name, blob}); // blob 必須是原始 Blob
+  request.onsuccess = () => {
+    console.log("Saved to IndexedDB:", name);
+  };
+  request.onerror = e => {
+    console.error("Failed to save to IndexedDB:", e);
+  };
+}
+
+// 從 IndexedDB 讀取圖片
+function loadCardsFromDB(){
+  if(!db) return;
+  cardsDiv.innerHTML = '';
+  const tx = db.transaction("cards", "readonly");
+  const store = tx.objectStore("cards");
+  const request = store.getAll();
+  request.onsuccess = e => {
+    const cards = e.target.result
+      .filter(c => c.name.includes('uprising-imperium'));
+    cards.forEach(c => {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(c.blob);
+      cardsDiv.appendChild(img);
+    });
+    if(cards.length) status.textContent = `Loaded ${cards.length} cards from IndexedDB`;
+    else status.textContent = "Upload your card.zip file";
+  };
+}
+
+// 上傳 ZIP 處理
+zipInput.addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  status.textContent = "Loading ZIP...";
+  const zip = await JSZip.loadAsync(file);
+
+  // 過濾圖片
+  const files = Object.values(zip.files).filter(f =>
+    f.name.endsWith('.webp') &&
+    f.name.includes('uprising-imperium') &&
+    !f.name.startsWith('__MACOSX/') &&
+    !f.name.split('/').pop().startsWith('._')
+  );
+
+  // 清空 DOM 和 IndexedDB
+  cardsDiv.innerHTML = '';
+  const txClear = db.transaction("cards", "readwrite");
+  const storeClear = txClear.objectStore("cards");
+  files.forEach(f => storeClear.delete(f.name));
+
+  for(const f of files){
+    const blob = await f.async('blob');
+    saveCardToDB(f.name, blob);
+
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(blob);
+    cardsDiv.appendChild(img);
+  }
+  status.textContent = `Loaded ${files.length} cards!`;
+});
+</script>
+</body>
+</html>
