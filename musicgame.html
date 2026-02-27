@@ -60,12 +60,22 @@
             transform: rotateY(180deg);
         }
 
-        .block {
+        .back .block {
             width: 300px;
             height: 352px;
             position: absolute;
             background-color: #1db954;
             top: 0;
+            transition: opacity 0.1s;
+            /* 快速淡出 */
+            z-index: 5;
+            pointer-events: none;
+
+        }
+
+        /* 翻轉時快速消失 */
+        .card.flipped .back .block {
+            opacity: 0;
         }
 
         button {
