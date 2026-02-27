@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港 Hitster</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .card {
+            width: 350px;
+            height: 500px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .inner {
+            transform: rotateY(180deg);
+        }
+
+        .side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .back {
+            background: #1db954;
+        }
+
+        .front {
+            background: #222;
+            transform: rotateY(180deg);
+        }
+
+        .back .block {
+            width: 300px;
+            height: 352px;
+            position: absolute;
+            background-color: #1db954;
+            top: 0;
+            transition: opacity 0.1s;
+            /* 快速淡出 */
+            z-index: 5;
+            pointer-events: none;
+
+        }
+
+        /* 翻轉時快速消失 */
+        .card.flipped .back .block {
+            opacity: 0;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>🎵 香港 Hitster</h2>
+
+    <div class="card" onclick="flipCard()" id="card">
+        <div class="inner">
+
+            <!-- 背面 -->
+            <div class="side back" id="back">
+                <h3>🎧 聽歌猜年份</h3>
+                <div id="spotifyEmbed"></div>
+                <p>點擊卡片翻面</p>
+            </div>
+
+            <!-- 正面 -->
+            <div class="side front" id="front">
+                <h3 id="trackName"></h3>
+                <p id="artistName"></p>
+                <h2 id="releaseYear"></h2>
+            </div>
+
+        </div>
+    </div>
+
+    <button onclick="newSong()">🎲 隨機下一首</button>
+
+    <script>
+        let drawnList = [];
+        const tracks = [
+            {
+                uri: "2NasEYCMz45B4see4iDqS0",
+                name: "ドラえもんのうた (OP)",
+                anime: "ドラえもん",
+                date: "1979-01-01"
+            },
+            {
+                uri: "2mMKWdXYz7vVelTbt69UJo",
+                name: "愛をとりもどせ!!",
+                anime: "北斗の拳",
+                date: "1984-01-01"
+            },
+            {
+                uri: "5CwhBU7eqQgkOVMnRNuzzT",
+                name: "Get Wild",
+                anime: "シティーハンター",
+                date: "1987-01-01"
+            },
+            {
+                uri: "252lj7Oy8JzIKVECJX4gpi",
+                name: "ムーンライト伝説",
+                anime: "美少女戦士セーラームーン",
+                date: "1992-01-01"
+            },
+            {
+                uri: "23phSRwoMy48rwFpmuAP8q",
+                name: "残酷な天使のテーゼ",
+                anime: "新世紀エヴァンゲリオン",
+                date: "1995-01-01"
+            },
+            {
+                uri: "2wN5DYZkj1EHlX2obTNBFj",
+                name: "檄! 帝国華撃団",
+                anime: "サクラ大戦",
+                date: "1996-01-01"
+            },
+            {
+                uri: "0IL7LGrnYObWYyYaJ3GzWr",
+                name: "そばかす",
+                anime: "るろうに剣心 -明治剣客浪漫譚-",
+                date: "1996-01-01"
+            },
+            {
+                uri: "2Yv0FavwiRO1mzaIThDAiM",
+                name: "Bad Apple!!",
+                anime: "東方幻想郷",
+                date: "1998-01-01"
+            },
+            {
+                uri: "4A3G4Chh8DTJftwJEf5tOp",
+                name: "Butter-Fly （デジモンアドベンチャー全話OP）",
+                anime: "デジモンアドベンチャー",
+                date: "1999-01-01"
+            },
+            {
+                uri: "1PdWDLJNk040dkuXoLLE2F",
+                name: "ウィーアー!",
+                anime: "ONE PIECE",
+                date: "1999-01-01"
+            },
+            {
+                uri: "17YUGZ488r8GzhbfclLQzq",
+                name: "GO!!! (Naruto Opening 4)",
+                anime: "NARUTO -ナルト-",
+                date: "2002-01-01"
+            },
+            {
+                uri: "7zty9mmmuqQsn8s4zDH4nk",
+                name: "メリッサ",
+                anime: "鋼の錬金術師",
+                date: "2003-01-01"
+            },
+            {
+                uri: "1FqOxfA4ghGxSrpNrjGhVx",
+                name: "瞳の中の迷宮",
+                anime: "ヤミと帽子と本の旅人",
+                date: "2004-01-01"
+            },
+            {
+                uri: "7gaaMd98dW4ssle6fc1fBh",
+                name: "逆さまの蝶",
+                anime: "地獄少女",
+                date: "2005-01-01"
+            },
+            {
+                uri: "2JacUWw1kxN2lunFlCLrPe",
+                name: "Tori no Uta",
+                anime: "AIR",
+                date: "2005-01-01"
+            },
+            {
+                uri: "4UVQnzCZX2Uw9hq4Ano1Ux",
+                name: "ハレ晴レユカイ - Ver.涼宮ハルヒ",
+                anime: "涼宮ハルヒの憂鬱",
+                date: "2006-01-01"
+            },
+            {
+                uri: "4YnXlBbFnMJf6qiO2LQMlU",
+                name: "God knows...",
+                anime: "涼宮ハルヒの憂鬱",
+                date: "2006-01-01"
+            },
+            {
+                uri: "6bPPyigCphBBQ9781j6eKM",
+                name: "COLORS",
+                anime: "コードギアス 反逆のルルーシュ",
+                date: "2006-01-01"
+            },
+            {
+                uri: "43FWf8KrIofEGueGabxPkK",
+                name: "旅の途中 (狼と香辛料)",
+                anime: "狼と香辛料",
+                date: "2008-01-01"
+            },
+            {
+                uri: "08hU4ic3BmXofI27o0vNCY",
+                name: "only my railgun",
+                anime: "とある科学の超電磁砲",
+                date: "2009-01-01"
+            },
+            {
+                uri: "77LQNv3wdUvN5sXG9v5H9u",
+                name: "Don't Say \"\"Lazy\"\" (From \"\"K-On!\"\")",
+                anime: "けいおん!",
+                date: "2009-01-01"
+            },
+            {
+                uri: "434YBNY61Y9sqBSp7OINBa",
+                name: "君の知らない物語",
+                anime: "化物語",
+                date: "2009-01-01"
+            },
+            {
+                uri: "4jYQqcYSoYy8iAwB5DloJz",
+                name: "My Soul Your Beats!",
+                anime: "Angel Beats!",
+                date: "2010-01-01"
+            },
+            {
+                uri: "6SrKLkuqWyKxSxzvtRWvX5",
+                name: "コネクト",
+                anime: "魔法少女まどか☆マギカ",
+                date: "2011-01-01"
+            },
+            {
+                uri: "7Bh5pZWryHBwxh13y7QTrt",
+                name: "secret base 〜君がくれたもの〜",
+                anime: "あの日見た花の名前を僕達はまだ知らない。",
+                date: "2011-01-01"
+            },
+            {
+                uri: "3VrY5AUgxJJsmw9HMP4w6W",
+                name: "Magia",
+                anime: "魔法少女まどか☆マギカ",
+                date: "2011-01-01"
+            },
+            {
+                uri: "4keYzo4xwFG5XgfBlh9SUW",
+                name: "Hacking To The Gate",
+                anime: "STEINS;GATE",
+                date: "2011-01-01"
+            },
+            {
+                uri: "5UNdjFCgpr2czfhKrT1Tmw",
+                name: "The Everlasting Guilty Crown",
+                anime: "ギルティクラウン",
+                date: "2011-01-01"
+            },
+            {
+                uri: "38mUTswfszVFQ952r89AP8",
+                name: "千本桜",
+                anime: "初音ミク",
+                date: "2012-01-01"
+            },
+            {
+                uri: "3mScGCzxiXA9OaHdBeuk7O",
+                name: "crossing field",
+                anime: "ソードアート・オンライン",
+                date: "2012-01-01"
+            },
+            {
+                uri: "1xAjcHiQRXrrduJeoYRXLG",
+                name: "Chase the world",
+                anime: "アクセル・ワールド",
+                date: "2012-01-01"
+            },
+            {
+                uri: "7CoXiUY4GvZqnKtM6oWvYT",
+                name: "デート・ア・ライブ",
+                anime: "デート・ア・ライブ",
+                date: "2013-01-01"
+            },
+            {
+                uri: "4WS4FgOG1fOZl1VuD5aeQX",
+                name: "回レ!雪月花",
+                anime: "機巧少女は傷つかない",
+                date: "2013-01-01"
+            },
+            {
+                uri: "0F8psXXh2oxE5BGdkKaoIs",
+                name: "紅蓮の弓矢",
+                anime: "進撃の巨人",
+                date: "2013-01-01"
+            },
+            {
+                uri: "18asIXvfX6RyEtdiGKpTF5",
+                name: "THIS GAME",
+                anime: "ノーゲーム・ノーライフ",
+                date: "2014-01-01"
+            },
+            {
+                uri: "4lFGExZoEArB7jzulnWtfl",
+                name: "Daydream café",
+                anime: "ご注文はうさぎですか？",
+                date: "2014-01-01"
+            },
+            {
+                uri: "6uR92injo4PDzSrOPRFfHt",
+                name: "シュガーソングとビターステップ",
+                anime: "血界戦線",
+                date: "2015-01-01"
+            },
+            {
+                uri: "0WjYHf18yTqGEQjLRHLNWp",
+                name: "Redo",
+                anime: "Re:ゼロから始める異世界生活",
+                date: "2016-01-01"
+            },
+            {
+                uri: "4AttA0ULabd5N5EBDw2jIO",
+                name: "前前前世",
+                anime: "君の名は。",
+                date: "2016-01-01"
+            },
+            {
+                uri: "6avH20eR9SGNwV1H0vzHed",
+                name: "ようこそジャパリパークへ",
+                anime: "けものフレンズ",
+                date: "2017-01-01"
+            },
+            {
+                uri: "3pKGijaLa4b6Fq0zCniPuo",
+                name: "One Last You (From \"\"Xenoblade Chronicles 2\"\") - Piano/Vocal Cover",
+                anime: "ゼノブレイド2",
+                date: "2017-01-01"
+            },
+            {
+                uri: "1n7h7TRGicLtXDZJcm8IGO",
+                name: "コレカラ",
+                anime: "りゅうおうのおしごと！",
+                date: "2018-01-01"
+            },
+            {
+                uri: "18dWBsEdWdGA1MRPN95H1X",
+                name: "FLARE",
+                anime: "ありふれた職業で世界最強",
+                date: "2018-01-01"
+            },
+            {
+                uri: "1hFsEbHxsfflhLEPCq5tzk",
+                name: "紅蓮華",
+                anime: "鬼滅の刃",
+                date: "2019-01-01"
+            },
+            {
+                uri: "06XQvnJb53SUYmlWIhUXUi",
+                name: "怪物",
+                anime: "BEASTARS",
+                date: "2019-01-01"
+            },
+            {
+                uri: "3r5h4WbAe3J4UtucnQwcD7",
+                name: "CHAIN",
+                anime: "ヴィジュアルプリズン",
+                date: "2021-01-01"
+            },
+            {
+                uri: "6iIUjQjRX0Wy6Ri179w9SP",
+                name: "KEEP WEAVING YOUR SPIDER WAY",
+                anime: "蜘蛛ですが、なにか？",
+                date: "2021-01-01"
+            },
+            {
+                uri: "1ocxu4f7ZOjOcwAbqQ8l1T",
+                name: "HIGHEST",
+                anime: "陰の実力者になりたくて！",
+                date: "2022-01-01"
+            },
+            {
+                uri: "7xm0KJMfeaJQmQdDxAipiY",
+                name: "チキチキバンバン",
+                anime: "パリピ孔明",
+                date: "2022-01-01"
+            },
+            {
+                uri: "7ovUcF5uHTBRzUpB6ZOmvt",
+                name: "アイドル",
+                anime: "【推しの子】",
+                date: "2023-01-01"
+            }
+        ];
+
+        let current = null;
+
+        function newSong() {
+            const card = document.getElementById("card");
+
+            // 1️⃣ 如果卡片已翻面，先翻回去
+            if (card.classList.contains("flipped")) {
+                card.classList.remove("flipped");
+            }
+            setTimeout(() => {
+                // 過濾掉已抽過的歌曲
+                const available = tracks.filter(track => !drawnList.includes(track.uri));
+
+                if (available.length === 0) {
+                    alert("所有歌曲已抽完，重新開始！");
+                    drawnList = [];
+                    return newSong(); // 重新抽
+                }
+
+                // 隨機抽
+                current = available[Math.floor(Math.random() * available.length)];
+
+                // 記錄已抽過
+                drawnList.push(current.uri);
+
+
+                document.getElementById("trackName").innerText = current.name;
+                document.getElementById("artistName").innerText = current.anime;
+                document.getElementById("releaseYear").innerText = current.date.substring(0, 4);
+
+                document.getElementById("spotifyEmbed").innerHTML = `
+    <iframe style="
+        width:100%;
+        height:352px;
+        border-radius:12px;"
+        src="https://open.spotify.com/embed/track/${current.uri}"
+        frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+    </iframe>
+    <div class ="block"></div>
+`;
+            }, 800); // 0.8s =
+        }
+
+        function flipCard() {
+            document.getElementById("card").classList.toggle("flipped");
+        }
+
+        newSong();
+
+    </script>
+
+</body>
+
+</html>
