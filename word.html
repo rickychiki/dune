@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>猜字組卡牌</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <style>
+        body, html {
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            overflow: hidden; background-color: #1a1a1a;
+            font-family: sans-serif;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            width: 90%;
+            height: 28%; /* 三個卡牌平分高度 */
+            background: #ffffff;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .word {
+            font-size: 15vw; /* 大字體 */
+            font-weight: bold;
+            color: #222;
+            letter-spacing: 5px;
+        }
+
+        .finished {
+            background: #444;
+            color: #888;
+        }
+
+        .swipe-anim {
+            transform: translateX(-120%) rotate(-5deg);
+            opacity: 0;
+        }
+        
+        #instruction {
+            position: fixed;
+            bottom: 10px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="card2" class="card"><div class="word"></div></div>
+    <div id="card3" class="card"><div class="word"></div></div>
+    <div id="card4" class="card"><div class="word"></div></div>
+    <div id="instruction">⬅️ 向左掃更換一組</div>
+</div>
+
+<script>
+    // --- 自由修改區 ---
+    const sourceData = {
+2: [
+    "的士", "巴士", "蘋果", "香蕉", "西瓜", "雪糕", "叉燒", "奶茶", "菠蘿", "雞蛋",
+    "電腦", "電話", "手錶", "書包", "眼鏡", "風扇", "電視", "單車", "雨傘", "鎖匙",
+    "跑步", "游水", "唱歌", "跳舞", "寫字", "睇書", "行街", "煮飯", "沖涼", "訓覺",
+    "醫生", "老師", "司機", "廚師", "警察", "護士", "街坊", "老友", "細路", "後生",
+    "太陽", "月亮", "落雨", "閃電", "打風", "春天", "冬天", "公園", "雪櫃", "冷氣",
+    "麵包", "燒賣", "蝦餃", "蛋撻", "雲吞", "公仔", "梳化", "衣櫃", "地鐵", "飛機",
+    "剪刀", "雨靴", "膠布", "牙刷", "毛巾", "風箏", "氣球", "畫筆", "相機", "電筒",
+    "垃圾", "掃把", "樓梯", "玻璃", "紙巾", "蠟燭", "禮物", "凍飲", "熱水", "蛋糕",
+],
+3: [
+    "計數機", "錄音機", "打字機", "吸塵機", "洗衣機", "電視機", "收音機", "遊戲機", "洗碗機", "影印機",
+    "多士爐", "微波爐", "電飯煲", "熱水壺", "指甲鉗", "放大鏡", "太陽油", "潤唇膏", "洗面奶", "沐浴露", 
+    "洗頭水", "護髮素", "洗潔精", "洗衣粉", "漂白水", "馬拉松", "乒乓波", "羽毛球", "保齡球", "健身房", 
+    "三文治", "漢堡包", "雞蛋仔", "格仔餅", "紅豆冰", "檸檬茶", "菠蘿包", "叉燒包", "瑜伽班", "大會堂", 
+    "遊樂場", "圖書館", "博物館", "體育館", "充電器", "糯米糍", "紅豆沙", "芝麻糊", "哈密瓜", "火龍果",
+    "糯米雞", "雙皮奶", "捉迷藏", "奇異果", "救生圈", "潛水鏡", "滑板車", "垃圾桶", "啄木鳥", "長頸鹿",
+    "班馬線", "便利店", "棉花糖", "車仔麵", "碗仔翅", "菠蘿油", "潛水艇", "直升機", "救護車", "消防車",
+    "保鮮紙", "螢火蟲", "魔術師", "洗手盆"," 太空船", "獨角獸", "晾衫架", "遊戲機", "原子筆", "優惠券", 
+],
+4: [
+    // --- 經典食物 (食材/菜名) ---
+    "乾炒牛河", "楊州炒飯", "瑞士雞翼", "咖哩魚蛋", "星洲炒米", "天星小輪", "貨櫃碼頭", "行人天橋", "電動牙刷", "太空戰士", 
+    "聖誕老人", "新年快樂", "生日蛋糕", "恭喜發財", "沙丘帝國", "哈利波特", "幽港迷城", "殖民火里", "工業革命", "帝國曙光",
+    "蓋亞計劃", "冷戰熱鬥", "歷史巨輪", "殺戮尖塔", "魔獸世界", "英雄聯盟", "七大奇蹟", "鐮刀戰爭", "詭鎮奇談", "神秘大地",
+    "畫蛇添足", "對牛彈琴", "守株待兔", "狐假虎威", "盲人摸象", "一石二鳥", "龍飛鳳舞", "雞飛狗走", "狼吞虎嚥", "走馬看花",
+    "如魚得水", "順手牽羊", "口不擇言", "井底之蛙", "情同手足", "破釜沉舟", "手舞足蹈", "指鹿為馬", "水落石出", "胸有成竹",
+    "瘟疫危機", "波多黎各", "電力公司", "展翅翱翔", "海洋公園", "環球影城", "超級市場", "太陽眼鏡", "自由女神", "比薩斜塔",
+    "萬里長城", "鐵達尼號", "星光大道", "千與千尋", "數碼暴龍", "鬼滅之刃", "火影忍者", "刀劍神域", "哆啦A夢", "得閒飲茶",
+    "白雪公主", "冰雪奇緣", "摩斯密碼", "阿茂整餅", "牛皮燈籠", "法國賭神", "少林足球", "如來神掌", "華山論劍", "月光寶盒",
+],
+    };
+
+    // 複製並隨機打亂陣列的函數
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    // 初始化已打亂的池子
+    let pools = {
+        2: shuffle([...sourceData[2]]),
+        3: shuffle([...sourceData[3]]),
+        4: shuffle([...sourceData[4]])
+    };
+
+    function updateCards() {
+        const ids = [2, 3, 4];
+        let hasData = false;
+
+        ids.forEach(len => {
+            const card = document.getElementById(`card${len}`);
+            const wordDiv = card.querySelector('.word');
+            
+            // 先做動畫
+            card.classList.add('swipe-anim');
+
+            setTimeout(() => {
+                if (pools[len].length > 0) {
+                    wordDiv.innerText = pools[len].pop();
+                    hasData = true;
+                } else {
+                    wordDiv.innerText = "完";
+                    card.classList.add('finished');
+                }
+
+                // 重置動畫位置
+                card.style.transition = 'none';
+                card.classList.remove('swipe-anim');
+                card.style.transform = 'translateX(100%)';
+                
+                card.offsetHeight; // 強制重繪
+                
+                card.style.transition = 'all 0.3s ease';
+                card.style.transform = 'translateX(0)';
+            }, 300);
+        });
+    }
+
+    // 初始化第一次顯示
+    [2, 3, 4].forEach(len => {
+        const wordDiv = document.querySelector(`#card${len} .word`);
+        wordDiv.innerText = pools[len].pop() || "完";
+    });
+
+    // 綁定手勢到整個容器
+    const hammer = new Hammer(document.getElementById('app'));
+    hammer.on("swipeleft", () => {
+        updateCards();
+    });
+</script>
+
+</body>
+</html>
