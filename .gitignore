@@ -1,5 +1,6 @@
 *.webp
 *.png
 *.jpg
+*.zip
 /node_modules
 /se

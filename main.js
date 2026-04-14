@@ -12,6 +12,7 @@ let permanent = { swordmaster: [], highCouncil: [], makerHooks: [], tech: [], wa
 let eventDraft = { playerId: null, type: null };
 
 // ================= DB =================
+let statusEl;
 let db;
 let imageMap = {}; // 全域圖片網址映射
 
@@ -56,36 +57,41 @@ function loadAllAssetsFromDB() {
 
 // 3. 上傳 ZIP 並寫入資料庫
 async function handleZipUpload(file) {
-    status.textContent = "Processing ZIP..."; // 假設你有個狀態列
-    const zip = await JSZip.loadAsync(file);
-
-    // 開啟讀寫事務
-    const tx = db.transaction("assets", "readwrite");
-    const store = tx.objectStore("assets");
-
-    // 清空舊資料 (選擇性)
-    store.clear();
-
-    const promises = [];
-
-    // 過濾並讀取檔案
-    for (let filename in zip.files) {
-        const fileEntry = zip.files[filename];
-        if (!fileEntry.dir && !filename.includes("__MACOSX")) {
-            const p = fileEntry.async("blob").then(blob => {
-                // 存入 IndexedDB
-                store.put({ path: filename, blob: blob });
-            });
-            promises.push(p);
-        }
-    }
-
-    await Promise.all(promises);
-
-    tx.oncomplete = () => {
-        console.log("All assets saved to IndexedDB");
-        loadAllAssetsFromDB(); // 重新整理 imageMap 並渲染
+    // 即時抓取，如果找不到就用 console 代替，避免當機
+    const el = document.getElementById('assets-status');
+    const updateStatus = (text) => {
+        if (el) el.textContent = text;
+        else console.log("Status:", text);
     };
+
+    updateStatus("正在解壓縮...");
+    
+    try {
+        const zip = await JSZip.loadAsync(file);
+        const pendingData = [];
+        const fileEntries = Object.keys(zip.files).filter(name => !zip.files[name].dir && !name.includes("__MACOSX"));
+
+        for (const filename of fileEntries) {
+            const blob = await zip.files[filename].async("blob");
+            pendingData.push({ path: filename, blob: blob });
+        }
+
+        const tx = db.transaction("assets", "readwrite");
+        const store = tx.objectStore("assets");
+        store.clear();
+
+        pendingData.forEach(item => {
+            store.put(item);
+        });
+
+        tx.oncomplete = () => {
+            updateStatus(`✅ 成功載入 ${pendingData.length} 個資源！`);
+            loadAllAssetsFromDB(); 
+        };
+    } catch (err) {
+        console.error(err);
+        updateStatus("❌ 處理 ZIP 失敗");
+    }
 }
 // ================= se =================
 // 音效物件定義
