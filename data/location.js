@@ -1,4 +1,4 @@
-window.location = [
+window.dunelocation = [
   {
     "no": "1",
     "img": "./image/conspire.png",
