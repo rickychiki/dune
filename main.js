@@ -97,19 +97,19 @@ async function handleZipUpload(file) {
 // 音效物件定義
 // 1. 初始化音效物件
 const sounds = {
-    vp: 'se/fx-gainvictorypoint.ogg',
+    vp: 'se/fx-gainvictorypoint.mp3',
     factions: {
-        "emperor": 'se/fx-alliancetok-emp.ogg',
-        "spacing guild": 'se/fx-alliancetok-space.ogg',
-        "bene gesserit": 'se/fx-alliancetok-bene.ogg',
-        "fremen": 'se/fx-alliancetok-frem.ogg'
+        "emperor": 'se/fx-alliancetok-emp.mp3',
+        "spacing guild": 'se/fx-alliancetok-space.mp3',
+        "bene gesserit": 'se/fx-alliancetok-bene.mp3',
+        "fremen": 'se/fx-alliancetok-frem.mp3'
     },
-    conflictresults: 'se/ui-prompt-conflictresults.ogg',
-    conflictendon: 'se/fx-conflictarea-conflictendon.ogg',
-    conflicttReveal: 'se/ui-prompt-conflictreveal.ogg',
-    endGameWin: 'se/music-gameresults-win.ogg',
-    sandworm: 'se/fx-spicemaker.ogg',
-    breakWall: 'se/fx-immo-familyatomicsreset.ogg'
+    conflictresults: 'se/ui-prompt-conflictresults.mp3',
+    conflictendon: 'se/fx-conflictarea-conflictendon.mp3',
+    conflicttReveal: 'se/ui-prompt-conflictreveal.mp3',
+    endGameWin: 'se/music-gameresults-win.mp3',
+    sandworm: 'se/fx-spicemaker.mp3',
+    breakWall: 'se/fx-immo-familyatomicsreset.mp3'
 };
 
 // 2. 播放函式
