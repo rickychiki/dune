@@ -65,7 +65,7 @@ async function handleZipUpload(file) {
     };
 
     updateStatus("正在解壓縮...");
-    
+
     try {
         const zip = await JSZip.loadAsync(file);
         const pendingData = [];
@@ -86,7 +86,7 @@ async function handleZipUpload(file) {
 
         tx.oncomplete = () => {
             updateStatus(`✅ 成功載入 ${pendingData.length} 個資源！`);
-            loadAllAssetsFromDB(); 
+            loadAllAssetsFromDB();
         };
     } catch (err) {
         console.error(err);
@@ -198,7 +198,7 @@ function setupPersistentUI() {
         .style("border", "none")
         .style("border-radius", "10px")
         .on("click", async () => {
-            if(confirm("確定要清除資源嗎？")) {
+            if (confirm("確定要清除資源嗎？")) {
                 const tx = db.transaction("assets", "readwrite");
                 tx.objectStore("assets").clear();
                 tx.oncomplete = () => location.reload();
@@ -369,9 +369,9 @@ function startGame(cnt, cfg) {
 function generateConflictDeck() {
     const s = a => a.sort(() => Math.random() - 0.5);
     conflictDeck = [
-        ...s(window.conflict.filter(c => c.level == "1")).slice(0, 1),
-        ...s(window.conflict.filter(c => c.level == "2")).slice(0, 5),
-        ...s(window.conflict.filter(c => c.level == "3")).slice(0, 4)
+        ...s(window.conflict.filter(c => c.level == "I")).slice(0, 1),
+        ...s(window.conflict.filter(c => c.level == "II")).slice(0, 5),
+        ...s(window.conflict.filter(c => c.level == "III")).slice(0, 4)
     ];
 }
 
@@ -383,8 +383,42 @@ function renderGame() {
     // Round
     const r = b.append("div");
     const card = conflictDeck[currentRound - 1];
-    r.append("h2").text(`Round ${currentRound} - ${card ? card.name + " " + card.level : "error"}`);
+    // 修改你原本的程式碼部分
+    const h2 = r.append("h2")
+        .style("cursor", "pointer")
+        .style("text-decoration", "underline")
+        .text(`Round ${currentRound} - ${card.level} - ${card ? card.name : "error"}`)
+        .on("click", () => {
+            // 從資料中獲取圖片路徑 (例如: "image/battle_for_arrakeen.png")
+            // 並從我們標準化過後的 imageMap 抓取 blobUrl
+            const path = card.img.toLowerCase();
+            const blobUrl = imageMap[path];
 
+            if (blobUrl) {
+                showImageOverlay(blobUrl);
+            } else {
+                console.warn("找不到圖片路徑:", path);
+                // 如果 local 找不到，嘗試直接用路徑抓
+                showImageOverlay(card.img);
+            }
+        });
+
+    // --- 建立懸浮視窗函式 ---
+    function showImageOverlay(src) {
+        // 建立背景
+        const overlay = d3.select("body").append("div")
+            .attr("id", "image-overlay")
+            .on("click", function () {
+                d3.select(this).remove(); // 點擊背景或圖片後關閉
+            });
+
+        // 放入圖片
+        overlay.append("img")
+            .attr("id", "overlay-img")
+            .attr("src", src)
+            .on("click", (e) => e.stopPropagation()); // 防止點擊圖片本身時觸發背景關閉 (如果想按圖片也能關，可拿掉這行)
+    }
+    
     // Player cards
     const pc = b.append("div");
     players.forEach((p, i) => {
