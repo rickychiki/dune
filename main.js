@@ -497,7 +497,7 @@ function selectEventPlayer(pid) {
 function renderEventTypeButtons() {
     const d = d3.select("#eventDiv").html("");
     const p = players.find(x => x.id === eventDraft.playerId);
-    d.append("h3").text(p.name).style("color", findPlayerColor(p.id)? findPlayerColor(p.id) : "#ccc");
+    d.append("h3").text(p.name).style("color", findPlayerColor(p.id) || "#ccc");
     d.append("button").text("➕ VP").on("click", () => renderVPInput());
     d.append("button").text("🤝 influence").on("click", () => renderInfluenceInput());
     d.append("button").text("⭐ Ability").on("click", () => renderPermInput());
@@ -512,7 +512,10 @@ function renderVPInput() {
     const p = players.find(pl => pl.id === eventDraft.playerId);
 
     const d = d3.select("#eventDiv").html(""); // 清空
-    d.append("h3").text(`${p.name} VP Change`);
+    d.append("h3").html(`
+    <span style="color: ${findPlayerColor(p.id) || '#ccc'}">${p.name}</span>
+    <span style="color: #eee;">- VP Change</span>
+`);
 
     // ===== 原因按鈕 =====
     const reasons = [
@@ -549,7 +552,10 @@ function renderInfluenceInput() {
     if (!eventDraft.playerId) return;
     const p = players.find(pl => pl.id === eventDraft.playerId);
     const d = d3.select("#eventDiv").html("");
-    d.append("h3").text(`${p.name} - Select Faction`);
+    d.append("h3").html(`
+    <span style="color: ${findPlayerColor(p.id) || '#ccc'}">${p.name}</span>
+    <span style="color: #eee;">- Select Faction</span>
+`);
 
     const factions = ["emperor", "spacing guild", "bene gesserit", "fremen"];
     const factionDiv = d.append("div").style("margin-top", "5px");
@@ -818,7 +824,10 @@ function renderPermInput() {
     const p = players.find(pl => pl.id === eventDraft.playerId);
 
     const d = d3.select("#eventDiv").html(""); // 清空
-    d.append("h3").text(`${p.name} Permanent Effect`);
+    d.append("h3").html(`
+    <span style="color: ${findPlayerColor(p.id) || '#ccc'}">${p.name}</span>
+    <span style="color: #eee;">- Permanent Effect</span>
+`);
 
     const abilities = [
         ["swordmaster", "⚔️", "personal"],
@@ -909,7 +918,7 @@ function renderBattleInput() {
         const btn = btnDiv.append("button")
             .attr("class", "battle-p-btn")
             .text(p.name)
-            .style("color", findPlayerColor(p.id)? findPlayerColor(p.id) : "#000")
+            .style("color", findPlayerColor(p.id) || "#000")
             .style("margin", "4px")
             .on("click", function () {
                 const idx = winners.indexOf(p.id);
@@ -919,7 +928,7 @@ function renderBattleInput() {
                 // 高亮處理
                 btnDiv.selectAll(".battle-p-btn")
                     .style("background-color", (d, i) => winners.includes(players[i].id) ? "lightblue" : "")
-                    .classed("active", (d, i) => winners.includes(players[i].id) ? true: false);
+                    .classed("active", (d, i) => winners.includes(players[i].id) ? true : false);
 
                 // 判斷是否顯示獎勵區（僅在唯一贏家時出現）
                 if (winners.length === 1) {
