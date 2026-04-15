@@ -11,7 +11,7 @@ let battleSummary = [];
 let permanent = { swordmaster: [], highCouncil: [], makerHooks: [], tech: [], wall: [] };
 let eventDraft = { playerId: null, type: null };
 
-// ================= DB =================
+// ================= DB及初始化 =================
 let statusEl;
 let db;
 let imageMap = {}; // 全域圖片網址映射
@@ -26,33 +26,62 @@ request.onupgradeneeded = e => {
     }
 };
 
-request.onsuccess = e => {
+request.onsuccess = async e => {
     db = e.target.result;
     console.log("Database opened successfully");
-    loadAllAssetsFromDB(); // 啟動後自動載入
+    try {
+        await loadAllAssetsFromDB(); // 啟動後自動載入
+
+        initGameUI();
+        loadGame();
+    } catch (err) {
+        console.error("❌ Initialization failed:", err);
+    }
 };
 
 // 2. 從資料庫載入所有圖片與音效
+// 2. 從資料庫載入所有圖片與音效 (Promise 版本)
 function loadAllAssetsFromDB() {
-    const tx = db.transaction("assets", "readonly");
-    const store = tx.objectStore("assets");
-    const request = store.getAll();
+    return new Promise((resolve, reject) => {
+        // 確保 db 已經存在
+        if (!db) {
+            reject("Database not initialized");
+            return;
+        }
 
-    request.onsuccess = e => {
-        const results = e.target.result;
-        if (results.length > 0) {
+        const tx = db.transaction("assets", "readonly");
+        const store = tx.objectStore("assets");
+        const request = store.getAll();
+
+        request.onsuccess = e => {
+            const results = e.target.result;
+
             // 釋放舊的 URL 防止記憶體洩漏
             Object.values(imageMap).forEach(url => URL.revokeObjectURL(url));
             imageMap = {};
 
-            results.forEach(item => {
-                // 將 Blob 轉為可用的 URL
-                imageMap[item.path] = URL.createObjectURL(item.blob);
-            });
-            console.log(`Loaded ${results.length} assets from IndexedDB`);
-            if (typeof render === "function") render(); // 刷新 UI
-        }
-    };
+            if (results.length > 0) {
+                results.forEach(item => {
+                    if (item.blob) {
+                        // 建議：將路徑轉為小寫存入，增加比對的成功率
+                        const pathKey = item.path.toLowerCase();
+                        imageMap[pathKey] = URL.createObjectURL(item.blob);
+                    }
+                });
+                console.log(`✅ Loaded ${results.length} assets from IndexedDB`);
+            } else {
+                console.warn("⚠️ IndexedDB is empty.");
+            }
+
+            // 關鍵：不論有無資料，都執行 resolve() 讓 await 結束
+            resolve(imageMap);
+        };
+
+        request.onerror = err => {
+            console.error("❌ IndexedDB read error", err);
+            reject(err);
+        };
+    });
 }
 
 // 3. 上傳 ZIP 並寫入資料庫
@@ -124,24 +153,18 @@ function playEffect(soundKey) {
         const ad = new Audio(src);
         ad.volume = 1; // 調整到舒適音量
         ad.play().catch(e => {
-            console.warn(`播放失敗: ${soundKey}。可能資源尚未載入或 ZIP 路徑不符。`, e);
+            console.warn(`play sound failed: ${soundKey}. maybe the resource is not loaded or the path is incorrect`, e);
         });
     } catch (err) {
-        console.error("無法建立音訊物件", err);
+        console.error("can't play sound", err);
     }
 }
 const COLORS = [
-    { name: "紅", value: "#e74c3c" },
-    { name: "黃", value: "#f1c40f" },
-    { name: "藍", value: "#3498db" },
-    { name: "綠", value: "#2ecc71" }
+    { name: "red", value: "#e74c3c" },
+    { name: "yellow", value: "#f1c40f" },
+    { name: "blue", value: "#3498db" },
+    { name: "green", value: "#2ecc71" }
 ];
-
-// ================= 初始化 =================
-window.onload = () => {
-    initGameUI();
-    loadGame();
-};
 
 // ================= Setup =================
 // 1. 先建立資源管理層（只建立一次）
@@ -344,6 +367,7 @@ function startGame(cnt, cfg) {
             highCouncil: false,
             makerHooks: false,
             wall: false,
+            sandworm: false,
             buyCards: [],
             influenceStates: {
                 "emperor": 0,
@@ -359,7 +383,7 @@ function startGame(cnt, cfg) {
     firstPlayerIndex = 0;
     events = [];
     battleSummary = [];
-    permanent = { swordmaster: [], highCouncil: [], makerHooks: [], tech: [], wall: [] };
+    permanent = { swordmaster: [], highCouncil: [], makerHooks: [], tech: [], wall: [], sandworm: [] };
 
     saveGame();
     renderGame();
@@ -391,7 +415,7 @@ function renderGame() {
         .on("click", () => {
             // 從資料中獲取圖片路徑 (例如: "image/battle_for_arrakeen.png")
             // 並從我們標準化過後的 imageMap 抓取 blobUrl
-            const path = card.img.toLowerCase();
+            const path = card.img;
             const blobUrl = imageMap[path];
 
             if (blobUrl) {
@@ -418,7 +442,7 @@ function renderGame() {
             .attr("src", src)
             .on("click", (e) => e.stopPropagation()); // 防止點擊圖片本身時觸發背景關閉 (如果想按圖片也能關，可拿掉這行)
     }
-    
+
     // Player cards
     const pc = b.append("div");
     players.forEach((p, i) => {
@@ -429,7 +453,23 @@ function renderGame() {
             .on("click", () => selectEventPlayer(p.id));
 
         c.append("h3").text(p.name);
-        c.append("div").text(`VP ${p.vp}`);
+        // 1. 取得圖片路徑與 Blob URL
+        const vpPath = `image/vp.png`;
+        const vpBlobUrl = imageMap[vpPath];
+
+        // 2. 建立 VP 容器
+        const vpContainer = c.append("div").attr("class", "vp-display");
+
+        if (vpBlobUrl) {
+            // 如果有圖片：插入圖片圖示 + 數字
+            vpContainer.html(`
+        <img src="${vpBlobUrl}" style="width: 48px; height: 48px; vertical-align: middle; margin-right: 4px;">
+        <span style="vertical-align: middle;">${p.vp}</span>
+    `);
+        } else {
+            // 如果沒有圖片：回退到原本的純文字格式
+            vpContainer.text(`VP ${p.vp}`);
+        }
         // c.append("div").text(`⚔️ ${p.influenceStates["emperor"]}  🏛️ ${p.highCouncil ? '✓' : '✗'}  🪝 ${p.makerHooks ? '✓' : '✗'}  💥 ${p.wall ? '✓' : '✗'}`);
     });
 
@@ -457,10 +497,9 @@ function selectEventPlayer(pid) {
 function renderEventTypeButtons() {
     const d = d3.select("#eventDiv").html("");
     const p = players.find(x => x.id === eventDraft.playerId);
-    d.append("h3").text(p.name);
-
+    d.append("h3").text(p.name).style("color", findPlayerColor(p.id)? findPlayerColor(p.id) : "#ccc");
     d.append("button").text("➕ VP").on("click", () => renderVPInput());
-    d.append("button").text("influence").on("click", () => renderInfluenceInput());
+    d.append("button").text("🤝 influence").on("click", () => renderInfluenceInput());
     d.append("button").text("⭐ Ability").on("click", () => renderPermInput());
     d.append("button").text("⚔️ Battle").on("click", () => renderBattleInput());
     // d.append("button").text("🎴 Buy Card").on("click", () => renderBuyCardInput());
@@ -786,7 +825,8 @@ function renderPermInput() {
         ["highCouncil", "🏛️", "personal"],
         ["makerHooks", "🪝", "personal"],
         ["tech", "🔧", "personal"],
-        ["breakWall", "💥", "global"]
+        ["breakWall", "💥", "global"],
+        ["sandworm", "🦠", "personal"]
     ];
 
     abilities.forEach(([key, emoji, type]) => {
@@ -837,6 +877,8 @@ function commitPerm(k) {
         playEffect(sounds.breakWall); // 嘗試取得 breakWall 就播放音效
         p.wall = !p.wall;
         newValue = p.wall;
+    } else if (k === "sandworm") {
+        playEffect(sounds.sandworm);
     }
 
     // 記錄事件，value = 更新後的真偽值
@@ -867,6 +909,7 @@ function renderBattleInput() {
         const btn = btnDiv.append("button")
             .attr("class", "battle-p-btn")
             .text(p.name)
+            .style("color", findPlayerColor(p.id)? findPlayerColor(p.id) : "#000")
             .style("margin", "4px")
             .on("click", function () {
                 const idx = winners.indexOf(p.id);
@@ -875,7 +918,8 @@ function renderBattleInput() {
 
                 // 高亮處理
                 btnDiv.selectAll(".battle-p-btn")
-                    .style("background-color", (d, i) => winners.includes(players[i].id) ? "#d4af37" : "");
+                    .style("background-color", (d, i) => winners.includes(players[i].id) ? "lightblue" : "")
+                    .classed("active", (d, i) => winners.includes(players[i].id) ? true: false);
 
                 // 判斷是否顯示獎勵區（僅在唯一贏家時出現）
                 if (winners.length === 1) {
@@ -901,8 +945,7 @@ function renderBattleInput() {
             // 更新視覺
             d3.select(this)
                 .classed("active", isIconActive)
-                .style("background", isIconActive ? "#d4af37" : "")
-                .style("color", isIconActive ? "black" : "white");
+                .style("background", isIconActive ? "green" : "")
         });
 
     // 2. Combat VP 區 (單選按鈕模式)
@@ -912,7 +955,7 @@ function renderBattleInput() {
 
     // 根據回合定義可選的分數
     // 基本 0, 1, 2。如果回合 >= 7 則加上 3, 4
-    let availableScores = [0, 1, 2];
+    let availableScores = [1, 2];
     if (currentRound >= 7) {
         availableScores.push(3, 4);
     }
@@ -921,15 +964,21 @@ function renderBattleInput() {
         combatBtnGroup.append("button")
             .attr("class", "combat-val-btn")
             .text(`${score} Battle VP`)
-            .style("margin", "2px")
-            .style("padding", "10px")
-            .style("background", score === 0 ? "#555" : "") // 預設 0 分亮起
             .on("click", function () {
-                selectedCombatVP = score;
-                // 清除其他按鈕高亮
-                combatBtnGroup.selectAll(".combat-val-btn").style("background", "");
-                // 高亮當前按鈕
-                d3.select(this).style("background", "green");
+                if (selectedCombatVP === score) {
+                    // 如果點擊同一個已選的分數，則取消選擇
+                    selectedCombatVP = 0;
+                    d3.select(this).style("background", "")
+                        .classed("active", false)
+                } else {
+                    selectedCombatVP = score;
+                    // 清除其他按鈕高亮
+                    combatBtnGroup.selectAll(".combat-val-btn").style("background", "")
+                        .classed("active", false);
+                    // 高亮當前按鈕
+                    d3.select(this).style("background", "green")
+                        .classed("active", true);
+                }
             });
     });
 
@@ -1086,43 +1135,73 @@ function renderTimeline() {
             "lose 2 influence": "(lost2)",
             "lose Alliance": "(lose4)"
         };
-        if (e.type === "vpChange")
-            t += `${findP(e.playerId)} VP ${e.value} ${e.faction ? e.faction.toUpperCase() + " " : ""}${e.faction ? reasonMap[e.reason] : e.reason}`;
 
+
+        if (e.type === "vpChange") {
+            // 1. 準備 VP 的顯示內容
+            const vpIconPath = `image/vp.png`;
+            const vpBlobUrl = imageMap[vpIconPath];
+
+            // 如果有圖就用 img 標籤，沒圖就維持文字 "VP"
+            const vpDisplay = vpBlobUrl
+                ? `<img src="${vpBlobUrl}" style="width: 48px; height: 48px;">`
+                : ` VP `;
+
+            // 2. 組裝 HTML 字串 (將原本的 " VP " 替換成 vpDisplay)
+            t += `
+    <span style="color: ${findPlayerColor(e.playerId)}; font-weight: bold;">
+        ${findPlayerName(e.playerId)}
+    </span> 
+    ${vpDisplay} 
+    <span style="font-size: 1.1em; font-weight: bold;">${e.value}</span> 
+    ${e.faction ? e.faction.toUpperCase() + " " : ""}
+    ${e.faction ? reasonMap[e.reason] : e.reason}
+`;
+        }
         if (e.type === "permanent")
-            t += `${findP(e.playerId)} ${e.value ? "gain" : "lose"} ${e.ability}`;
+            t += `${findPlayerName(e.playerId)} ${e.value ? "gain" : "lose"} ${e.ability}`;
 
         if (e.type === "battle") {
-            const findP = (id) => {
-                const p = players.find(pl => pl.id === id);
-                return p ? p.name.toUpperCase() : "UNKNOWN";
-            };
-
             if (e.winners && e.winners.length > 0) {
-                const winnerNames = e.winners.map(pid => findP(pid)).join(" & ");
-
+                const winnerNames = e.winners.map(pid => {
+                    const pName = findPlayerName(pid);
+                    const pColor = findPlayerColor(pid);
+                    // 為每一個贏家單獨封裝顏色標籤
+                    return `<span style="color: ${pColor}; font-weight: bold;">${pName}</span>`;
+                }).join(" & ");
                 if (e.winners.length === 1) {
                     // 單一人贏
-                    t += `⚔️ ${winnerNames} wins the Conflict!`;
+                    t += `${winnerNames} wins the Conflict!`;
                 } else {
                     // 多人平手贏
-                    t += `⚔️ ${winnerNames} tied the Conflict!`;
+                    t += `${winnerNames} tied the Conflict!`;
                 }
             } else {
                 // 沒有人贏
-                t += "⚔️ NO ONE WIN";
+                t += "No one wins the Conflict!";
             }
         }
 
         if (e.type === "buyCard")
-            t += `${findP(e.playerId)} Buy card ${e.card.name} (Persuasion: ${e.card.cost})`;
+            t += `${findPlayerName(e.playerId)} Buy card ${e.card.name} (Persuasion: ${e.card.cost})`;
 
-        ul.append("li").text(t);
+        const playerColor = findPlayerColor(e.playerId) ? findPlayerColor(e.playerId) : "#eee";
+        const li = ul.append("li")
+            .style("border-left", `6px solid ${playerColor}`) // 在左側加一條顏色邊
+            .style("padding-left", "10px")                  // 留點空間給顏色條
+            .style("margin-bottom", "5px")
+            .style("color", "#eee");                         // 主要文字顏色維持白色方便閱讀
+
+        li.html(t);
     });
     renderTimelineFilters();
 }
 
-const findP = id => players.find(p => p.id === id).name;
+const findPlayerColor = id => {
+    const p = players.find(p => p.id === id);
+    return p ? p.color : "#ccc";
+};
+const findPlayerName = id => players.find(p => p.id === id).name;
 
 let timelineFilter = {
     type: "all",
