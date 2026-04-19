@@ -36,7 +36,6 @@ request.onsuccess = async e => {
     }
 };
 
-// 2. 從資料庫載入所有圖片與音效
 // 2. 從資料庫載入所有圖片與音效 (Promise 版本)
 function loadAllAssetsFromDB() {
     return new Promise((resolve, reject) => {
@@ -110,9 +109,10 @@ async function handleZipUpload(file) {
             store.put(item);
         });
 
-        tx.oncomplete = () => {
+        tx.oncomplete = async () => {
             updateStatus(`✅ 成功載入 ${pendingData.length} 個資源！`);
-            loadAllAssetsFromDB();
+            await loadAllAssetsFromDB();
+            initGameUI();
         };
     } catch (err) {
         console.error(err);
@@ -286,34 +286,34 @@ function renderSetupPlayers() {
         }
 
         // 3. 建立圖片與選單的容器
-       // --- 建立圖片與選單的容器 ---
-const leaderContainer = row.append("div")
-    .style("display", "flex")       // 啟用 Flexbox
-    .style("flex-direction", "row") // 確保水平排列
-    .style("align-items", "center") // 垂直居中對齊
-    .style("gap", "12px")           // 圖片與選單間的間距
-    .style("width", "100%")
-    .style("margin-bottom", "10px");
+        // --- 建立圖片與選單的容器 ---
+        const leaderContainer = row.append("div")
+            .style("display", "flex")       // 啟用 Flexbox
+            .style("flex-direction", "row") // 確保水平排列
+            .style("align-items", "center") // 垂直居中對齊
+            .style("gap", "12px")           // 圖片與選單間的間距
+            .style("width", "100%")
+            .style("margin-bottom", "10px");
 
-// --- 圖片部分 (只有有圖才顯示) ---
-if (finalUrl) {
-    leaderContainer.append("div")
-        .attr("class", "leader-img-frame")
-        .append("img")
-        .attr("src", finalUrl)
-        .attr("class", "leader-preview-img")
-        .on("error", function() { d3.select(this.parentNode).remove(); })
-        .on("click", () => showImageOverlay(finalUrl));
-}
+        // --- 圖片部分 (只有有圖才顯示) ---
+        if (finalUrl) {
+            leaderContainer.append("div")
+                .attr("class", "leader-img-frame")
+                .append("img")
+                .attr("src", finalUrl)
+                .attr("class", "leader-preview-img")
+                .on("error", function () { d3.select(this.parentNode).remove(); })
+                .on("click", () => showImageOverlay(finalUrl));
+        }
 
-// --- 下拉選單部分 ---
-const select = leaderContainer.append("select")
-    .attr("class", "leader-select")
-    .style("flex", "1") // 重要：這會讓選單自動佔滿剩下的空間
-    .on("change", function() {
-        p.leaderNo = this.value;
-        renderSetupPlayers();
-    });
+        // --- 下拉選單部分 ---
+        const select = leaderContainer.append("select")
+            .attr("class", "leader-select")
+            .style("flex", "1") // 重要：這會讓選單自動佔滿剩下的空間
+            .on("change", function () {
+                p.leaderNo = this.value;
+                renderSetupPlayers();
+            });
 
         // 取得目前已被其他玩家選走的 Leader ID 列表
         const takenLeaders = setupPlayers
@@ -333,9 +333,11 @@ const select = leaderContainer.append("select")
         // --- Color 按鈕 (維持原樣) ---
         const cb = row.append("div").attr("class", "btn-group").style("margin-top", "10px");
         COLORS.forEach(c => {
+            const isActive = (c.value === p.color); // 判斷是否為選中項
             cb.append("button")
-                .style("background", c.value)
-                .classed("active", c.value === p.color)
+                // 根據 active 狀態切換背景色：選中用 c.value，沒選中用 #ccc
+                .style("background", isActive ? c.value : "#ccc")
+                .classed("active", isActive)
                 .on("click", () => swapColor(i, c.value));
         });
     });
