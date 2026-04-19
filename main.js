@@ -201,7 +201,7 @@ function setupPersistentUI() {
 
     // 上傳按鈕
     controls.append("button")
-        .text("📦 上傳 ZIP")
+        .text("📦 upload ZIP")
         .style("padding", "15px")
         .style("background", "#28a745")
         .style("color", "white")
@@ -211,7 +211,7 @@ function setupPersistentUI() {
 
     // 清除按鈕
     controls.append("button")
-        .text("🗑️ 清除快取")
+        .text("🗑️ remove assest")
         .style("padding", "15px")
         .style("background", "#dc3545")
         .style("color", "white")
@@ -446,6 +446,7 @@ function renderGame() {
     const card = conflictDeck[currentRound - 1];
     // 修改你原本的程式碼部分
     const h2 = r.append("h2")
+        .attr("class", "round-title")
         .style("cursor", "pointer")
         .style("text-decoration", "underline")
         .text(`Round ${currentRound} - ${card ? card.level : "no"} - ${card ? card.name : "data"}`)
@@ -456,29 +457,13 @@ function renderGame() {
             const blobUrl = imageMap[path];
 
             if (blobUrl) {
-                showImageOverlay(blobUrl);
+                showImageOverlay(blobUrl, true);
             } else {
                 console.warn("找不到圖片路徑:", path);
                 // 如果 local 找不到，嘗試直接用路徑抓
-                showImageOverlay(card.img);
+                showImageOverlay(card.img, true);
             }
         });
-
-    // --- 建立懸浮視窗函式 ---
-    function showImageOverlay(src) {
-        // 建立背景
-        const overlay = d3.select("body").append("div")
-            .attr("id", "image-overlay")
-            .on("click", function () {
-                d3.select(this).remove(); // 點擊背景或圖片後關閉
-            });
-
-        // 放入圖片
-        overlay.append("img")
-            .attr("id", "overlay-img")
-            .attr("src", src)
-            .on("click", (e) => e.stopPropagation()); // 防止點擊圖片本身時觸發背景關閉 (如果想按圖片也能關，可拿掉這行)
-    }
 
     // Player cards
     const pc = b.append("div");
@@ -523,6 +508,128 @@ function renderGame() {
 
     renderTimeline();
     saveGame();
+}
+
+// --- 建立懸浮視窗函式 ---
+function showImageOverlay(src, isConflictCard = false) {
+    const overlay = d3.select("body").append("div")
+        .attr("id", "image-overlay")
+        .on("click", function () { d3.select(this).remove(); });
+
+    // 建立一個垂直排列的容器
+    const container = overlay.append("div")
+        .style("display", "flex")
+        .style("flex-direction", "column")
+        .style("align-items", "center")
+        .style("gap", "20px")
+        .on("click", (e) => e.stopPropagation());
+
+    if (isConflictCard) {
+        const card = conflictDeck[currentRound - 1];
+        container.append("h2")
+            .style("color", "white")
+            .style("margin", "0")
+            .style("text-shadow", "2px 2px 4px rgba(0,0,0,0.8)")
+            .text(`Round ${currentRound} - ${card ? card.level : "no"} - ${card ? card.name : "data"}`);
+    }
+
+    container.append("img")
+        .attr("id", "overlay-img")
+        .attr("src", src)
+
+    if (isConflictCard) {
+        container.append("button")
+            .text("🔄 Swap Conflict Card")
+            .style("padding", "15px 30px")
+            .style("font-size", "32px")
+            .style("background", "#f0ad4e")
+            .style("border", "none")
+            .style("border-radius", "10px")
+            .style("font-weight", "bold")
+            .style("cursor", "pointer")
+            .on("click", () => {
+                overlay.remove();
+                showConflictSelector();
+            });
+    }
+}
+
+function showConflictSelector() {
+    const overlay = d3.select("body").append("div")
+        .attr("id", "selector-overlay")
+        .style("position", "fixed")
+        .style("top", "0")
+        .style("left", "0")
+        .style("width", "100vw")
+        .style("height", "100vh")
+        .style("background", "rgba(0,0,0,0.95)")
+        .style("overflow-y", "auto")
+        .style("padding", "20px")
+        .style("z-index", "3000");
+
+    overlay.append("h2")
+        .text("Select Conflict Card")
+        .style("color", "white")
+        .style("text-align", "center");
+
+    const grid = overlay.append("div")
+        .style("display", "grid")
+        .style("grid-template-columns", "repeat(auto-fill, minmax(230px, 1fr))")
+        .style("gap", "10px");
+
+    // 列出所有可用 Conflict Cards
+    let targetLevel = "II";
+    if (currentRound === 1) {
+        targetLevel = "I";
+    } else if (currentRound >= 2 && currentRound <= 6) {
+        targetLevel = "II";
+    } else if (currentRound >= 7) {
+        targetLevel = "III";
+    }
+    const availableCards = window.conflict.filter(c => c.level === targetLevel);
+
+    availableCards.forEach(card => {
+        const btn = grid.append("div")
+            .style("background", "#333")
+            .style("padding", "10px")
+            .style("border-radius", "8px")
+            .style("text-align", "center")
+            .style("cursor", "pointer")
+            .on("click", () => {
+                // 強制覆蓋當前輪次的卡片
+                conflictDeck[currentRound - 1] = card;
+                overlay.remove();
+                saveGame();
+                renderGame(); // 重新渲染，圖片和名字都會變
+            });
+
+        const imgPath = card.img;
+        const blobUrl = imageMap[imgPath] || imgPath;
+
+        if (blobUrl) {
+            btn.append("img")
+                .attr("src", blobUrl)
+                .style("width", "100%")
+                .style("border-radius", "4px");
+        }
+
+        btn.append("div")
+            .text(card.name)
+            .style("color", "white")
+            .style("font-size", "24px")
+            .style("margin-top", "5px");
+    });
+
+    // 關閉按鈕
+    overlay.append("button")
+        .text("Close")
+        .style("position", "fixed")
+        .style("bottom", "20px")
+        .style("left", "50%")
+        .style("font-size", "32px")
+        .style("transform", "translateX(-50%)")
+        .style("padding", "10px 40px")
+        .on("click", () => overlay.remove());
 }
 
 // ================= Event Flow =================
@@ -1308,6 +1415,9 @@ function nextRound() {
         currentRound++;
         firstPlayerIndex = (firstPlayerIndex + 1) % playerCount;
         renderGame();
+
+        // 自動觸發剛畫好的 h2 點擊事件
+        d3.select(".round-title").dispatch("click");
     }
 }
 function prevRound() {
@@ -1327,6 +1437,7 @@ function applyGameData(data) {
     if (!data) return;
 
     players = data.players;
+    playerCount = players.length;
     currentRound = data.currentRound;
     events = data.events;
     firstPlayerIndex = data.firstPlayerIndex;
