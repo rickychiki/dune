@@ -563,7 +563,7 @@ function showConflictSelector() {
         .style("width", "100vw")
         .style("height", "100vh")
         .style("background", "rgba(0,0,0,0.95)")
-        .style("overflow-y", "auto")
+        .style("overflow-y", "scroll")
         .style("padding", "20px")
         .style("z-index", "3000")
         .style("padding-bottom", "env(safe-area-inset-bottom)");
