@@ -208,11 +208,11 @@ function setupPersistentUI() {
     controls.append("div")
         .text("✕")
         .style("position", "absolute")
-        .style("top", "5px")
+        .style("top", "-15px")
         .style("right", "10px")
         .style("color", "white")
         .style("cursor", "pointer")
-        .style("font-size", "18px")
+        .style("font-size", "48px")
         .style("font-weight", "bold")
         // 修改 X 的 click 事件
         .on("click", function () {
