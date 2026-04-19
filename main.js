@@ -190,7 +190,7 @@ function setupPersistentUI() {
         .style("font-size", "14px")
         .text("Checking local assets...");
 
-    // 按鈕容器
+    // 1. 修改按鈕容器的樣式，加入 position: relative 以便定位 X
     const controls = uiLayer.append("div")
         .attr("id", "upload-controls")
         .style("position", "fixed")
@@ -198,7 +198,43 @@ function setupPersistentUI() {
         .style("left", "50%")
         .style("transform", "translateX(-50%)")
         .style("display", "flex")
-        .style("gap", "10px");
+        .style("gap", "10px")
+        .style("padding", "25px 15px 15px 15px") // 上方留多一點空間給 X
+        .style("background", "rgba(0,0,0,0.5)")   // 加個半透明背景，讓面板更有整體感
+        .style("border-radius", "15px")
+        .style("backdrop-filter", "blur(5px)"); // 毛玻璃效果 (可選)
+
+    // 2. 加入關閉按鈕 (X)
+    controls.append("div")
+        .text("✕")
+        .style("position", "absolute")
+        .style("top", "5px")
+        .style("right", "10px")
+        .style("color", "white")
+        .style("cursor", "pointer")
+        .style("font-size", "18px")
+        .style("font-weight", "bold")
+        // 修改 X 的 click 事件
+        .on("click", function () {
+            const isHidden = controls.style("height") === "0px";
+
+            if (!isHidden) {
+                // 縮小成一個小球
+                controls.selectAll("button").style("display", "none");
+                controls.style("height", "0px")
+                    .style("width", "40px")
+                    .style("overflow", "hidden")
+                    .style("padding", "20px");
+                d3.select(this).text("⚙️"); // 變成齒輪
+            } else {
+                // 展開回原樣
+                controls.selectAll("button").style("display", "block");
+                controls.style("height", "auto")
+                    .style("width", "auto")
+                    .style("padding", "25px 15px 15px 15px");
+                d3.select(this).text("✕");
+            }
+        });
 
     // 上傳按鈕
     controls.append("button")
@@ -208,16 +244,18 @@ function setupPersistentUI() {
         .style("color", "white")
         .style("border", "none")
         .style("border-radius", "10px")
+        .style("cursor", "pointer")
         .on("click", () => document.getElementById("zipInput").click());
 
     // 清除按鈕
     controls.append("button")
-        .text("🗑️ remove assest")
+        .text("🗑️ remove assets") // 修正了原本拼字 assets
         .style("padding", "15px")
         .style("background", "#dc3545")
         .style("color", "white")
         .style("border", "none")
         .style("border-radius", "10px")
+        .style("cursor", "pointer")
         .on("click", async () => {
             if (confirm("確定要清除資源嗎？")) {
                 const tx = db.transaction("assets", "readwrite");
