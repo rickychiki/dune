@@ -208,31 +208,46 @@ function setupPersistentUI() {
     controls.append("div")
         .text("✕")
         .style("position", "absolute")
-        .style("top", "5px")
+        .style("top", "-5px")
         .style("right", "10px")
         .style("color", "white")
         .style("cursor", "pointer")
-        .style("font-size", "32px")
+        .style("font-size", "48px")
         .style("font-weight", "bold")
         // 修改 X 的 click 事件
-        .on("click", function () {
-            const isHidden = controls.style("height") === "0px";
+.on("click", function () {
+            // 使用 d3 的 state 來存儲狀態，初始預設為 expanded
+            const currentState = d3.select(this).attr("data-state") || "expanded";
 
-            if (!isHidden) {
-                // 縮小成一個小球
+            if (currentState === "expanded") {
+                // --- 執行縮小 ---
                 controls.selectAll("button").style("display", "none");
-                controls.style("height", "60px")
-                    .style("width", "50px")
+                controls.style("height", "60px") // 這裡改為你要的 50px
+                    .style("width", "60px")
                     .style("overflow", "hidden")
-                    .style("padding", "20px");
-                d3.select(this).text("⚙️"); // 變成齒輪
+                    .style("padding", "0px") // 縮小時通常 padding 也要設 0 才不會擠歪
+                    .style("display", "flex")
+                    .style("align-items", "center")
+                    .style("justify-content", "center");
+                
+                d3.select(this)
+                    .text("⚙️")
+                    .style("position", "static") // 讓齒輪居中
+                    .attr("data-state", "collapsed"); // 標記為收起
             } else {
-                // 展開回原樣
+                // --- 執行展開 ---
                 controls.selectAll("button").style("display", "block");
                 controls.style("height", "auto")
                     .style("width", "auto")
-                    .style("padding", "25px 15px 15px 15px");
-                d3.select(this).text("✕");
+                    .style("padding", "25px 15px 15px 15px")
+                    .style("overflow", "visible");
+                
+                d3.select(this)
+                    .text("✕")
+                    .style("position", "absolute") // X 回到右上角
+                    .style("top", "5px")
+                    .style("right", "10px")
+                    .attr("data-state", "expanded"); // 標記為展開
             }
         });
 
