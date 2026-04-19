@@ -516,7 +516,7 @@ function renderGame() {
     const ctl = b.append("div").attr("class", "btn-group");
     ctl.append("button").text("◀").on("click", prevRound);
     ctl.append("button").text("▶").on("click", nextRound);
-    ctl.append("button").text("undo").on("click", undo);
+    ctl.append("button").text("undo").on("click", confirmUndo);
     ctl.append("button").text("export").on("click", exportData);
     ctl.append("button").text("import").on("click", importData);
     ctl.append("button").text("end game").on("click", endGame);
@@ -1470,4 +1470,80 @@ function undo() {
     // 3. 重新儲存並渲染畫面
     saveGame();
     renderGame();
+}
+
+function confirmUndo() {
+    if (events.length === 0) return;
+    const last = events[events.length - 1];
+    // 建立全螢幕背景遮罩
+    const overlay = d3.select("body").append("div")
+        .attr("id", "confirm-overlay")
+        .style("position", "fixed")
+        .style("top", "0")
+        .style("left", "0")
+        .style("width", "100vw")
+        .style("height", "100vh")
+        .style("background", "rgba(0,0,0,0.85)")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("align-items", "center")
+        .style("z-index", "2000");
+
+    // 建立對話框主體
+    const dialog = overlay.append("div")
+        .style("background", "#2a2a2a")
+        .style("padding", "30px")
+        .style("border-radius", "16px")
+        .style("border", "2px solid #555")
+        .style("text-align", "center")
+        .style("max-width", "80%");
+
+
+    const actionDesc = last.reason ? `${last.type} (${last.reason})` : last.type;
+    dialog.append("p")
+        .text("Are you sure you want to revert the last action?")
+        .style("color", "#ccc")
+        .style("font-size", "32px");
+
+    dialog.append("div")
+        .style("background", "#1a1a1a")
+        .style("padding", "10px")
+        .style("border-radius", "8px")
+        .style("margin", "15px 0")
+        .style("color", "#f0ad4e")
+        .style("font-size", "32px")
+        .style("font-family", "monospace")
+        .text(`${actionDesc}`);
+
+    const btnGroup = dialog.append("div")
+        .style("display", "flex")
+        .style("gap", "20px")
+        .style("justify-content", "center");
+
+    // 「確定」按鈕
+    btnGroup.append("button")
+        .text("confirm")
+        .style("background", "#d9534f") // 紅色，代表危險操作
+        .style("color", "white")
+        .style("padding", "10px 20px")
+        .style("border", "none")
+        .style("border-radius", "8px")
+        .style("font-size", "32px")
+        .on("click", () => {
+            overlay.remove(); // 關閉彈窗
+            undo();           // 執行原本的 undo
+        });
+
+    // 「取消」按鈕
+    btnGroup.append("button")
+        .text("cancel")
+        .style("background", "#5bc0de") // 藍色或灰色
+        .style("color", "white")
+        .style("padding", "10px 20px")
+        .style("border", "none")
+        .style("border-radius", "8px")
+        .style("font-size", "32px")
+        .on("click", () => {
+            overlay.remove(); // 關閉彈窗，不執行任何動作
+        });
 }
