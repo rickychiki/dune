@@ -194,7 +194,7 @@ function setupPersistentUI() {
     const controls = uiLayer.append("div")
         .attr("id", "upload-controls")
         .style("position", "fixed")
-        .style("bottom", "20px")
+        .style("bottom", "150px")
         .style("left", "50%")
         .style("transform", "translateX(-50%)")
         .style("display", "flex")
