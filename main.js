@@ -7,6 +7,7 @@ let conflictDeck = [];
 let firstPlayerIndex = 0;
 let events = [];
 let eventDraft = { playerId: null, type: null };
+let bloodlines = false;
 
 // ================= DB及初始化 =================
 let statusEl;
@@ -248,6 +249,25 @@ function initGameUI() {
 
     c.append("div").attr("id", "playerForms");
     c.append("div").attr("id", "playerButtons");
+
+    c.append("button")
+        .attr("class", "main-btn")
+        .text("Bloodlines")
+        .classed("active", bloodlines)
+        // 初始化顏色
+        .style("background", bloodlines ? "green" : "#ccc")
+        .on("click", function () {
+            // 1. 切換全域變數
+            bloodlines = !bloodlines;
+
+            // 2. 更新 Class (用於其他 CSS 選取器)
+            d3.select(this).classed("active", bloodlines);
+
+            // 3. 直接更新 Style (確保顏色會變)
+            d3.select(this).style("background", bloodlines ? "green" : "#ccc");
+
+            initGameUI();
+        });
     c.append("button")
         .attr("class", "main-btn")
         .text("Start Game")
@@ -257,7 +277,8 @@ function initGameUI() {
 }
 
 function createRandomPlayers(n) {
-    const leaders = d3.shuffle([...window.leader]).slice(0, n);
+    const leaderPool = bloodlines ? window.leader : window.leader.slice(0, 9); //bloodlines
+    const leaders = d3.shuffle([...leaderPool]).slice(0, n); // base leader only
     const colors = d3.shuffle([...COLORS]).slice(0, n);
 
     return leaders.map((l, i) => ({
@@ -302,7 +323,10 @@ function renderSetupPlayers() {
                 .append("img")
                 .attr("src", finalUrl)
                 .attr("class", "leader-preview-img")
-                .on("error", function () { d3.select(this.parentNode).remove(); })
+                .on("error", function () {
+                    console.warn("圖片載入失敗，已自動隱藏:", finalUrl);
+                    d3.select(this.parentNode).remove(); // 圖片載入失敗時，直接從容器中移除自己
+                })
                 .on("click", () => showImageOverlay(finalUrl));
         }
 
@@ -320,7 +344,16 @@ function renderSetupPlayers() {
             .filter((other, idx) => idx !== i) // 排除自己
             .map(other => other.leaderNo);
 
-        window.leader.forEach(l => {
+
+        const displayPool = bloodlines ? window.leader : window.leader.slice(0, 9); //bloodlines
+        displayPool.forEach((l, index) => {
+            if (bloodlines && index === 9) {
+                select.append("option")
+                    .attr("disabled", true)
+                    .text("--------- Bloodlines ---------")
+                    .style("text-align", "center")
+                    .style("background", "#444");
+            }
             const isTaken = takenLeaders.includes(l.no);
 
             select.append("option")
@@ -387,7 +420,7 @@ function renderPlayerButtons() {
 }
 
 function startFromSetup() {
-    startGame(setupPlayers.length, setupPlayers);
+    startGame(setupPlayers.length, setupPlayers, bloodlines);
 }
 
 // ================= Game Start =================
@@ -429,10 +462,18 @@ function startGame(cnt, cfg) {
 // ================= Conflict =================
 function generateConflictDeck() {
     const s = a => a.sort(() => Math.random() - 0.5);
+
+    // 1. 決定可用池：如果是 false，只取前 16 張
+    const availablePool = bloodlines ? window.conflict : window.conflict.slice(0, 16);
+
+    // 2. 從可用池中根據 Level 過濾並抽牌
     conflictDeck = [
-        ...s(window.conflict.filter(c => c.level == "I")).slice(0, 1),
-        ...s(window.conflict.filter(c => c.level == "II")).slice(0, 5),
-        ...s(window.conflict.filter(c => c.level == "III")).slice(0, 4)
+        // Level I 抽 1 張
+        ...s(availablePool.filter(c => c.level === "I")).slice(0, 1),
+        // Level II 抽 5 張
+        ...s(availablePool.filter(c => c.level === "II")).slice(0, 5),
+        // Level III 抽 4 張
+        ...s(availablePool.filter(c => c.level === "III")).slice(0, 4)
     ];
 }
 
@@ -449,7 +490,7 @@ function renderGame() {
         .attr("class", "round-title")
         .style("cursor", "pointer")
         .style("text-decoration", "underline")
-        .text(`Round ${currentRound} - ${card ? card.level : "no"} - ${card ? card.name : "data"}`)
+        .text(` ${bloodlines ? "Bloodlines" : "Uprising"} - Round ${currentRound} - ${card ? card.level : "no"} - ${card ? card.name : "data"}`)
         .on("click", () => {
             // 從資料中獲取圖片路徑 (例如: "image/battle_for_arrakeen.png")
             // 並從我們標準化過後的 imageMap 抓取 blobUrl
@@ -536,6 +577,10 @@ function showImageOverlay(src, isConflictCard = false) {
     container.append("img")
         .attr("id", "overlay-img")
         .attr("src", src)
+        .on("error", function () {
+            console.warn("圖片載入失敗，已自動隱藏:", src);
+            d3.select(this).remove(); // 圖片載入失敗時，直接從容器中移除自己
+        });
 
     if (isConflictCard) {
         container.append("button")
@@ -587,7 +632,9 @@ function showConflictSelector() {
     } else if (currentRound >= 7) {
         targetLevel = "III";
     }
-    const availableCards = window.conflict.filter(c => c.level === targetLevel);
+    // 1. 決定可用池：如果是 false，只取前 16 張
+    const availablePool = bloodlines ? window.conflict : window.conflict.slice(0, 16);
+    const availableCards = availablePool.filter(c => c.level === targetLevel);
 
     availableCards.forEach(card => {
         const btn = grid.append("div")
@@ -611,7 +658,11 @@ function showConflictSelector() {
             btn.append("img")
                 .attr("src", blobUrl)
                 .style("width", "100%")
-                .style("border-radius", "4px");
+                .style("border-radius", "4px")
+                .on("error", function () {
+                    console.warn("圖片載入失敗，已自動隱藏:", blobUrl);
+                    d3.select(this).remove(); // 圖片載入失敗時，直接從容器中移除自己
+                });;
         }
 
         btn.append("div")
@@ -669,10 +720,16 @@ function renderVPInput() {
         { text: "imperium", vp: 1 },
         { text: "endgame icon", vp: 1 },
         { text: "endgame intrigue", vp: 1 },
+        { text: "tech/other", vp: 1 }, // 這個按鈕將受到 bloodlines 變數控制
     ];
 
     const reasonDiv = d.append("div").attr("id", "vpReasonBtns").style("margin-top", "5px");
     reasons.forEach(r => {
+        // --- 關鍵判斷：如果是 tech/other 且 bloodlines 為 false，則跳過不渲染 ---
+        if (r.text === "tech/other" && !bloodlines) {
+            return;
+        }
+
         reasonDiv.append("button")
             .text(r.text)
             .style("margin", "2px")
@@ -749,7 +806,7 @@ function renderInfluenceInput() {
 
                 // 1. 移除載入失敗的圖片
                 d3.select(this).remove();
-
+                console.warn("圖片載入失敗，已自動隱藏:", blobUrl || path);
                 // 2. 插入替代文字
                 parent.append("span")
                     .text(f)
@@ -1442,6 +1499,7 @@ function applyGameData(data) {
     currentRound = data.currentRound;
     events = data.events;
     firstPlayerIndex = data.firstPlayerIndex;
+    bloodlines = data.bloodlines;
 
     // 重新關連 Conflict 物件
     conflictDeck = data.conflictDeckOrder.map(no =>
@@ -1454,7 +1512,7 @@ function applyGameData(data) {
 function saveGame() {
     localStorage.setItem("duneGame", JSON.stringify({
         players, currentRound, events, firstPlayerIndex,
-        conflictDeckOrder: conflictDeck.map(c => c.no)
+        conflictDeckOrder: conflictDeck.map(c => c.no), bloodlines
     }));
 }
 function loadGame() {
@@ -1503,7 +1561,7 @@ function importData() {
 // ================= Export =================
 function exportData() {
     const conflictDeckOrder = conflictDeck.map(c => c.no)
-    const blob = new Blob([JSON.stringify({ players, currentRound, events, firstPlayerIndex, conflictDeckOrder }, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify({ players, currentRound, events, firstPlayerIndex, conflictDeckOrder, bloodlines }, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "dune.json";
