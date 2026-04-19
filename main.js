@@ -208,11 +208,11 @@ function setupPersistentUI() {
     controls.append("div")
         .text("✕")
         .style("position", "absolute")
-        .style("top", "-15px")
+        .style("top", "5px")
         .style("right", "10px")
         .style("color", "white")
         .style("cursor", "pointer")
-        .style("font-size", "48px")
+        .style("font-size", "32px")
         .style("font-weight", "bold")
         // 修改 X 的 click 事件
         .on("click", function () {
@@ -221,8 +221,8 @@ function setupPersistentUI() {
             if (!isHidden) {
                 // 縮小成一個小球
                 controls.selectAll("button").style("display", "none");
-                controls.style("height", "0px")
-                    .style("width", "40px")
+                controls.style("height", "60px")
+                    .style("width", "50px")
                     .style("overflow", "hidden")
                     .style("padding", "20px");
                 d3.select(this).text("⚙️"); // 變成齒輪
