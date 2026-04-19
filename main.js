@@ -565,7 +565,8 @@ function showConflictSelector() {
         .style("background", "rgba(0,0,0,0.95)")
         .style("overflow-y", "auto")
         .style("padding", "20px")
-        .style("z-index", "3000");
+        .style("z-index", "3000")
+        .style("padding-bottom", "env(safe-area-inset-bottom)");
 
     overlay.append("h2")
         .text("Select Conflict Card")
