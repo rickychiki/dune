@@ -4,15 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Dune helper</title>
-  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#e74c3c">
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('SW registered:', reg))
-        .catch(err => console.log('SW registration failed:', err));
-    }
-  </script>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -27,7 +19,7 @@
     body {
       margin: 0;
       padding: 0;
-      height: 100vh;
+      height: 100dvh;
       /* 滿螢幕高度 */
       overflow: hidden;
       /* 網頁本身不滾動 */
@@ -72,12 +64,15 @@
 
     /* ================= Setup ================= */
     #setup {
-      height: 100vh;
+      height: 100dvh;
       /* 滿螢幕高度 */
       overflow-y: auto;
       /* 內容超過時可垂直捲動 */
       padding: 10px;
+      padding-bottom: 40px;
       box-sizing: border-box;
+
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     .player-setup {
@@ -301,6 +296,51 @@
     border: 3px solid #fff;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+    /* ================= leader ================= */
+.leader-img-frame {
+    width: 320px;  /* 固定預覽圖寬度 */
+    height: 220px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #333;
+    flex-shrink: 0; /* 防止圖片被擠壓 */
+    border: 2px solid gold;
+    cursor: pointer;
+}
+
+.leader-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 確保圖片填滿格子且不變形 */
+}
+
+.leader-select {
+    width: 100%;
+    /* 縮小字體到適合閱讀的大小，通常 20-24px 在手機上就很大了 */
+    height: 200px;
+    font-size: 48px; 
+    
+    /* 使用大的內距來增加點擊區域與高度 */
+    padding: 20px 15px; 
+    
+    background: #2a2a2a;
+    color: white;
+    border: 2px solid #555;
+    border-radius: 12px;
+    
+    /* 讓文字置中（部分瀏覽器支援） */
+    text-align: center;
+    
+    /* 移除系統預設外觀（如 iOS 的圓角預設） */
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* 讓被停用的選項看起來明顯一點 */
+.leader-select option:disabled {
+    color: #666;
 }
   </style>
 </head>

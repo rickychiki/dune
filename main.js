@@ -5,10 +5,7 @@ let setupPlayers = [];
 let currentRound = 1;
 let conflictDeck = [];
 let firstPlayerIndex = 0;
-let edit = false;
 let events = [];
-let battleSummary = [];
-let permanent = { swordmaster: [], highCouncil: [], makerHooks: [], tech: [], wall: [] };
 let eventDraft = { playerId: null, type: null };
 
 // ================= DB及初始化 =================
@@ -251,7 +248,6 @@ function initGameUI() {
 
     c.append("div").attr("id", "playerForms");
     c.append("div").attr("id", "playerButtons");
-
     c.append("button")
         .attr("class", "main-btn")
         .text("Start Game")
@@ -278,23 +274,64 @@ function renderSetupPlayers() {
 
         row.append("h3").text(`Player ${i + 1} (Seat ${i + 1})`);
 
-        // Leader buttons
-        const lb = row.append("div").attr("class", "btn-group");
+        // 1. 先找出 Leader 資料與圖片 URL
+        const leaderData = window.leader.find(l => String(l.no) === String(p.leaderNo));
+        const rawPath = leaderData ? leaderData.img : null;
+
+        // 2. 只有當 path 存在時，才嘗試計算最終 URL
+        let finalUrl = null;
+        if (rawPath) {
+            const cleanPath = rawPath.startsWith("./") ? rawPath.substring(2) : rawPath;
+            finalUrl = imageMap[rawPath] || imageMap[cleanPath] || rawPath;
+        }
+
+        // 3. 建立圖片與選單的容器
+       // --- 建立圖片與選單的容器 ---
+const leaderContainer = row.append("div")
+    .style("display", "flex")       // 啟用 Flexbox
+    .style("flex-direction", "row") // 確保水平排列
+    .style("align-items", "center") // 垂直居中對齊
+    .style("gap", "12px")           // 圖片與選單間的間距
+    .style("width", "100%")
+    .style("margin-bottom", "10px");
+
+// --- 圖片部分 (只有有圖才顯示) ---
+if (finalUrl) {
+    leaderContainer.append("div")
+        .attr("class", "leader-img-frame")
+        .append("img")
+        .attr("src", finalUrl)
+        .attr("class", "leader-preview-img")
+        .on("error", function() { d3.select(this.parentNode).remove(); })
+        .on("click", () => showImageOverlay(finalUrl));
+}
+
+// --- 下拉選單部分 ---
+const select = leaderContainer.append("select")
+    .attr("class", "leader-select")
+    .style("flex", "1") // 重要：這會讓選單自動佔滿剩下的空間
+    .on("change", function() {
+        p.leaderNo = this.value;
+        renderSetupPlayers();
+    });
+
+        // 取得目前已被其他玩家選走的 Leader ID 列表
+        const takenLeaders = setupPlayers
+            .filter((other, idx) => idx !== i) // 排除自己
+            .map(other => other.leaderNo);
+
         window.leader.forEach(l => {
-            lb.append("button")
+            const isTaken = takenLeaders.includes(l.no);
+
+            select.append("option")
+                .attr("value", l.no)
                 .text(l.name)
-                .classed("active", l.no === p.leaderNo)
-                .on("click", () => {
-                    setupPlayers.forEach(sp => {
-                        if (sp.leaderNo === l.no) sp.leaderNo = p.leaderNo;
-                    });
-                    p.leaderNo = l.no;
-                    renderSetupPlayers();
-                });
+                .property("selected", l.no === p.leaderNo)
+                .property("disabled", isTaken); // 防止重複選擇
         });
 
-        // Color buttons
-        const cb = row.append("div").attr("class", "btn-group");
+        // --- Color 按鈕 (維持原樣) ---
+        const cb = row.append("div").attr("class", "btn-group").style("margin-top", "10px");
         COLORS.forEach(c => {
             cb.append("button")
                 .style("background", c.value)
@@ -326,7 +363,7 @@ function renderPlayerButtons() {
             const availColors = COLORS.filter(c => !usedColors.includes(c.value));
 
             if (availLeaders.length === 0 || availColors.length === 0) {
-                alert("no leader or color available");
+                console.log("no leader or color available");
                 return;
             }
 
@@ -382,8 +419,6 @@ function startGame(cnt, cfg) {
     currentRound = 1;
     firstPlayerIndex = 0;
     events = [];
-    battleSummary = [];
-    permanent = { swordmaster: [], highCouncil: [], makerHooks: [], tech: [], wall: [], sandworm: [] };
 
     saveGame();
     renderGame();
@@ -411,7 +446,7 @@ function renderGame() {
     const h2 = r.append("h2")
         .style("cursor", "pointer")
         .style("text-decoration", "underline")
-        .text(`Round ${currentRound} - ${card.level} - ${card ? card.name : "error"}`)
+        .text(`Round ${currentRound} - ${card ? card.level : "no"} - ${card ? card.name : "data"}`)
         .on("click", () => {
             // 從資料中獲取圖片路徑 (例如: "image/battle_for_arrakeen.png")
             // 並從我們標準化過後的 imageMap 抓取 blobUrl
@@ -470,7 +505,6 @@ function renderGame() {
             // 如果沒有圖片：回退到原本的純文字格式
             vpContainer.text(`VP ${p.vp}`);
         }
-        // c.append("div").text(`⚔️ ${p.influenceStates["emperor"]}  🏛️ ${p.highCouncil ? '✓' : '✗'}  🪝 ${p.makerHooks ? '✓' : '✗'}  💥 ${p.wall ? '✓' : '✗'}`);
     });
 
     // Event area
@@ -480,8 +514,9 @@ function renderGame() {
     const ctl = b.append("div").attr("class", "btn-group");
     ctl.append("button").text("◀").on("click", prevRound);
     ctl.append("button").text("▶").on("click", nextRound);
-    ctl.append("button").text("edit").on("click", () => { edit = !edit; });
+    ctl.append("button").text("undo").on("click", undo);
     ctl.append("button").text("export").on("click", exportData);
+    ctl.append("button").text("import").on("click", importData);
     ctl.append("button").text("end game").on("click", endGame);
 
     renderTimeline();
@@ -500,7 +535,7 @@ function renderEventTypeButtons() {
     d.append("h3").text(p.name).style("color", findPlayerColor(p.id) || "#ccc");
     d.append("button").text("➕ VP").on("click", () => renderVPInput());
     d.append("button").text("🤝 influence").on("click", () => renderInfluenceInput());
-    d.append("button").text("⭐ Ability").on("click", () => renderPermInput());
+    d.append("button").text("⭐ Ability").on("click", () => renderAbilityInput());
     d.append("button").text("⚔️ Battle").on("click", () => renderBattleInput());
     // d.append("button").text("🎴 Buy Card").on("click", () => renderBuyCardInput());
     d.append("button").text("Cancel").on("click", resetEventDraft);
@@ -522,6 +557,8 @@ function renderVPInput() {
         { text: "spice must flow", vp: 1 },
         { text: "intrigue", vp: 1 },
         { text: "imperium", vp: 1 },
+        { text: "endgame icon", vp: 1 },
+        { text: "endgame intrigue", vp: 1 },
     ];
 
     const reasonDiv = d.append("div").attr("id", "vpReasonBtns").style("margin-top", "5px");
@@ -818,22 +855,21 @@ function addBuyCard(card) {
     renderGame();       // 回到主畫面
 }
 
-// Permanent
-function renderPermInput() {
+// Ability
+function renderAbilityInput() {
     if (!eventDraft.playerId) return;
     const p = players.find(pl => pl.id === eventDraft.playerId);
 
     const d = d3.select("#eventDiv").html(""); // 清空
     d.append("h3").html(`
     <span style="color: ${findPlayerColor(p.id) || '#ccc'}">${p.name}</span>
-    <span style="color: #eee;">- Permanent Effect</span>
+    <span style="color: #eee;">- Ability Effect</span>
 `);
 
     const abilities = [
         ["swordmaster", "⚔️", "personal"],
         ["highCouncil", "🏛️", "personal"],
         ["makerHooks", "🪝", "personal"],
-        ["tech", "🔧", "personal"],
         ["breakWall", "💥", "global"],
         ["sandworm", "🦠", "personal"]
     ];
@@ -847,24 +883,18 @@ function renderPermInput() {
             hasAbility = players.some(pl => pl.wall === true);
         }
 
-
-        if (edit) {
-            // 編輯模式 → 顯示全部按鈕
+        // 非編輯模式 → 只顯示尚未取得的能力
+        if (!hasAbility) {
             const btn = d.append("button").text(emoji);
-            btn.on("click", () => commitPerm(key));
-        } else {
-            // 非編輯模式 → 只顯示尚未取得的能力
-            if (!hasAbility) {
-                const btn = d.append("button").text(emoji);
-                if (type === "global" && hasAbility) btn.attr("disabled", true);
-                btn.on("click", () => commitPerm(key));
-            }
+            if (type === "global" && hasAbility) btn.attr("disabled", true);
+            btn.on("click", () => commitAbility(key));
         }
+
     });
     d.append("button").text("Cancel").on("click", resetEventDraft);
 }
 
-function commitPerm(k) {
+function commitAbility(k) {
     const p = players.find(x => x.id === eventDraft.playerId);
 
     let newValue = false; // 這次更新後的值
@@ -878,10 +908,6 @@ function commitPerm(k) {
     } else if (k === "makerHooks") {
         p.makerHooks = !p.makerHooks;
         newValue = p.makerHooks;
-    } else if (k === "tech") {
-        // tech 可以累加，每點一次就加一個 id
-        permanent.tech.push(p.id);
-        newValue = true;
     } else if (k === "breakWall") {
         playEffect(sounds.breakWall); // 嘗試取得 breakWall 就播放音效
         p.wall = !p.wall;
@@ -892,7 +918,7 @@ function commitPerm(k) {
 
     // 記錄事件，value = 更新後的真偽值
     events.push({
-        type: "permanent",
+        type: "ability",
         round: currentRound,
         playerId: p.id,
         ability: k,
@@ -1167,7 +1193,7 @@ function renderTimeline() {
     ${e.faction ? reasonMap[e.reason] : e.reason}
 `;
         }
-        if (e.type === "permanent")
+        if (e.type === "ability")
             t += `${findPlayerName(e.playerId)} ${e.value ? "gain" : "lose"} ${e.ability}`;
 
         if (e.type === "battle") {
@@ -1295,6 +1321,22 @@ function endGame() {
     initGameUI();
 }
 // ================= Storage =================
+function applyGameData(data) {
+    if (!data) return;
+
+    players = data.players;
+    currentRound = data.currentRound;
+    events = data.events;
+    firstPlayerIndex = data.firstPlayerIndex;
+
+    // 重新關連 Conflict 物件
+    conflictDeck = data.conflictDeckOrder.map(no =>
+        window.conflict.find(c => c.no === no)
+    );
+
+    saveGame();   // 載入後存入 LocalStorage，確保重新整理也不會丟失
+    renderGame(); // 刷新畫面
+}
 function saveGame() {
     localStorage.setItem("duneGame", JSON.stringify({
         players, currentRound, events, firstPlayerIndex,
@@ -1303,21 +1345,127 @@ function saveGame() {
 }
 function loadGame() {
     const d = localStorage.getItem("duneGame");
-    if (!d) return;
-    const g = JSON.parse(d);
-    players = g.players;
-    currentRound = g.currentRound;
-    events = g.events;
-    firstPlayerIndex = g.firstPlayerIndex;
-    conflictDeck = g.conflictDeckOrder.map(no => window.conflict.find(c => c.no === no));
-    renderGame();
+    if (d) {
+        applyGameData(JSON.parse(d));
+    }
 }
+// ================= Import =================
+function importData() {
+    // 1. 動態建立一個隱藏的 file input
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
 
+    // 2. 監聽選取檔案動作
+    input.onchange = (e) => {
+        const file = e.target.files[0]; // 這裡現在能讀到 '0' 了
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const gameData = JSON.parse(event.target.result);
+
+                // 恢復玩家的 Leader 物件連結 (這點很重要，否則匯入後按鈕會失效)
+                gameData.players.forEach(p => {
+                    if (p.leader && p.leader.no) {
+                        p.leader = window.leader.find(l => l.no === p.leaderNo) || p.leader;
+                    }
+                });
+
+                applyGameData(gameData);
+                console.log("Game Imported!");
+            } catch (err) {
+                console.error(err);
+                console.log("Import failed: Invalid JSON");
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    // 3. 模擬點擊這個隱藏的 input
+    input.click();
+}
 // ================= Export =================
 function exportData() {
-    const blob = new Blob([JSON.stringify({ players, events }, null, 2)], { type: "application/json" });
+    const conflictDeckOrder = conflictDeck.map(c => c.no)
+    const blob = new Blob([JSON.stringify({ players, currentRound, events, firstPlayerIndex, conflictDeckOrder }, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "dune.json";
     a.click();
+}
+
+// ================= Undo =================
+function undo() {
+    if (events.length === 0) {
+        console.log("can't undo, no events");
+        return;
+    }
+
+    // 1. 取得最後一個 event 並從陣列移除
+    const lastEvent = events.pop();
+
+    // 2. 根據 event 類型進行「逆運算」
+    switch (lastEvent.type) {
+        case "vpChange":
+            // 找到該玩家，把加的分扣回去
+            const p = players.find(x => x.id === lastEvent.playerId);
+
+            // 1. 基本操作：扣回分數
+            p.vp -= lastEvent.value;
+
+            // 2. 處理副作用：根據 reason 還原其他狀態
+            switch (lastEvent.reason) {
+                case "reach 2 influence":
+                    // 還原聲望：減 1 (假設這分是因為從 1 變 2 拿到的)
+                    if (lastEvent.faction) {
+                        p.influenceStates[lastEvent.faction] -= 1;
+                    }
+                    break;
+
+                case "gain Alliance":
+                    if (lastEvent.faction) {
+                        p.influenceStates[lastEvent.faction] -= 1;
+                    }
+                    break;
+                case "lose Alliance":
+                    if (lastEvent.faction) {
+                        p.influenceStates[lastEvent.faction] += 1;
+                    }
+                    break;
+            }
+            break;
+
+        case "ability":
+            // 還原能力狀態
+            const pAbility = players.find(p => p.id === lastEvent.playerId);
+            if (pAbility) {
+                // 這裡要對應你的 ability 物件與 player 屬性
+                // 假設 ability 是 "breakWall" 對應 player.wall
+                if (lastEvent.ability === "breakWall") {
+                    pAbility.wall = !lastEvent.value; // 設回相反值
+                }
+            }
+            break;
+
+        case "battle":
+            // Battle 如果只是純紀錄，pop 掉即可
+            // 但如果有影響戰力或領地，則需在此還原
+            break;
+
+        case "influenceChange": // 假設你有這個
+            const pInf = players.find(p => p.id === lastEvent.playerId);
+            if (pInf) {
+                pInf.influenceStates[lastEvent.faction] -= lastEvent.value;
+            }
+            break;
+
+        default:
+            console.warn("未定義的撤銷類型:", lastEvent.type);
+    }
+
+    // 3. 重新儲存並渲染畫面
+    saveGame();
+    renderGame();
 }
