@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>洗牌助手</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --highlight: #ef4444;
+            --bg: #f1f5f9;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        input {
+            width: 45px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+
+        .step-container {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 900px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .phase-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .phase-desc {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        .list-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .list-item {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 12px 5px;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+        }
+
+        .list-item .index-label {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            background: #94a3b8;
+            color: white;
+            padding: 0 4px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .list-item.active {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .main-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .btn-next {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 1.1rem;
+            background: #1e293b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* 最終序列顯示樣式 */
+        .final-report {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            word-break: break-all;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .finish-msg {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.5rem;
+            color: #059669;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="controls">
+        <label>預設方案:
+            <select id="presets" onchange="applyPreset()">
+                <option value="69,9,8">大卡 (69張 - 9堆/8列)</option>
+                <option value="65,9,8">大卡 (65張 - 9堆/8列)</option>
+                <option value="44,8,6">細卡 (44張 - 8堆/6列)</option>
+                <option value="40,7,6">細卡 (40張 - 7堆/6列)</option>
+                <option value="custom">自定義</option>
+            </select>
+        </label>
+        |
+        <label>總數 <input type="number" id="total" value="69"></label>
+        <label>堆 <input type="number" id="rows" value="9"></label>
+        <label>列 <input type="number" id="cols" value="8"></label>
+        <button onclick="startProcess()">生成方案</button>
+    </div>
+
+    <div id="main-ui" class="step-container" style="display:none;">
+        <div class="phase-title">
+            <span id="phase-label"></span>
+            <small id="progress-tag"></small>
+        </div>
+        <div id="phase-desc" class="phase-desc"></div>
+        <div id="display-area"></div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button onclick="handlePrev()" style="flex: 1; background: #94a3b8; color: white;">上一步 (Backspace)</button>
+            <button id="next-btn" onclick="handleNext()" style="flex: 2; background: #1e293b; color: white;">下一步
+                (Space)</button>
+        </div>
+    </div>
+
+    <script>
+        let config = { total: 69, rows: 9, cols: 8 };
+        let fullSequence = []; // 存儲 0-68 索引的目標位置
+        let piles = [];
+        let currentPhase = 1;
+        let batchIndex = 0;
+        let currentPileIdx = 0;
+
+        function applyPreset() {
+            const presetVal = document.getElementById('presets').value;
+            if (presetVal === 'custom') return;
+
+            const [t, r, c] = presetVal.split(',');
+            document.getElementById('total').value = t;
+            document.getElementById('rows').value = r;
+            document.getElementById('cols').value = c;
+
+            // 選取後自動聚焦到「生成方案」按鈕，按 Enter 即可開始
+            document.querySelector('button[onclick="startProcess()"]').focus();
+        }
+
+        function fisherYates(n) {
+            let arr = Array.from({ length: n }, (_, i) => i + 1);
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startProcess() {
+            config.total = parseInt(document.getElementById('total').value);
+            config.rows = parseInt(document.getElementById('rows').value);
+            config.cols = parseInt(document.getElementById('cols').value);
+
+            fullSequence = fisherYates(config.total);
+            piles = Array.from({ length: config.rows }, () => []);
+
+            fullSequence.forEach((targetPos, originalIdx) => {
+                let targetRow = Math.ceil(targetPos / config.cols);
+                if (targetRow > config.rows) targetRow = config.rows;
+                piles[targetRow - 1].push({
+                    originalOrder: originalIdx + 1,
+                    targetPos: targetPos,
+                    targetCol: (targetPos - 1) % config.cols + 1
+                });
+            });
+
+            currentPhase = 1; batchIndex = 0;
+            currentPileIdx = config.rows - 1;
+            document.getElementById('main-ui').style.display = 'block';
+            renderPhase();
+        }
+
+        function renderPhase() {
+            const area = document.getElementById('display-area');
+            const label = document.getElementById('phase-label');
+            const desc = document.getElementById('phase-desc');
+            const prog = document.getElementById('progress-tag');
+            area.innerHTML = '';
+
+            if (currentPhase === 1) {
+                label.innerText = "步驟 1：分發卡牌到各牌堆";
+                desc.innerHTML = `請把原本的卡牌<b>一張一張拿起</b>，並丟入對應的目標堆中。<br>
+                      <span style="color: #ef4444;">注意：後發的牌請直接覆蓋在先發的牌之上。</span>`;
+                prog.innerText = `進度：${batchIndex + 1} / ${config.rows} 堆`;
+                let start = batchIndex * config.cols;
+                let html = `<div class="list-grid">`;
+                for (let i = start; i < start + config.cols; i++) {
+                    if (i < config.total) {
+                        let targetRow = Math.ceil(fullSequence[i] / config.cols);
+                        if (targetRow > config.rows) targetRow = config.rows;
+                        html += `<div class="list-item active"><span class="index-label">第 ${i + 1} 張</span><span class="main-val">堆 ${targetRow}</span></div>`;
+                    } else {
+                        html += `<div class="list-item" style="opacity:0.2"></div>`;
+                    }
+                }
+                area.innerHTML = html + `</div>`;
+
+            } else if (currentPhase === 2) {
+                label.innerText = `步驟 2：重新排列並合併 (剩餘${currentPileIdx + 1} 堆)`;
+                desc.innerHTML = `
+        1. 拿起<b>第 ${currentPileIdx + 1} 堆</b>全部卡牌。<br>
+        2. 從<b>最上面那張</b>開始，依照下方順序「由左至右」擺在桌面上。<br>
+        3. <b>【關鍵】</b>按順序將桌面上的這幾張牌收成一疊，然後<b>整體疊在「成品堆」的最上方</b>。
+    `;
+                prog.innerText = `進度：${config.rows - currentPileIdx} / ${config.rows} 堆`;
+                // 推薦做法：直接反轉發牌順序
+                let currentItems = [...piles[currentPileIdx]].reverse();
+                let html = `<div class="list-grid">`;
+                currentItems.forEach((item, idx) => {
+                    html += `<div class="list-item active"><span class="index-label">內 ${idx + 1}</span><span class="main-val">位 ${item.targetCol}</span></div>`;
+                });
+                area.innerHTML = html + `</div>`;
+            }
+        }
+
+        function getFinalArray() {
+            // 計算最終從頂到底的編號
+            // 邏輯：按 targetPos 排序所有卡牌
+            let allCards = [];
+            piles.forEach(p => allCards.push(...p));
+            allCards.sort((a, b) => a.targetPos - b.targetPos);
+            return allCards.map(c => c.originalOrder);
+        }
+
+        function handleNext() {
+            if (currentPhase === 1) {
+                if ((batchIndex + 1) * config.cols < config.total) {
+                    batchIndex++;
+                } else {
+                    currentPhase = 2;
+                }
+            } else if (currentPhase === 2) {
+                if (currentPileIdx > 0) {
+                    currentPileIdx--;
+                } else {
+                    const finalArr = getFinalArray();
+                    document.getElementById('main-ui').innerHTML = `
+                        <div class="finish-msg">✨ 洗牌完成！</div>
+                        <p style="text-align:center; color:#64748b;">以下是本次牌堆從頂部到底部的最終編號序列：</p>
+                        <div class="final-report">${finalArr.join(', ')}</div>
+                        <button onclick="location.reload()" style="width:100%; margin-top:20px; padding:10px; border-radius:8px; border:1px solid #ddd; background:white; cursor:pointer;">開啟新對局</button>
+                    `;
+                    return;
+                }
+            }
+            renderPhase();
+        }
+
+        function handlePrev() {
+            if (currentPhase === 1) {
+                if (batchIndex > 0) {
+                    batchIndex--;
+                }
+            } else if (currentPhase === 2) {
+                // 如果在第二階段的第一堆按上一步，回到第一階段的最後一組
+                if (currentPileIdx === config.rows - 1) {
+                    currentPhase = 1;
+                    batchIndex = Math.floor((config.total - 1) / config.cols);
+                } else {
+                    currentPileIdx++;
+                }
+            }
+            renderPhase();
+        }
+        window.onkeydown = (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                handleNext();
+            }
+            if (e.code === 'Backspace') {
+                // 防止退格鍵導致網頁後退
+                e.preventDefault();
+                handlePrev();
+            }
+        };
+    </script>
+</body>
+
+</html>

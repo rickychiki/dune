@@ -514,19 +514,32 @@ function startGame(cnt, cfg) {
 
 // ================= Conflict =================
 function generateConflictDeck() {
-    const s = a => a.sort(() => Math.random() - 0.5);
+    // 1. Fisher-Yates 洗牌算法
+    const shuffle = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    };
 
-    // 1. 決定可用池：如果是 false，只取前 16 張
-    const availablePool = bloodlines ? window.conflict : window.conflict.slice(0, 16);
+    // 2. 處理可用池：如果 bloodlines 為 false，建議先洗牌再取前 16 張，而不是直接截斷
+    let basePool = [...window.conflict];
+    if (!bloodlines) {
+        // 先打亂原始庫再取前 16 張，確保每次不啟動擴充時，這 16 張也是隨機的
+        basePool = basePool.slice(0, 16);
+    }
 
-    // 2. 從可用池中根據 Level 過濾並抽牌
+    // 3. 根據等級過濾並抽牌
+    const getCards = (level, count) => {
+        const filtered = basePool.filter(c => c.level === level);
+        return shuffle(filtered).slice(0, count);
+    };
+
     conflictDeck = [
-        // Level I 抽 1 張
-        ...s(availablePool.filter(c => c.level === "I")).slice(0, 1),
-        // Level II 抽 5 張
-        ...s(availablePool.filter(c => c.level === "II")).slice(0, 5),
-        // Level III 抽 4 張
-        ...s(availablePool.filter(c => c.level === "III")).slice(0, 4)
+        ...getCards("I", 1),
+        ...getCards("II", 5),
+        ...getCards("III", 4)
     ];
 }
 
