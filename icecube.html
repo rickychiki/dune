@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <title>冰塊棋 Ice Block Chess</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: sans-serif;
+            background-color: #f0f4f8;
+            margin-top: 20px;
+        }
+
+        canvas {
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #info {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>❄️ 冰塊棋 (Ice Block Chess) ❄️</h2>
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <div id="info">目前回合：藍方 (Blue)</div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const tileSize = 100;
+
+        // 棋盤邏輯：x 對應 A-E (0-4)，y 對應 1-5 (0-4)
+        // 左下角 A1 為 board[0][0]
+        let board = Array(5).fill(null).map(() => Array(5).fill(null));
+        let currentTurn = 'blue';
+        let selectedPiece = null;
+        let validDestinations = []; // 儲存目前選取棋子可移動的終點坐標
+        let gameOver = false;
+
+        // 初始配置
+        board[0][4] = { color: 'white', type: 'square' };
+        board[1][4] = { color: 'white', type: 'square' };
+        board[2][4] = { color: 'white', type: 'square' };
+        board[4][4] = { color: 'white', type: 'square' };
+        board[3][3] = { color: 'white', type: 'hex' };
+
+        board[0][0] = { color: 'blue', type: 'square' };
+        board[4][0] = { color: 'blue', type: 'square' };
+        board[2][0] = { color: 'blue', type: 'square' };
+        board[3][0] = { color: 'blue', type: 'square' };
+        board[1][1] = { color: 'blue', type: 'hex' };
+
+        // 計算某一棋子在冰面上推到底的所有有效終點
+        function getValidDestinations(startX, startY) {
+            const dests = [];
+            const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]]; // 下、上、左、右
+
+            for (let [dx, dy] of dirs) {
+                let curX = startX;
+                let curY = startY;
+                let moved = false;
+
+                // 直線滑動直到撞牆或撞子
+                while (true) {
+                    let nextX = curX + dx;
+                    let nextY = curY + dy;
+                    if (nextX < 0 || nextX >= 5 || nextY < 0 || nextY >= 5 || board[nextX][nextY]) {
+                        break;
+                    }
+                    curX = nextX;
+                    curY = nextY;
+                    moved = true;
+                }
+
+                // 必須至少移動 1 格才算有效移動（不能原地踏步移動 0 格）
+                if (moved) {
+                    dests.push({ x: curX, y: curY });
+                }
+            }
+            return dests;
+        }
+
+        function drawBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 2;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#999';
+
+            // 繪製網格與圍棋坐標標籤
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    // 將 y 軸視覺反轉，讓 y=0 (1) 在最下面
+                    const canvasX = x * tileSize;
+                    const canvasY = (4 - y) * tileSize;
+                    ctx.strokeRect(canvasX, canvasY, tileSize, tileSize);
+                }
+            }
+
+            // C3 雪花 (邏輯與視覺中心皆為 2,2)
+            ctx.font = '40px Arial';
+            ctx.fillText('❄️', 2 * tileSize + 50, 2 * tileSize + 50);
+
+            // 繪製選取棋子的黃色高亮底色
+            if (selectedPiece) {
+                ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+                ctx.fillRect(selectedPiece.x * tileSize, (4 - selectedPiece.y) * tileSize, tileSize, tileSize);
+
+                // 繪製可行走終點的提示（半透明綠色圓點）
+                for (let dest of validDestinations) {
+                    ctx.fillStyle = 'rgba(46, 204, 113, 0.6)';
+                    ctx.beginPath();
+                    ctx.arc(dest.x * tileSize + 50, (4 - dest.y) * tileSize + 50, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // 繪製棋子（置於格子中心）
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    const piece = board[x][y];
+                    if (piece) {
+                        const cx = x * tileSize + 50;
+                        const cy = (4 - y) * tileSize + 50; // 反轉 Y 軸計算圓心
+
+                        if (piece.color === 'white') {
+                            ctx.fillStyle = '#ecf0f1';
+                            ctx.strokeStyle = '#bdc3c7';
+                        } else {
+                            ctx.fillStyle = '#3498db';
+                            ctx.strokeStyle = '#2980b9';
+                        }
+
+                        ctx.lineWidth = 4;
+                        ctx.beginPath();
+
+                        if (piece.type === 'square') {
+                            // 正方形棋子
+                            ctx.rect(cx - 30, cy - 30, 60, 60);
+                        } else if (piece.type === 'hex') {
+                            // 六角形棋子
+                            for (let i = 0; i < 6; i++) {
+                                const angle = Math.PI / 3 * i;
+                                const hx = cx + 35 * Math.cos(angle);
+                                const hy = cy + 35 * Math.sin(angle);
+                                if (i === 0) ctx.moveTo(hx, hy);
+                                else ctx.lineTo(hx, hy);
+                            }
+                            ctx.closePath();
+                        }
+                        ctx.fill();
+                        ctx.stroke();
+
+                        // 六角形加個皇冠方便識別
+                        if (piece.type === 'hex') {
+                            ctx.fillStyle = piece.color === 'white' ? '#333' : '#fff';
+                            ctx.font = '24px Arial';
+                            ctx.fillText('👑', cx, cy);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 計算圍棋群組的氣
+        function getLiberties(x, y, color, visited = new Set()) {
+            const key = `${x},${y}`;
+            if (visited.has(key)) return 0;
+            visited.add(key);
+
+            let liberties = 0;
+            const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+
+            for (let [dx, dy] of dirs) {
+                const nx = x + dx, ny = y + dy;
+                if (nx >= 0 && nx < 5 && ny >= 0 && ny < 5) {
+                    if (!board[nx][ny]) {
+                        liberties++;
+                    } else if (board[nx][ny].color === color) {
+                        liberties += getLiberties(nx, ny, color, visited);
+                    }
+                }
+            }
+            return liberties;
+        }
+
+        // 檢查並移除全盤沒有氣的對手棋子
+        function checkCaptures(opponentColor) {
+            let capturedHex = false;
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    if (board[x][y] && board[x][y].color === opponentColor) {
+                        let visited = new Set();
+                        if (getLiberties(x, y, opponentColor, visited) === 0) {
+                            // 該群組氣數為 0，執行吃子
+                            visited.forEach(key => {
+                                const [cx, cy] = key.split(',').map(Number);
+                                if (board[cx][cy].type === 'hex') capturedHex = true;
+                                board[cx][cy] = null;
+                            });
+                        }
+                    }
+                }
+            }
+            return capturedHex;
+        }
+
+        // 點擊事件監聽
+        canvas.addEventListener('click', (e) => {
+            if (gameOver) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const clickCanvasX = Math.floor((e.clientX - rect.left) / tileSize);
+            const clickCanvasY = Math.floor((e.clientY - rect.top) / tileSize);
+
+            const x = clickCanvasX;
+            const y = 4 - clickCanvasY; // 將畫面的 Y 軸轉回邏輯坐標 (1-5)
+
+            if (!selectedPiece) {
+                // 【階段一：選擇棋子】
+                if (board[x][y] && board[x][y].color === currentTurn) {
+                    selectedPiece = { x, y };
+                    validDestinations = getValidDestinations(x, y);
+                    drawBoard();
+                }
+            } else {
+                // 【階段二：選擇終點】
+                // 檢查點擊的格子是否包含在算好的終點陣列中
+                const targetDest = validDestinations.find(dest => dest.x === x && dest.y === y);
+
+                if (targetDest) {
+                    // 執行移動
+                    const piece = board[selectedPiece.x][selectedPiece.y];
+                    board[selectedPiece.x][selectedPiece.y] = null;
+                    board[targetDest.x][targetDest.y] = piece;
+
+                    // 勝利條件 1：己方六角形滑行抵達 C3 (2, 2)
+                    if (piece.type === 'hex' && targetDest.x === 2 && targetDest.y === 2) {
+                        drawBoard();
+                        document.getElementById('info').innerText = `🎉 ${currentTurn === 'blue' ? '藍方' : '白方'} 六角形抵達中心，獲得勝利！`;
+                        gameOver = true;
+                        return;
+                    }
+
+                    // 執行圍棋吃子判定
+                    const opponentColor = currentTurn === 'blue' ? 'white' : 'blue';
+                    const hexCaptured = checkCaptures(opponentColor);
+
+                    // 勝利條件 2：吃掉對手的六角形棋子
+                    if (hexCaptured) {
+                        drawBoard();
+                        document.getElementById('info').innerText = `⚔️ ${currentTurn === 'blue' ? '藍方' : '白方'} 吃掉了對手的六角形，獲得勝利！`;
+                        gameOver = true;
+                        return;
+                    }
+
+                    // 計算場上雙方剩餘的棋子總數
+                    let blueCount = 0;
+                    let whiteCount = 0;
+                    for (let i = 0; i < 5; i++) {
+                        for (let j = 0; j < 5; j++) {
+                            if (board[i][j]) {
+                                if (board[i][j].color === 'blue') blueCount++;
+                                else whiteCount++;
+                            }
+                        }
+                    }
+
+                    // 勝利條件 3：當總棋子數降至 5 顆或以下時，立刻強制結算
+                    const totalPieces = blueCount + whiteCount;
+                    if (totalPieces <= 5) {
+                        drawBoard();
+                        let resultMsg = '';
+                        if (blueCount > whiteCount) resultMsg = '藍方棋子較多，獲得勝利！';
+                        else if (whiteCount > blueCount) resultMsg = '白方棋子較多，獲得勝利！';
+                        else resultMsg = '雙方數量相同，平局！';
+
+                        document.getElementById('info').innerHTML = `🏁 場上總棋子數降至 ${totalPieces} 顆，遊戲強制結束！<br>藍方 ${blueCount} : 白方 ${whiteCount}<br>👉 <b>${resultMsg}</b>`;
+                        gameOver = true;
+                        return;
+                    }
+
+                    // 進入下一回合，清空暫存
+                    currentTurn = opponentColor;
+                    selectedPiece = null;
+                    validDestinations = [];
+                    document.getElementById('info').innerText = `目前回合：${currentTurn === 'blue' ? '藍方 (Blue)' : '白方 (White)'}`;
+
+                } else {
+                    // 如果點選的不是合法綠色終點：允許點擊其他己方棋子切換，或者點擊空格取消選取
+                    if (board[x][y] && board[x][y].color === currentTurn) {
+                        selectedPiece = { x, y };
+                        validDestinations = getValidDestinations(x, y);
+                    } else {
+                        selectedPiece = null;
+                        validDestinations = [];
+                    }
+                }
+                drawBoard();
+            }
+        });
+
+        // 初始化繪製
+        drawBoard();
+    </script>
+</body>
+
+</html>
