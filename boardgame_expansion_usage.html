@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BoardGame Expansion Usage Stats</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #fff;
+      --line: #e4e7ef;
+      --text: #1c2434;
+      --muted: #6d7688;
+      --accent: #4f46e5;
+      --accent2: #eef2ff;
+      --good: #087443;
+      --bad: #b42318
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+    }
+
+    .wrap {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 24px
+    }
+
+    .top {
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px
+    }
+
+    .sub {
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .04);
+      margin-bottom: 14px
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .file {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .file input {
+      max-width: 360px
+    }
+
+    button,
+    select,
+    input {
+      font: inherit
+    }
+
+    button,
+    select {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 9px;
+      padding: 8px 11px
+    }
+
+    button {
+      cursor: pointer
+    }
+
+    .primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent)
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 10px
+    }
+
+    .stat {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fafbff
+    }
+
+    .stat b {
+      display: block;
+      font-size: 20px
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px
+    }
+
+    .tab {
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      cursor: pointer
+    }
+
+    .tab.active {
+      background: var(--accent2);
+      border-color: #c7d2fe;
+      color: #3730a3;
+      font-weight: 600
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px
+    }
+
+    .grow {
+      flex: 1
+    }
+
+    .toolbar input {
+      min-width: 220px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px
+    }
+
+    .table-wrap {
+      max-height: 68vh
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1080px
+    }
+
+    th,
+    td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8f9fc;
+      z-index: 2;
+      font-size: 12px;
+      color: #596275;
+      cursor: pointer;
+      white-space: nowrap
+    }
+
+    tr:hover td {
+      background: #fbfcff
+    }
+
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums
+    }
+
+    .name {
+      font-weight: 600
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #f0f2f7;
+      font-size: 11px
+    }
+
+    .rate {
+      font-weight: 700
+    }
+
+    .rate.good {
+      color: var(--good)
+    }
+
+    .rate.high {
+      color: #1d4ed8
+    }
+
+    .rate.low {
+      color: var(--bad)
+    }
+
+    .progress {
+      width: 120px;
+      height: 7px;
+      background: #edf0f5;
+      border-radius: 99px;
+      overflow: hidden
+    }
+
+    .progress>i {
+      display: block;
+      height: 100%;
+      background: var(--accent)
+    }
+
+    #error {
+      color: var(--bad);
+      white-space: pre-wrap
+    }
+
+    .hidden {
+      display: none
+    }
+
+    .small {
+      font-size: 12px
+    }
+
+    .loading {
+      color: var(--accent);
+      font-weight: 600
+    }
+
+    .footnote {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px
+    }
+
+    @media(max-width:900px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .wrap {
+        padding: 12px
+      }
+
+      h1 {
+        font-size: 23px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>BoardGame Expansion Usage Stats</h1>
+        <div class="sub">CSV / TSV · Big Box contain 計入使用率</div>
+      </div>
+      <div id="status" class="small muted">尚未載入資料</div>
+    </div>
+
+    <section class="card">
+      <div class="controls">
+        <label class="file"><b>載入 CSV</b><input id="file" type="file"
+            accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values"></label>
+        <button id="demo">載入範例</button>
+        <button id="clear">清除</button>
+      </div>
+      <div id="error" class="small" style="margin-top:10px"></div>
+      <div class="footnote">可自動判斷逗號或 Tab 分隔；空白列、空白欄位、最後多一個換行都會安全處理。</div>
+    </section>
+
+    <section class="card">
+      <div class="stats">
+        <div class="stat"><b id="sRows">0</b><span>讀取資料列</span></div>
+        <div class="stat"><b id="sGames">0</b><span>Base Game</span></div>
+        <div class="stat"><b id="sExps">0</b><span>Expansion</span></div>
+        <div class="stat"><b id="sBoxes">0</b><span>Big Box / Container</span></div>
+        <div class="stat"><b id="sLinked">0</b><span>有 baseid / containid</span></div>
+        <div class="stat"><b id="sTime">-</b><span>處理時間</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="tabs">
+        <button class="tab active" data-view="game">同一 Game 排名</button>
+        <button class="tab" data-view="all">全部擴充排名</button>
+      </div>
+
+      <div id="gameView">
+        <div class="toolbar">
+          <label>Base Game：<select id="gameSelect" disabled>
+              <option>請先載入資料</option>
+            </select></label>
+          <label>Top：<select id="gameLimit">
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="250">250</option>
+              <option value="1000">1000</option>
+              <option value="0">全部</option>
+            </select></label>
+          <button id="downloadGame" disabled>下載目前排名 CSV</button>
+        </div>
+        <div id="gameInfo" class="small muted" style="margin-bottom:8px"></div>
+        <div class="table-wrap">
+          <table>
+            <thead id="gameHead"></thead>
+            <tbody id="gameBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="allView" class="hidden">
+        <div class="toolbar">
+          <input id="search" class="grow" placeholder="搜尋擴充名稱 / ID / Base Game">
+          <label>排名依：<select id="allSort">
+              <option value="directUsage">直接使用率</option>
+              <option value="usage">使用率</option>
+              <option value="effectiveOwned">Expansion 有效 Own</option>
+              <option value="baseEffective">Base 有效 Own</option>
+              <option value="numowned">直接擁有人數</option>
+              <option value="bayesaverage">Bayes Rating</option>
+              <option value="average">Average Rating（按票數校正）</option>
+              <option value="rank">BGG Rank</option>
+              <option value="name">名稱</option>
+            </select></label>
+          <label>Top：<select id="allLimit">
+              <option value="100">100</option>
+              <option value="250">250</option>
+              <option value="1000">1000</option>
+              <option value="5000">5000</option>
+              <option value="0">全部</option>
+            </select></label>
+          <button id="downloadAll" disabled>下載目前排名 CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead id="allHead"></thead>
+            <tbody id="allBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. 納入與排除篩選邏輯 -->
+    <section class="card small">
+      <b>納入與排除篩選邏輯 (Filtering Rules)：</b><br>
+      <b>【納入 (✅)】：</b><br>
+      1. 正式獨立販售的 Expansion、Mini-Expansion。<br>
+      2. 正式獨立販售的 Scenario / Campaign / Map Pack。<br>
+      3. 正式獨立販售，且增加一個可在正常遊戲中運作之獨立 gameplay module。<br>
+      4. Kickstarter Exclusive / Stretch Goals：若後續有另外獨立上架零售，則 ✅ 納入計算。<br>
+      <br>
+      <b>【排除 (❌)】：</b><br>
+      1. Promo / 首刷贈品 / 隨其他產品附送 / 1–2 張 Promo 卡。<br>
+      2. 免費 Web 下載 / Codex / Fan-made 模組。<br>
+      3. 主要為配件升級、替換元件、少量附加卡（如金屬幣、木指示物、純修訂卡）。<br>
+      4. Big Box / Bundle / Compilation：不作為獨立 Expansion 排名，將其 Own 數量拆解併入其包含的 Base / Expansion 計算。
+    </section>
+
+    <!-- 2. 特殊遊戲綁定與歸屬規則 -->
+    <section class="card small">
+      <b>特殊遊戲綁定與歸屬規則 (Game-Specific Mapping Rules)：</b><br>
+      1. <b>Edition 定義：</b>主要以bgg頁面。官方對原 Base Game 進行實質性規則或遊戲內容修訂後發行的新版本（如 2nd Edition, Revised
+      Core）。單純換出版社、換美術、多國語言版、配件升級、單純重印，即使產品名稱不同，也不視為新的 Edition。<br>
+      2. <b>Arkham Horror: The Card Game：</b>2016 年原版與 2021 年 Revised Core Set 視作【同一個 Base】合併計算。<br>
+      3. <b>Star Realms：</b>Star Realms: Colony Wars 與 Star Realms: Frontiers 納入 Star Realms。<br>
+      5. <b>Dune: Imperium：</b>Rise of Ix、Immortality、Bloodlines 僅納入最接近的 Base Game（如 Dune: Imperium 或 Dune: Imperium –
+      Uprising）。<br>
+      6. <b>Concordia：</b>任何 Concordia 擴充【不納入】Concordia Venus。<br>
+      7. <b>Nemesis：</b>任何 Nemesis 擴充【不納入】Nemesis: Lockdown。<br>
+      8. <b>Wingspan：</b>Wingspan: Oceania Expansion 【不納入】Wingspan Asia。
+    </section>
+
+    <!-- 3. 持有率計算與排名演算法 -->
+    <section class="card small">
+      <b>使用率計算(Usage)：</b><br>
+      • <b>Expansion Own</b> = 直接持有 Expansion 的人 + 持有 Big Boxes 包括 Expansion 的人<br>
+      • <b>Base Own</b> = 直接持有 Base 的人 + 持有 Set 包括 Base 的人<br>
+      • <b>Direct Owned</b> = 直接持有 Expansion 的人<br>
+      • <b>Big Boxes</b> = 有多少個 Big Boxes 包括這個擴充<br>
+      • <b>Usage</b> = Expansion Own ÷ Base Own × 100%<br>
+      • <b>Direct Usage</b> = Direct Owned ÷ 直接持有 Base 的人 × 100%<br>
+      <br>同一擴充納入多個 Base Games 會分別計算各 Base Game 使用率；「全部擴充排名」採用其中最高使用率作為排名值，並保留所有 Base Game 名稱。
+      <br>注意：BGG 的持有數是作品層級統計，不是同一批玩家的去重名單。
+    </section>
+
+    <!-- 4. 評級輸出標準 -->
+    <section class="card small">
+      <b>評級標準 (Rating Output)：</b><br>
+      • ≥ 30.0% : 5 星 ★★★★★ 閉眼買（社群公認必備神擴） <br>
+      • 20.0% ~ 29.9% : 4 星 ★★★★☆ 強烈推薦（開 5 次以上直接買）<br>
+      • 10.0% ~ 19.9% : 3 星 ★★★☆☆ 按需購入<br>
+      • 5.0% ~ 9.9% : 2 星 ★★☆☆☆ 粉絲向（真愛粉或想要完整收集才買）<br>
+      • &lt; 5.0% : 1 星 ★☆☆☆☆ 可跳過（除非有特殊收藏需求）
+    </section>
+  </div>
+
+  <script>
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const state = { rows: [], byId: new Map(), baseGames: [], expansions: [], containers: [], gameRows: new Map(), allRows: [], view: 'game', gameId: null, gameSort: { key: 'directUsage', dir: -1 }, allSort: { key: 'directUsage', dir: -1 } };
+
+    const HEADERS = ['id', 'name', 'yearpublished', 'rank', 'numowned', 'numprevowned', 'baseid', 'containid', 'bayesaverage', 'average', 'usersrated', 'is_expansion'];
+
+    function clean(v) { return (v ?? '').trim(); }
+    function num(v) { const x = parseFloat(clean(v)); return Number.isFinite(x) ? x : 0; }
+    function int(v) { const x = parseInt(clean(v), 10); return Number.isFinite(x) ? x : 0; }
+    function ids(v) { return clean(v).split(';').map(x => x.trim()).filter(Boolean); }
+    function escapeHtml(s) { return String(s ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c])); }
+    function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+    function pct(n) { return (Number(n || 0)).toFixed(1) + '%'; }
+    function rating(n) { return n ? Number(n).toFixed(2) : '—'; }
+    function rateClass(r) { return r >= 50 ? 'high' : r >= 20 ? 'good' : 'low'; }
+
+    // Fast enough for 180k rows: process File.stream() chunk-by-chunk instead of reading the whole file as one giant string.
+    async function parseFile(file) {
+      const t0 = performance.now();
+      const stream = file.stream().pipeThrough(new TextDecoderStream('utf-8', { fatal: false }));
+      const reader = stream.getReader();
+      let buf = '', headers = null, delimiter = null, rows = [];
+      function parseLine(line) {
+        // This input is expected to be simple CSV/TSV without embedded newline fields.
+        // Quote-aware splitting still handles commas/tabs inside quoted fields.
+        const out = []; let cur = ''; let quoted = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') { if (quoted && line[i + 1] === '"') { cur += '"'; i++; } else quoted = !quoted; }
+          else if (ch === delimiter && !quoted) { out.push(cur); cur = ''; }
+          else cur += ch;
+        }
+        out.push(cur); return out;
+      }
+      let lines = 0;
+      while (true) {
+        const { value, done } = await reader.read(); if (done) break; buf += value;
+        let idx;
+        while ((idx = buf.indexOf('\n')) >= 0) {
+          let line = buf.slice(0, idx); buf = buf.slice(idx + 1); if (line.endsWith('\r')) line = line.slice(0, -1);
+          if (!line.trim()) continue;
+          if (!headers) {
+            delimiter = (line.includes('\t') ? '\t' : ',');
+            headers = parseLine(line).map(clean);
+            continue;
+          }
+          const vals = parseLine(line); const row = {};
+          for (let i = 0; i < headers.length; i++) row[headers[i] || `col${i}`] = clean(vals[i] ?? '');
+          if (!row.id) continue;
+          rows.push({
+            id: row.id, name: row.name, yearpublished: int(row.yearpublished), rank: int(row.rank), numowned: num(row.numowned), numprevowned: num(row.numprevowned),
+            baseIds: ids(row.baseid), containIds: ids(row.containid), bayesaverage: num(row.bayesaverage), average: num(row.average), usersrated: int(row.usersrated), isExpansion: clean(row.is_expansion) === '1'
+          });
+          lines++; if (lines % 25000 === 0) $('status').textContent = `讀取中… ${fmt(lines)} rows`;
+        }
+      }
+      if (buf.trim()) {
+        const vals = parseLine(buf), row = {}; for (let i = 0; i < headers.length; i++) row[headers[i] || `col${i}`] = clean(vals[i] ?? '');
+        if (row.id) rows.push({ id: row.id, name: row.name, yearpublished: int(row.yearpublished), rank: int(row.rank), numowned: num(row.numowned), numprevowned: num(row.numprevowned), baseIds: ids(row.baseid), containIds: ids(row.containid), bayesaverage: num(row.bayesaverage), average: num(row.average), usersrated: int(row.usersrated), isExpansion: clean(row.is_expansion) === '1' });
+      }
+      return { rows, time: performance.now() - t0, delimiter };
+    }
+
+    function buildModel(rows) {
+      state.rows = rows; state.byId = new Map(rows.map(r => [r.id, r]));
+      state.baseGames = rows.filter(r => !r.isExpansion);
+      // Big Boxes commonly have containid and no baseid. Keep both explicit containers and any non-expansion container rows.
+      state.containers = rows.filter(r => r.containIds.length > 0 && r.baseIds.length === 0);
+      state.expansions = rows.filter(r => r.isExpansion || r.baseIds.length > 0);
+
+      // Reverse map: expansion/item id -> direct Big Boxes that contain it.
+      const containedBy = new Map();
+      for (const box of state.containers) {
+        for (const cid of box.containIds) {
+          if (!containedBy.has(cid)) containedBy.set(cid, []);
+          containedBy.get(cid).push(box);
+        }
+      }
+
+      // Build the Big Box -> Base Game relationship from the expansions listed in containid.
+      // A Big Box counts as one owned copy of every expansion it contains, and also one
+      // owned copy of each Base Game that those contained expansions belong to.
+      const baseBoxes = new Map(); // base id -> Set of related Big Box rows
+      for (const box of state.containers) {
+        const relatedBases = new Set();
+        for (const cid of box.containIds) {
+          const contained = state.byId.get(cid);
+          if (!contained) continue;
+          for (const gid of contained.baseIds) {
+            relatedBases.add(gid);
+          }
+        }
+        for (const gid of relatedBases) {
+          if (!baseBoxes.has(gid)) baseBoxes.set(gid, new Set());
+          baseBoxes.get(gid).add(box);
+        }
+      }
+
+      // For each Base Game, collect expansions and compute: 
+      // effective Expansion Own = direct Expansion Own + all Big Boxes containing it
+      // effective Base Own      = direct Base Own + all related Base and Big Box Own(base have big box containid)
+      // usage                   = effective Expansion Own / effective Base Own
+      const gameMap = new Map();
+      for (const exp of state.expansions) {
+        for (const gid of exp.baseIds) {
+          const game = state.byId.get(gid); if (!game) continue;
+          if (!gameMap.has(gid)) gameMap.set(gid, []);
+          const boxes = containedBy.get(exp.id) || [];
+          const expansionBoxOwn = boxes.reduce((s, b) => s + (b.numowned || 0), 0);
+          const effective = (exp.numowned || 0) + expansionBoxOwn;
+          const baseBoxesList = [...(baseBoxes.get(gid) || [])];
+
+          // === 處理 Base Game 自身有 containIds 的情況 ===
+          let baseContainedOwn = 0;
+          if (game.containIds && game.containIds.length > 0) {
+            for (const cid of game.containIds) {
+              const containedItem = state.byId.get(cid);
+              if (containedItem) {
+                baseContainedOwn += (containedItem.numowned || 0);
+              }
+            }
+          }
+
+          const effectiveBase = (game.numowned || 0) + baseContainedOwn;
+          const usage = effectiveBase > 0 ? effective / effectiveBase * 100 : 0;
+          const directUsage = game.numowned > 0 ? exp.numowned / game.numowned * 100 : 0;;
+          gameMap.get(gid).push({ exp, game, effective, usage, directUsage, boxes, baseEffective: effectiveBase, baseBoxes: baseBoxesList });
+        }
+      }
+      state.gameRows = gameMap;
+      state.allRows = [];
+      for (const exp of state.expansions) {
+        const entries = []; for (const gid of exp.baseIds) { const arr = gameMap.get(gid); if (arr) { const x = arr.find(v => v.exp.id === exp.id); if (x) entries.push(x); } }
+        if (entries.length) {
+          const best = entries.reduce((a, b) => b.usage > a.usage ? b : a, entries[0]);
+          state.allRows.push({ exp, entries, best });
+        } else {
+          state.allRows.push({ exp, entries, best: { effective: exp.numowned || 0, usage: 0, directUsage: 0, game: null, boxes: containedBy.get(exp.id) || [], baseEffective: 0, baseBoxes: [] } });
+        }
+      }
+      // Only show Base Games that are actually referenced by an expansion (baseid)
+      // or indirectly by a Big Box (containid). This avoids a huge dropdown when
+      // the source contains hundreds of thousands of unrelated base games.
+      const linkedBaseIds = new Set();
+      for (const exp of state.expansions) {
+        for (const gid of exp.baseIds) linkedBaseIds.add(gid);
+      }
+      state.baseGames = state.baseGames.filter(g => linkedBaseIds.has(g.id));
+
+      state.baseGames.sort((a, b) => a.name.localeCompare(b.name));
+      state.expansions.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    function renderStats() {
+      $('sRows').textContent = fmt(state.rows.length); $('sGames').textContent = fmt(state.baseGames.length); $('sExps').textContent = fmt(state.expansions.length); $('sBoxes').textContent = fmt(state.containers.length);
+      $('sLinked').textContent = fmt(state.rows.filter(r => r.baseIds.length || r.containIds.length).length);
+    }
+
+    function metricHeaders() {
+      return `<tr><th data-key="pos">#</th><th data-key="name">Expansion</th><th data-key="game">Base Game</th><th data-key="usage">Usage</th><th data-key="directUsage">Direct Usage</th><th data-key="effectiveOwned">Expansion Own</th><th data-key="baseEffective">Base Own</th><th data-key="numowned">Direct Owned</th><th>Big Boxes</th><th data-key="bayesaverage">Bayes</th><th data-key="average">Avg</th><th data-key="usersrated">Votes</th><th data-key="rank">BGG Rank</th><th>Year</th></tr>`;
+    }
+
+    function rowsToHtml(items, start = 0) {
+      return items.map((x, i) => {
+        const e = x.exp, g = x.game, r = x.usage, d = x.directUsage;
+
+        // 組合 Core Game + containIds 的名稱
+        let baseNameText = '—';
+        if (g) {
+          const names = [g.name];
+          if (g.containIds && g.containIds.length > 0) {
+            for (const cid of g.containIds) {
+              const sub = state.byId.get(cid);
+              if (sub) names.push(sub.name);
+            }
+          }
+          baseNameText = names.join(' + ');
+        }
+
+        return `<tr><td class="num">${start + i + 1}</td><td><div class="name">${escapeHtml(e.name || '(無名稱)')}</div><div class="muted small">ID ${escapeHtml(e.id)}${e.baseIds.length > 1 ? ` · ${e.baseIds.length} base games` : ''}</div></td><td>${escapeHtml(baseNameText)}</td><td><div class="rate ${rateClass(r)}">${pct(r)}</div><div class="progress"><i style="width:${Math.min(100, Math.max(0, r))}%"></i></div></td><td><div class="rate ${rateClass(d)}">${pct(d)}</div><div class="progress"><i style="width:${Math.min(100, Math.max(d))}%"></i></div></td><td class="num">${fmt(x.effective)}</td><td class="num">${fmt(x.baseEffective)}</td><td class="num">${fmt(e.numowned)}</td><td>${x.boxes.length ? `<span class="badge">${x.boxes.length} box</span>` : '—'}</td><td class="num">${rating(e.bayesaverage)}</td><td class="num">${rating(e.average)}</td><td class="num">${fmt(e.usersrated)}</td><td class="num">${e.rank ? fmt(e.rank) : '—'}</td><td class="num">${e.yearpublished || '—'}</td></tr>`;
+      }).join('');
+    }
+    function sortGame(items, key, dir) {
+      const copy = items.slice(); copy.sort((a, b) => {
+        let av, bv;
+        if (key === 'name') { av = a.exp.name; bv = b.exp.name; return dir * String(av).localeCompare(String(bv)); }
+        av = key === 'game' ? a.game?.name : key === 'rank' ? a.exp.rank : key === 'bayesaverage' ? a.exp.bayesaverage : key === 'average' ? a.exp.average : key === 'numowned' ? a.exp.numowned : key === 'baseEffective' ? a.baseEffective : key === 'effectiveOwned' ? a.effective : key === 'directUsage' ? a.directUsage : a.usage;
+        bv = key === 'game' ? b.game?.name : key === 'rank' ? b.exp.rank : key === 'bayesaverage' ? b.exp.bayesaverage : key === 'average' ? b.exp.average : key === 'numowned' ? b.exp.numowned : key === 'baseEffective' ? b.baseEffective : key === 'effectiveOwned' ? b.effective : key === 'directUsage' ? b.directUsage : b.usage;
+        if (key === 'rank') { if (!av) av = Infinity; if (!bv) bv = Infinity; }
+        return dir * ((av > bv) - (av < bv));
+      }); return copy;
+    }
+    function renderGame() {
+      const gid = $('gameSelect').value; state.gameId = gid; const game = state.byId.get(gid); let items = state.gameRows.get(gid) || [];
+      items = sortGame(items, state.gameSort.key, state.gameSort.dir); const lim = int($('gameLimit').value); if (lim > 0) items = items.slice(0, lim);
+      $('gameHead').innerHTML = metricHeaders(); $('gameBody').innerHTML = rowsToHtml(items);
+
+      function getBaseInfoDetails(game) {
+        if (!game) return { total: 0, detailText: '' };
+
+        const parts = [`${game.name} (${fmt(game.numowned || 0)})`];
+        let total = game.numowned || 0;
+
+        if (game.containIds && game.containIds.length > 0) {
+          for (const cid of game.containIds) {
+            const contained = state.byId.get(cid);
+            if (contained) {
+              const owned = contained.numowned || 0;
+              total += owned;
+              parts.push(`${contained.name} (${fmt(owned)})`);
+            }
+          }
+        }
+
+        // 當有多個版本加總時顯示拆解 (A (100) + B (50) · 150 owners)，單一版本則簡化顯示
+        const detailText = parts.length > 1
+          ? `${parts.join(' + ')} · ${fmt(total)} owners`
+          : `${fmt(total)} owners`;
+
+        return { total, detailText };
+      }
+
+      const info = getBaseInfoDetails(game);
+      $('gameInfo').textContent = game
+        ? `${info.detailText} · ${items.length}${lim ? ' 顯示' : ''} expansions`
+        : '—';
+
+      $('downloadGame').disabled = !items.length;
+    }
+
+    // 1. 將全域平均值 C 獨立出來算（傳入 expansions 陣列，只計算 1 次）
+    function getGlobalMean(expansions) {
+      let allVotes = 0;
+      let allWeighted = 0;
+
+      for (let i = 0; i < expansions.length; i++) {
+        const e = expansions[i];
+        const v = e.usersrated || 0;
+        allVotes += v;
+        allWeighted += (e.average || 0) * v;
+      }
+
+      return allVotes > 0 ? allWeighted / allVotes : 7;
+    }
+
+    // 2. 計算單一項目的 adjustedAverage（接受預先算好的 C）
+    function calcAdjustedAverage(exp, C) {
+      const m = 100;
+      const v = exp.usersrated || 0;
+      const R = exp.average || 0;
+      return (v / (v + m)) * R + (m / (v + m)) * C;
+    }
+
+    function sortAll(items, key, dir) {
+      const copy = items.slice();
+
+      // 若排序 key 是 average，先算出全域 C（只算一次 O(N)）
+      let globalC = 0;
+      if (key === 'average') {
+        globalC = getGlobalMean(state.expansions);
+      }
+
+      copy.sort((a, b) => {
+        // 特殊處理：Rank（修正了原本 dir 降序失效的 bug）
+        if (key === 'rank') {
+          const ar = Number(a.exp?.rank) || 0;
+          const br = Number(b.exp?.rank) || 0;
+
+          if (ar === 0 && br !== 0) return 1;
+          if (ar !== 0 && br === 0) return -1;
+          if (ar === 0 && br === 0) return 0;
+
+          return dir * (ar - br);
+        }
+
+        // 特殊處理：Name
+        if (key === 'name') {
+          const av = String(a.exp?.name || '');
+          const bv = String(b.exp?.name || '');
+          return dir * av.localeCompare(bv);
+        }
+        // 提取 Key 值（其餘常規欄位）
+        let av, bv;
+        if (key === 'average') {
+          av = calcAdjustedAverage(a.exp, globalC);
+          bv = calcAdjustedAverage(b.exp, globalC);
+        } else if (key === 'usage') { av = a.best?.usage; bv = b.best?.usage; }
+        else if (key === 'directUsage') { av = a.best?.directUsage; bv = b.best?.directUsage; }
+        else if (key === 'effectiveOwned') { av = a.best?.effective; bv = b.best?.effective; }
+        else if (key === 'baseEffective') { av = a.best?.baseEffective; bv = b.best?.baseEffective; }
+        else if (key === 'numowned') { av = a.exp?.numowned; bv = b.exp?.numowned; }
+        else if (key === 'bayesaverage') { av = a.exp?.bayesaverage; bv = b.exp?.bayesaverage; }
+        else { av = a.best?.usage; bv = b.best?.usage; }
+
+        return dir * ((av > bv) - (av < bv));
+      });
+
+      return copy;
+    }
+    function renderAll() {
+      let items = state.allRows; const q = clean($('search').value).toLowerCase();
+      if (q) items = items.filter(x => {
+        const hay = [x.exp.id, x.exp.name, x.exp.baseIds.flatMap(id => {
+          const g = state.byId.get(id);
+          if (!g) return [id];
+          const names = [g.name];
+          if (g.containIds) g.containIds.forEach(cid => { const sub = state.byId.get(cid); if (sub) names.push(sub.name); });
+          return names;
+        }).join(' ')].join(' ').toLowerCase();
+        return hay.includes(q);
+      });
+      items = sortAll(items, state.allSort.key, state.allSort.dir); const lim = int($('allLimit').value); if (lim > 0) items = items.slice(0, lim);
+      $('allHead').innerHTML = `<tr><th>#</th><th>Expansion</th><th>Base Game(s)</th><th>Usage</th><th>Direct Usage</th><th>Expansion Own</th><th>Base Own</th><th>Direct Owned</th><th>Big Boxes</th><th>Bayes</th><th>Avg</th><th>Votes</th><th>BGG Rank</th><th>Year</th></tr>`;
+      $('allBody').innerHTML = items.map((x, i) => {
+        const e = x.exp, r = x.best.usage, d = x.best.directUsage;
+        const games = x.entries.map(y => {
+          const names = [y.game.name];
+          if (y.game.containIds && y.game.containIds.length > 0) {
+            for (const cid of y.game.containIds) {
+              const sub = state.byId.get(cid);
+              if (sub) names.push(sub.name);
+            }
+          }
+          return `${escapeHtml(names.join(' + '))} (${pct(y.usage)})`;
+        }).join('<br>');
+        return `<tr><td class="num">${i + 1}</td><td><div class="name">${escapeHtml(e.name || '(無名稱)')}</div><div class="muted small">ID ${escapeHtml(e.id)}</div></td><td>${games || '—'}</td><td><div class="rate ${rateClass(r)}">${pct(r)}</div><div class="progress"><i style="width:${Math.min(100, Math.max(0, r))}%"></i></div></td><td><div class="rate ${rateClass(d)}">${pct(d)}</div><div class="progress"><i style="width:${Math.min(100, Math.max(0, d))}%"></i></div></td><td class="num">${fmt(x.best.effective)}</td><td class="num">${fmt(x.best.baseEffective)}</td><td class="num">${fmt(e.numowned)}</td><td>${x.best.boxes.length ? `<span class="badge">${x.best.boxes.length} box</span>` : '—'}</td><td class="num">${rating(e.bayesaverage)}</td><td class="num">${rating(e.average)}</td><td class="num">${fmt(e.usersrated)}</td><td class="num">${e.rank ? fmt(e.rank) : '—'}</td><td class="num">${e.yearpublished || '—'}</td></tr>`
+      }).join('');
+      $('downloadAll').disabled = !items.length;
+    }
+
+    function getBaseEffectiveOwn(game) {
+      if (!game) return 0;
+      let total = game.numowned || 0;
+      if (game.containIds && game.containIds.length > 0) {
+        for (const cid of game.containIds) {
+          const contained = state.byId.get(cid);
+          if (contained) total += (contained.numowned || 0);
+        }
+      }
+      return total;
+    }
+
+    function fillGameSelect() {
+      const sel = $('gameSelect');
+      sel.innerHTML = state.baseGames.map(g => {
+        const totalOwned = getBaseEffectiveOwn(g);
+        return `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)} (${fmt(totalOwned)})</option>`;
+      }).join('');
+
+      sel.disabled = state.baseGames.length === 0;
+      if (state.baseGames.length) {
+        state.gameId = state.baseGames[0].id;
+        sel.value = state.gameId;
+      }
+    }
+    function enableAfterLoad() { $('downloadGame').disabled = false; $('downloadAll').disabled = false; }
+
+    function downloadCsv(filename, rows) {
+      const cols = ['rank', 'id', 'name', 'base_games', 'usage_pct', 'direct_usage_pct', 'effective_expansion_owned', 'effective_base_owned', 'direct_owned', 'big_box_count', 'bayesaverage', 'average', 'usersrated', 'bgg_rank', 'yearpublished'];
+      const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const csv = [cols.join(','), ...rows.map(r => cols.map(c => esc(r[c])).join(','))].join('\n');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+    function currentGameExport() { const gid = $('gameSelect').value, items = sortGame(state.gameRows.get(gid) || [], state.gameSort.key, state.gameSort.dir); const game = state.byId.get(gid); return items.map((x, i) => ({ rank: i + 1, id: x.exp.id, name: x.exp.name, base_games: game?.name || '', direct_usage_pct: x.directUsage.toFixed(2), usage_pct: x.usage.toFixed(2), effective_expansion_owned: x.effective, effective_base_owned: x.baseEffective, direct_owned: x.exp.numowned, big_box_count: x.boxes.length, bayesaverage: x.exp.bayesaverage, average: x.exp.average, usersrated: x.exp.usersrated, bgg_rank: x.exp.rank, yearpublished: x.exp.yearpublished })); }
+    function currentAllExport() { let items = state.allRows; const q = clean($('search').value).toLowerCase(); if (q) items = items.filter(x => [x.exp.id, x.exp.name, x.exp.baseIds.map(id => state.byId.get(id)?.name || id).join(' ')].join(' ').toLowerCase().includes(q)); items = sortAll(items, state.allSort.key, state.allSort.dir); const lim = int($('allLimit').value); if (lim > 0) items = items.slice(0, lim); return items.map((x, i) => ({ rank: i + 1, id: x.exp.id, name: x.exp.name, base_games: x.entries.map(y => y.game.name + ' (' + y.usage.toFixed(2) + '%)').join(' | '), direct_usage_pct: x.best.directUsage.toFixed(2), usage_pct: x.best.usage.toFixed(2), effective_expansion_owned: x.best.effective, effective_base_owned: x.best.baseEffective, direct_owned: x.exp.numowned, big_box_count: x.best.boxes.length, bayesaverage: x.exp.bayesaverage, average: x.exp.average, usersrated: x.exp.usersrated, bgg_rank: x.exp.rank, yearpublished: x.exp.yearpublished })); }
+
+    function bindTableSort() {
+      document.addEventListener('click', e => {
+        const th = e.target.closest('th[data-key]'); if (!th) return; const key = th.dataset.key;
+        if (state.view === 'game') { state.gameSort = { key, dir: state.gameSort.key === key ? -state.gameSort.dir : -1 }; renderGame(); }
+      });
+    }
+
+    $('file').addEventListener('change', async e => { const f = e.target.files?.[0]; if (!f) return; await load(f); });
+    $('demo').addEventListener('click', () => load(new File([`id\tname\tyearpublished\trank\tnumowned\tnumprevowned\tbaseid\tcontainid\tbayesaverage\taverage\tusersrated\tis_expansion\n173346\t7 Wonders Duel\t2015\t1\t120000\t0\t\t\t8.0\t8.1\t80000\t0\n309116\t7 Wonders Duel: Agora\t2020\t0\t24427\t833\t173346\t\t7.26444\t8.05443\t6035\t1\n202976\t7 Wonders Duel: Pantheon\t2016\t0\t51792\t2893\t173346\t\t7.62344\t7.99525\t16502\t1\n310215\t7 Wonders Duel: Solo\t2020\t0\t1753\t97\t173346\t\t5.90501\t7.66697\t583\t1\n999001\t7 Wonders Duel Big Box\t2025\t0\t30000\t0\t\t309116;202976\t8.2\t8.3\t1000\t0\n`], 'demo.tsv', { type: 'text/tab-separated-values' })));
+    $('clear').addEventListener('click', () => location.reload());
+    $('gameSelect').addEventListener('change', renderGame); $('gameLimit').addEventListener('change', renderGame); $('search').addEventListener('input', renderAll); $('allSort').addEventListener('change', () => { state.allSort = { key: $('allSort').value, dir: -1 }; renderAll(); }); $('allLimit').addEventListener('change', renderAll);
+    $('downloadGame').addEventListener('click', () => downloadCsv('expansion-ranking-game.csv', currentGameExport())); $('downloadAll').addEventListener('click', () => downloadCsv('expansion-ranking-all.csv', currentAllExport()));
+    document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); t.classList.add('active'); state.view = t.dataset.view; $('gameView').classList.toggle('hidden', state.view !== 'game'); $('allView').classList.toggle('hidden', state.view !== 'all'); }));
+    bindTableSort();
+
+    async function loadDefaultCSV() {
+      try {
+        const response = await fetch('./bggdb_top200.csv');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const blob = await response.blob();
+
+        // 給原本的 load(file) 使用
+        const file = new File([blob], 'bggdb_top200.csv', { type: 'text/csv' });
+        await load(file);
+
+      } catch (err) {
+        console.error(err);
+        $('error').textContent = '載入 CSV 失敗：' + (err?.message || err);
+        $('status').textContent = '載入失敗';
+      }
+    }
+
+    loadDefaultCSV();
+
+    async function load(file) {
+      $('error').textContent = ''; $('status').textContent = '讀取中…';
+      try { const parsed = await parseFile(file); buildModel(parsed.rows); renderStats(); fillGameSelect(); renderGame(); renderAll(); $('sTime').textContent = (parsed.time / 1000).toFixed(2) + ' s'; $('status').textContent = `完成：${file.name} · ${fmt(parsed.rows.length)} rows · ${parsed.delimiter === '\t' ? 'TSV / Tab' : 'CSV / Comma'}`; enableAfterLoad(); }
+      catch (err) { console.error(err); $('error').textContent = '載入失敗：' + (err?.message || err); $('status').textContent = '載入失敗'; }
+    }
+  </script>
+</body>
+
+</html>
