@@ -1039,7 +1039,7 @@
 
 
     const AGILE_PREDICT_URL =
-      "https://agilepredict.com/api/G?days=10&forecast_count=1&high_low=true";
+      `https://api.allorigins.win/raw?url=https://api.x2r.uk/agile/G`;
 
 
     const OCTOPUS_PRODUCTS_URL =
@@ -5261,11 +5261,10 @@
 
           try {
 
-            const json =
-              await fetchJson(
-                AGILE_PREDICT_URL,
-                "AgilePredict API"
-              );
+            const json = await fetchJson(
+              './agile.json',
+              "AgilePredict API"
+            );
 
 
             const map =

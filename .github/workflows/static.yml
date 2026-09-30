@@ -6,6 +6,9 @@ on:
   push:
     branches: ["master"]
 
+  schedule:
+      - cron: '0 * * * *'
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -31,6 +34,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Fetch latest Agile API data
+        run: |
+          curl -s "https://agilepredict.com/api/G/?days=10&forecast_count=1&format=json&high_low=true" -o agile.json
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
