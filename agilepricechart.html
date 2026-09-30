@@ -1,40 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Octopus Agile Region G — 10 Day Price Chart</title>
+  <title>Octopus Agile Region G — 10 Day Price Chart</title>
 
-<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
 
-<style>
-:root {
-    --bg: #101218;
-    --panel: #181b23;
-    --panel2: #20242e;
-    --border: #303642;
-    --text: #edf1f7;
-    --muted: #9da6b5;
-    --actual: #4da3ff;
-    --forecast: #ff9f43;
-    --good: #69d391;
-    --warning: #ffd166;
-    --error: #ff7373;
-}
+  <style>
+    :root {
+      --bg: #101218;
+      --panel: #181b23;
+      --panel2: #20242e;
+      --border: #303642;
+      --text: #edf1f7;
+      --muted: #9da6b5;
+      --actual: #4da3ff;
+      --forecast: #ff9f43;
+      --good: #69d391;
+      --warning: #ffd166;
+      --error: #ff7373;
+    }
 
-* {
-    box-sizing: border-box;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
 
-    font-family:
+      font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
@@ -42,323 +43,651 @@ body {
         Helvetica,
         Arial,
         sans-serif;
-}
+    }
 
-.container {
-    max-width: 1500px;
-    margin: auto;
-    padding: 20px;
-}
+    .container {
+      max-width: 1500px;
+      margin: auto;
+      padding: 20px;
+    }
 
-h1 {
-    margin: 0;
-    font-size: 28px;
-}
+    h1 {
+      margin: 0;
+      font-size: 28px;
+    }
 
-.subtitle {
-    margin-top: 5px;
-    color: var(--muted);
-    font-size: 14px;
-}
+    .subtitle {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 14px;
+    }
 
-/* =========================================================
+    /* =========================================================
    SOURCE PANELS
    ========================================================= */
 
-.source-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-top: 16px;
-}
+    .source-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 16px;
+    }
 
-.source-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 15px;
-}
+    .source-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 15px;
+    }
 
-.source-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 8px;
-}
+    .source-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
 
-.source-title strong {
-    font-size: 15px;
-}
+    .source-title strong {
+      font-size: 15px;
+    }
 
-.badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 8px;
-    border-radius: 999px;
-    font-size: 11px;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    background: #12151b;
-}
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: #12151b;
+    }
 
-.badge.api {
-    color: var(--good);
-    border-color: rgba(105,211,145,.35);
-}
+    .badge.api {
+      color: var(--good);
+      border-color: rgba(105, 211, 145, .35);
+    }
 
-.badge.manual {
-    color: var(--warning);
-    border-color: rgba(255,209,102,.35);
-}
+    .badge.manual {
+      color: var(--warning);
+      border-color: rgba(255, 209, 102, .35);
+    }
 
-.badge.dummy {
-    color: var(--muted);
-}
+    .badge.dummy {
+      color: var(--muted);
+    }
 
-.badge.error {
-    color: var(--error);
-    border-color: rgba(255,115,115,.35);
-}
+    .badge.error {
+      color: var(--error);
+      border-color: rgba(255, 115, 115, .35);
+    }
 
-.description {
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.5;
-    margin-bottom: 8px;
-}
+    .description {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
 
-textarea {
-    display: block;
-    width: 100%;
-    min-height: 170px;
-    resize: vertical;
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 170px;
+      resize: vertical;
 
-    background: #0e1015;
-    color: #e8edf5;
+      background: #0e1015;
+      color: #e8edf5;
 
-    border: 1px solid var(--border);
-    border-radius: 7px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
 
-    padding: 10px;
+      padding: 10px;
 
-    font-family:
+      font-family:
         ui-monospace,
         SFMono-Regular,
         Menlo,
         Consolas,
         monospace;
 
-    font-size: 12px;
-    line-height: 1.45;
-}
+      font-size: 12px;
+      line-height: 1.45;
+    }
 
-textarea:focus {
-    outline: none;
-    border-color: #4da3ff;
-}
+    textarea:focus {
+      outline: none;
+      border-color: #4da3ff;
+    }
 
-textarea.manual-required {
-    border-color: rgba(255,209,102,.7);
-}
+    textarea.manual-required {
+      border-color: rgba(255, 209, 102, .7);
+    }
 
-/* =========================================================
+    /* =========================================================
    CONTROLS
    ========================================================= */
 
-.controls {
-    margin-top: 14px;
+    .controls {
+      margin-top: 14px;
 
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-button {
-    border: 1px solid var(--border);
-    border-radius: 7px;
+    button {
+      border: 1px solid var(--border);
+      border-radius: 7px;
 
-    background: var(--panel2);
-    color: var(--text);
+      background: var(--panel2);
+      color: var(--text);
 
-    padding: 9px 15px;
+      padding: 9px 15px;
 
-    cursor: pointer;
-}
+      cursor: pointer;
+    }
 
-button:hover {
-    background: #292e39;
-}
+    button:hover {
+      background: #292e39;
+    }
 
-button.primary {
-    background: #245f91;
-    border-color: #327bb7;
-}
+    button.primary {
+      background: #245f91;
+      border-color: #327bb7;
+    }
 
-button:disabled {
-    opacity: .55;
-    cursor: wait;
-}
+    button:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
 
-/* =========================================================
+    /* =========================================================
    STATUS
    ========================================================= */
 
-.status {
-    margin-top: 14px;
+    .status {
+      margin-top: 14px;
 
-    padding: 10px 12px;
+      padding: 10px 12px;
 
-    border-radius: 7px;
+      border-radius: 7px;
 
-    background: #12151b;
-    border: 1px solid var(--border);
+      background: #12151b;
+      border: 1px solid var(--border);
 
-    font-size: 13px;
-    line-height: 1.5;
-}
+      font-size: 13px;
+      line-height: 1.5;
+    }
 
-.status.ok {
-    color: var(--good);
-}
+    .status.ok {
+      color: var(--good);
+    }
 
-.status.warning {
-    color: var(--warning);
-}
+    .status.warning {
+      color: var(--warning);
+    }
 
-.status.error {
-    color: var(--error);
-}
+    .status.error {
+      color: var(--error);
+    }
 
-/* =========================================================
+    /* =========================================================
    CHART
    ========================================================= */
 
-.chart-panel {
-    position: relative;
+    .chart-panel {
+      position: relative;
 
-    margin-top: 16px;
+      margin-top: 16px;
 
-    height: min(70vh, 750px);
-    min-height: 450px;
+      height: min(70vh, 750px);
+      min-height: 450px;
 
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
 
-    padding: 15px;
-}
+      padding: 15px;
+    }
 
-.chart-wrapper {
-    width: 100%;
-    height: 100%;
-}
+    .chart-wrapper {
+      width: 100%;
+      height: 100%;
+    }
 
-canvas {
-    width: 100% !important;
-    height: 100% !important;
-}
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
 
-.warning-overlay {
-    display: none;
+    .warning-overlay {
+      display: none;
 
-    position: absolute;
+      position: absolute;
 
-    z-index: 5;
+      z-index: 5;
 
-    left: 25px;
-    right: 25px;
-    top: 25px;
+      left: 25px;
+      right: 25px;
+      top: 25px;
 
-    padding: 9px 12px;
+      padding: 9px 12px;
 
-    border-radius: 7px;
+      border-radius: 7px;
 
-    background: rgba(65,50,20,.94);
-    border: 1px solid rgba(255,209,102,.4);
+      background: rgba(65, 50, 20, .94);
+      border: 1px solid rgba(255, 209, 102, .4);
 
-    color: #ffd166;
+      color: #ffd166;
 
-    font-size: 12px;
+      font-size: 12px;
 
-    pointer-events: none;
-}
+      pointer-events: none;
+    }
 
-/* =========================================================
+    /* =========================================================
    INFO
    ========================================================= */
 
-.info-grid {
-    display: grid;
+    .info-grid {
+      display: grid;
 
-    grid-template-columns:
+      grid-template-columns:
         repeat(4, 1fr);
 
-    gap: 10px;
+      gap: 10px;
 
-    margin-top: 12px;
-}
+      margin-top: 12px;
+    }
 
-.info {
-    background: var(--panel);
+    .info {
+      background: var(--panel);
 
-    border: 1px solid var(--border);
+      border: 1px solid var(--border);
 
-    border-radius: 7px;
+      border-radius: 7px;
 
-    padding: 10px 12px;
-}
+      padding: 10px 12px;
+    }
 
-.info-title {
-    color: var(--muted);
+    .info-title {
+      color: var(--muted);
 
-    font-size: 11px;
+      font-size: 11px;
 
-    text-transform: uppercase;
-}
+      text-transform: uppercase;
+    }
 
-.info-value {
-    margin-top: 4px;
+    .info-value {
+      margin-top: 4px;
 
-    font-size: 14px;
-}
+      font-size: 14px;
+    }
 
-/* =========================================================
+    /* =========================================================
    MOBILE
    ========================================================= */
 
-@media(max-width: 850px) {
+    @media(max-width: 850px) {
 
-    .container {
+      .container {
         padding: 12px;
-    }
+      }
 
-    .source-grid {
+      .source-grid {
         grid-template-columns: 1fr;
-    }
+      }
 
-    .info-grid {
+      .info-grid {
         grid-template-columns: 1fr 1fr;
-    }
+      }
 
-    .chart-panel {
+      .chart-panel {
         height: 60vh;
         min-height: 400px;
+      }
     }
-}
-</style>
+
+    /* =========================================================
+   PRICE ANALYSIS
+   ========================================================= */
+
+    .analysis-panel {
+      margin-top: 16px;
+    }
+
+
+    .analysis-header {
+      display: flex;
+
+      align-items: flex-start;
+      justify-content: space-between;
+
+      gap: 15px;
+
+      margin-bottom: 12px;
+    }
+
+
+    .analysis-header h2 {
+      margin: 0;
+
+      font-size: 22px;
+    }
+
+
+    .analysis-subtitle {
+      margin-top: 4px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+    }
+
+
+    .analysis-date-box {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 5px;
+
+      min-width: 180px;
+    }
+
+
+    .analysis-date-box label {
+      margin: 0;
+
+      color: var(--muted);
+
+      font-size: 11px;
+
+      text-transform: uppercase;
+    }
+
+
+    .analysis-date-box select {
+      background: var(--panel2);
+
+      color: var(--text);
+
+      border: 1px solid var(--border);
+
+      border-radius: 7px;
+
+      padding: 9px 12px;
+
+      font-size: 13px;
+
+      cursor: pointer;
+    }
+
+
+    .analysis-date-box select:focus {
+      outline: none;
+
+      border-color:
+        #4da3ff;
+    }
+
+
+    .baseline-card {
+      margin-bottom: 12px;
+    }
+
+
+    .analysis-card {
+      background: var(--panel);
+
+      border: 1px solid var(--border);
+
+      border-radius: 9px;
+
+      padding: 15px;
+    }
+
+
+    .analysis-card h3 {
+      margin: 0 0 12px;
+
+      font-size: 15px;
+    }
+
+
+    .analysis-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 12px;
+    }
+
+
+    .baseline-main {
+      font-size: 24px;
+
+      font-weight: 600;
+    }
+
+
+    .analysis-muted {
+      margin-top: 7px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      line-height: 1.5;
+    }
+
+
+    .window-list {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 8px;
+    }
+
+
+    .window-card {
+      background: #12151b;
+
+      border: 1px solid var(--border);
+
+      border-radius: 7px;
+
+      padding: 10px 11px;
+    }
+
+
+    .window-top {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: flex-start;
+
+      gap: 10px;
+    }
+
+
+    .window-time {
+      font-weight: 600;
+
+      font-size: 13px;
+    }
+
+
+    .window-source {
+      flex-shrink: 0;
+
+      border: 1px solid var(--border);
+
+      border-radius: 999px;
+
+      padding: 2px 7px;
+
+      color: var(--muted);
+
+      font-size: 10px;
+    }
+
+
+    .window-details {
+      display: flex;
+
+      align-items: baseline;
+
+      flex-wrap: wrap;
+
+      gap: 7px;
+
+      margin-top: 5px;
+
+      font-size: 12px;
+    }
+
+
+    .window-price {
+      font-size: 15px;
+
+      font-weight: 600;
+    }
+
+
+    .window-saving {
+      color: var(--good);
+
+      font-weight: 600;
+    }
+
+
+    .window-confidence {
+      color: var(--muted);
+    }
+
+
+    .usage-section {
+      margin-bottom: 16px;
+    }
+
+
+    .usage-section:last-child {
+      margin-bottom: 0;
+    }
+
+
+    .usage-section h4 {
+      margin: 0 0 7px;
+
+      font-size: 13px;
+    }
+
+
+    .cheap-slot-list {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 6px;
+    }
+
+
+    .cheap-slot {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 10px;
+
+      padding: 7px 9px;
+
+      background: #12151b;
+
+      border: 1px solid var(--border);
+
+      border-radius: 6px;
+
+      font-size: 12px;
+    }
+
+
+    .cheap-slot-left {
+      min-width: 0;
+    }
+
+
+    .cheap-slot-time {
+      font-weight: 600;
+    }
+
+
+    .cheap-slot-source {
+      color: var(--muted);
+
+      margin-left: 5px;
+    }
+
+
+    .cheap-slot-price {
+      flex-shrink: 0;
+
+      font-weight: 600;
+    }
+
+
+    .analysis-empty {
+      color: var(--muted);
+
+      font-size: 12px;
+
+      padding: 6px 0;
+    }
+
+
+    .analysis-fallback {
+      color: var(--warning);
+    }
+
+
+    .analysis-error {
+      color: var(--error);
+    }
+
+
+    @media(max-width: 850px) {
+
+      .analysis-header {
+        flex-direction: column;
+      }
+
+      .analysis-date-box {
+        width: 100%;
+      }
+
+      .analysis-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="container">
+  <div class="container">
 
     <h1>
-        Octopus Agile — Region G
+      Octopus Agile — Region G
     </h1>
 
     <div class="subtitle">
-        North West England · Europe/London · p/kWh
+      North West England · Europe/London · p/kWh
     </div>
 
 
@@ -368,88 +697,82 @@ canvas {
 
     <div class="source-grid">
 
-        <!-- ACTUAL -->
+      <!-- ACTUAL -->
 
-        <section class="source-panel">
+      <section class="source-panel">
 
-            <div class="source-title">
+        <div class="source-title">
 
-                <strong>
-                    Actual Prices
-                </strong>
+          <strong>
+            Actual Prices
+          </strong>
 
-                <span
-                    id="actualBadge"
-                    class="badge"
-                >
-                    Not loaded
-                </span>
+          <span id="actualBadge" class="badge">
+            Not loaded
+          </span>
 
-            </div>
+        </div>
 
-            <a href="https://api.octopus.energy/v1/products/AGILE-24-10-01/electricity-tariffs/E-1R-AGILE-24-10-01-G/standard-unit-rates/" target="_blank" rel="noopener noreferrer"
-              class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 underline my-1 transition-colors">
-              Open Octopus api link
-            </a>
-            <br>
-            <div class="description">
+        <a href="https://api.octopus.energy/v1/products/AGILE-24-10-01/electricity-tariffs/E-1R-AGILE-24-10-01-G/standard-unit-rates/"
+          target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 underline my-1 transition-colors">
+          Open Octopus api link
+        </a>
+        <br>
+        <div class="description">
 
-                First tries the Octopus API automatically.
-                If fetch/CORS fails, paste the Octopus JSON here.
+          First tries the Octopus API automatically.
+          If fetch/CORS fails, paste the Octopus JSON here.
 
-                Empty input uses dummy data.
+          Empty input uses dummy data.
 
-            </div>
+        </div>
 
 
-            <textarea
-                id="actualJson"
-                placeholder="Paste Octopus API JSON here if automatic fetch fails..."
-            ></textarea>
+        <textarea id="actualJson" placeholder="Paste Octopus API JSON here if automatic fetch fails..."></textarea>
 
-        </section>
+      </section>
 
 
-        <!-- FORECAST -->
+      <!-- FORECAST -->
 
-        <section class="source-panel">
+      <section class="source-panel">
 
-            <div class="source-title">
+        <div class="source-title">
 
-                <strong>
-                    Forecast Prices
-                </strong>
+          <strong>
+            Forecast Prices
+          </strong>
 
-                <span
-                    id="forecastBadge"
-                    class="badge"
-                >
-                    Not loaded
-                </span>
+          <span id="forecastBadge" class="badge">
+            Not loaded
+          </span>
 
-            </div>
+        </div>
+        <a href="https://api.x2r.uk/agile/G" target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 underline my-1 transition-colors">
+          Open X2 api link
+        </a>
+        <br>
+        <a href="https://agilepredict.com/api/G/?days=10&forecast_count=1&format=json&high_low=true" target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 underline my-1 transition-colors">
+          Open AgilePredict api link
+        </a>
+        <br>
+        <div class="description">
 
-            <a href="https://agilepredict.com/api/G/?days=10&forecast_count=1&format=json&high_low=true" target="_blank" rel="noopener noreferrer"
-              class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 underline my-1 transition-colors">
-              Open AgilePredict api link
-            </a>
-            <br>
-            <div class="description">
+          First tries AgilePredict automatically.
+          If fetch/CORS fails, paste the AgilePredict JSON here.
 
-                First tries AgilePredict automatically.
-                If fetch/CORS fails, paste the AgilePredict JSON here.
+          Empty input uses dummy data.
 
-                Empty input uses dummy data.
-
-            </div>
+        </div>
 
 
-            <textarea
-                id="forecastJson"
-                placeholder="Paste AgilePredict JSON here if automatic fetch fails..."
-            ></textarea>
+        <textarea id="forecastJson" placeholder="Paste AgilePredict JSON here if automatic fetch fails..."></textarea>
 
-        </section>
+      </section>
 
     </div>
 
@@ -460,33 +783,24 @@ canvas {
 
     <div class="controls">
 
-        <button
-            id="fetchButton"
-            class="primary"
-        >
-            Fetch APIs
-        </button>
+      <button id="fetchButton" class="primary">
+        Fetch APIs
+      </button>
 
 
-        <button
-            id="drawButton"
-        >
-            Draw From JSON
-        </button>
+      <button id="drawButton">
+        Draw From JSON
+      </button>
 
 
-        <button
-            id="dummyButton"
-        >
-            Use Dummy Data
-        </button>
+      <button id="dummyButton">
+        Use Dummy Data
+      </button>
 
 
-        <button
-            id="clearButton"
-        >
-            Clear
-        </button>
+      <button id="clearButton">
+        Clear
+      </button>
 
     </div>
 
@@ -495,11 +809,8 @@ canvas {
          STATUS
          ===================================================== -->
 
-    <div
-        id="status"
-        class="status"
-    >
-        Ready.
+    <div id="status" class="status">
+      Ready.
     </div>
 
 
@@ -509,14 +820,11 @@ canvas {
 
     <section class="chart-panel">
 
-        <div
-            id="warningOverlay"
-            class="warning-overlay"
-        ></div>
+      <div id="warningOverlay" class="warning-overlay"></div>
 
-        <div class="chart-wrapper">
-            <canvas id="priceChart"></canvas>
-        </div>
+      <div class="chart-wrapper">
+        <canvas id="priceChart"></canvas>
+      </div>
 
     </section>
 
@@ -527,428 +835,550 @@ canvas {
 
     <div class="info-grid">
 
-        <div class="info">
+      <div class="info">
 
-            <div class="info-title">
-                Actual
-            </div>
-
-            <div
-                id="actualInfo"
-                class="info-value"
-            >
-                —
-            </div>
-
+        <div class="info-title">
+          Actual
         </div>
 
-
-        <div class="info">
-
-            <div class="info-title">
-                Forecast
-            </div>
-
-            <div
-                id="forecastInfo"
-                class="info-value"
-            >
-                —
-            </div>
-
+        <div id="actualInfo" class="info-value">
+          —
         </div>
 
+      </div>
 
-        <div class="info">
 
-            <div class="info-title">
-                Missing actual
-            </div>
+      <div class="info">
 
-            <div
-                id="missingActual"
-                class="info-value"
-            >
-                —
-            </div>
-
+        <div class="info-title">
+          Forecast
         </div>
 
-
-        <div class="info">
-
-            <div class="info-title">
-                Missing forecast
-            </div>
-
-            <div
-                id="missingForecast"
-                class="info-value"
-            >
-                —
-            </div>
-
+        <div id="forecastInfo" class="info-value">
+          —
         </div>
+
+      </div>
+
+
+      <div class="info">
+
+        <div class="info-title">
+          Missing actual
+        </div>
+
+        <div id="missingActual" class="info-value">
+          —
+        </div>
+
+      </div>
+
+
+      <div class="info">
+
+        <div class="info-title">
+          Missing forecast
+        </div>
+
+        <div id="missingForecast" class="info-value">
+          —
+        </div>
+
+      </div>
 
     </div>
+    <!-- =========================================================
+     PRICE ANALYSIS
+     ========================================================= -->
 
-</div>
+    <section class="analysis-panel">
 
+      <div class="analysis-header">
 
-<script>
+        <div>
+          <h2>價格分析</h2>
 
-"use strict";
+          <div id="analysisExecutionTime" class="analysis-subtitle">
+            —
+          </div>
+        </div>
 
+        <div class="analysis-date-box">
 
-/* ================================================================
-   CONFIG
-   ================================================================ */
+          <label for="analysisDate">
+            分析日期
+          </label>
 
-const TIMEZONE =
-    "Europe/London";
+          <select id="analysisDate"></select>
 
+        </div>
 
-const AGILE_PREDICT_URL =
-    "https://agilepredict.com/api/G?days=10&forecast_count=1&high_low=true";
-
-
-const OCTOPUS_PRODUCTS_URL =
-    "https://api.octopus.energy/v1/products/?brand=OCTOPUS_ENERGY&is_variable=true&page_size=100";
-
-
-const REGION =
-    "G";
-
-
-const MAX_OCTOPUS_PAGES =
-    10;
+      </div>
 
 
-let chart =
-    null;
+      <!-- 1. BASELINE -->
+
+      <div class="analysis-card baseline-card">
+
+        <h3>
+          1. 當日基準
+        </h3>
+
+        <div id="baselineText" class="baseline-main">
+          —
+        </div>
+
+        <div id="baselineDetail" class="analysis-muted">
+          —
+        </div>
+
+      </div>
 
 
-/* ================================================================
-   DOM
-   ================================================================ */
+      <!-- 2 / 3 / 4 -->
 
-const actualInput =
-    document.getElementById("actualJson");
-
-const forecastInput =
-    document.getElementById("forecastJson");
-
-const actualBadge =
-    document.getElementById("actualBadge");
-
-const forecastBadge =
-    document.getElementById("forecastBadge");
-
-const statusElement =
-    document.getElementById("status");
-
-const warningElement =
-    document.getElementById("warningOverlay");
-
-const fetchButton =
-    document.getElementById("fetchButton");
+      <div class="analysis-grid">
 
 
-/* ================================================================
-   STATUS / BADGES
-   ================================================================ */
+        <!-- 2 -->
 
-function setStatus(
-    message,
-    type = ""
-) {
+        <div class="analysis-card">
 
-    statusElement.textContent =
+          <h3>
+            2. 最值得延後
+          </h3>
+
+          <div id="bestWindows" class="window-list">
+            —
+          </div>
+
+        </div>
+
+
+        <!-- 3 -->
+
+        <div class="analysis-card">
+
+          <h3>
+            3. 按用途
+          </h3>
+
+
+          <div class="usage-section">
+
+            <h4>
+              🧺 洗衣機
+            </h4>
+
+            <div id="laundryWindows" class="window-list">
+              —
+            </div>
+
+          </div>
+
+
+          <div class="usage-section">
+
+            <h4>
+              🍽️ 洗碗碟機
+            </h4>
+
+            <div id="dishwasherWindows" class="window-list">
+              —
+            </div>
+
+          </div>
+
+
+          <div class="usage-section">
+
+            <h4>
+              🔌 充電
+            </h4>
+
+            <div id="chargingWindows" class="window-list">
+              —
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- 4 -->
+
+        <div class="analysis-card">
+
+          <h3>
+            4. 其他低價時段
+          </h3>
+
+          <div id="otherCheapSlots" class="cheap-slot-list">
+            —
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+  </div>
+
+
+  <script>
+
+    "use strict";
+
+
+    /* ================================================================
+       CONFIG
+       ================================================================ */
+
+    const TIMEZONE =
+      "Europe/London";
+
+
+    const AGILE_PREDICT_URL =
+      "https://agilepredict.com/api/G?days=10&forecast_count=1&high_low=true";
+
+
+    const OCTOPUS_PRODUCTS_URL =
+      "https://api.octopus.energy/v1/products/?brand=OCTOPUS_ENERGY&is_variable=true&page_size=100";
+
+
+    const REGION =
+      "G";
+
+
+    const MAX_OCTOPUS_PAGES =
+      10;
+
+
+    let chart =
+      null;
+
+
+    /* ================================================================
+       DOM
+       ================================================================ */
+
+    const actualInput =
+      document.getElementById("actualJson");
+
+    const forecastInput =
+      document.getElementById("forecastJson");
+
+    const actualBadge =
+      document.getElementById("actualBadge");
+
+    const forecastBadge =
+      document.getElementById("forecastBadge");
+
+    const statusElement =
+      document.getElementById("status");
+
+    const warningElement =
+      document.getElementById("warningOverlay");
+
+    const fetchButton =
+      document.getElementById("fetchButton");
+
+
+    /* ================================================================
+       STATUS / BADGES
+       ================================================================ */
+
+    function setStatus(
+      message,
+      type = ""
+    ) {
+
+      statusElement.textContent =
         message;
 
-    statusElement.className =
+      statusElement.className =
         "status " + type;
-
-}
-
-
-function setBadge(
-    element,
-    text,
-    type = ""
-) {
-
-    element.textContent =
-        text;
-
-    element.className =
-        "badge " + type;
-
-}
-
-
-function showWarning(text) {
-
-    if (!text) {
-
-        warningElement.style.display =
-            "none";
-
-        warningElement.textContent =
-            "";
-
-        return;
 
     }
 
 
-    warningElement.textContent =
+    function setBadge(
+      element,
+      text,
+      type = ""
+    ) {
+
+      element.textContent =
         text;
 
-    warningElement.style.display =
+      element.className =
+        "badge " + type;
+
+    }
+
+
+    function showWarning(text) {
+
+      if (!text) {
+
+        warningElement.style.display =
+          "none";
+
+        warningElement.textContent =
+          "";
+
+        return;
+
+      }
+
+
+      warningElement.textContent =
+        text;
+
+      warningElement.style.display =
         "block";
 
-}
+    }
 
 
-/* ================================================================
-   TIME
-   ================================================================ */
+    /* ================================================================
+       TIME
+       ================================================================ */
 
-function londonToday() {
+    function londonToday() {
 
-    return luxon.DateTime
+      return luxon.DateTime
         .now()
         .setZone(TIMEZONE)
         .startOf("day");
 
-}
+    }
 
 
-/*
- * IMPORTANT
- *
- * Chart.js receives milliseconds.
- */
+    /*
+     * IMPORTANT
+     *
+     * Chart.js receives milliseconds.
+     */
 
-function timestamp(dt) {
+    function timestamp(dt) {
 
-    return dt.toMillis();
+      return dt.toMillis();
 
-}
+    }
 
 
-/* ================================================================
-   SLOTS
-   ================================================================ */
+    /* ================================================================
+       SLOTS
+       ================================================================ */
 
-function makeSlotList(
-    start,
-    endExclusive
-) {
+    function makeSlotList(
+      start,
+      endExclusive
+    ) {
 
-    const result = [];
+      const result = [];
 
-    let current =
+      let current =
         start;
 
 
-    while (
+      while (
         current < endExclusive
-    ) {
+      ) {
 
         result.push(current);
 
         current =
-            current.plus({
-                minutes: 30
-            });
+          current.plus({
+            minutes: 30
+          });
+
+      }
+
+
+      return result;
 
     }
 
 
-    return result;
+    /* ================================================================
+       GENERIC FETCH
+       ================================================================ */
 
-}
+    async function fetchJson(
+      url,
+      label
+    ) {
 
+      let response;
 
-/* ================================================================
-   GENERIC FETCH
-   ================================================================ */
-
-async function fetchJson(
-    url,
-    label
-) {
-
-    let response;
-
-    try {
+      try {
 
         response =
-            await fetch(
-                url,
-                {
-                    method: "GET",
+          await fetch(
+            url,
+            {
+              method: "GET",
 
-                    cache: "no-store",
+              cache: "no-store",
 
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    }
-                }
-            );
+              headers: {
+                "Accept":
+                  "application/json"
+              }
+            }
+          );
 
-    } catch (error) {
-
-        throw new Error(
-            `${label} fetch failed. This may be CORS or a network error.`
-        );
-
-    }
-
-
-    if (!response.ok) {
+      } catch (error) {
 
         throw new Error(
-            `${label} returned HTTP ${response.status}.`
+          `${label} fetch failed. This may be CORS or a network error.`
         );
 
-    }
+      }
 
 
-    const contentType =
+      if (!response.ok) {
+
+        throw new Error(
+          `${label} returned HTTP ${response.status}.`
+        );
+
+      }
+
+
+      const contentType =
         response.headers.get(
-            "content-type"
+          "content-type"
         ) || "";
 
 
-    if (
+      if (
         !contentType
-            .toLowerCase()
-            .includes("json")
-    ) {
+          .toLowerCase()
+          .includes("json")
+      ) {
 
         throw new Error(
-            `${label} did not return JSON.`
+          `${label} did not return JSON.`
         );
+
+      }
+
+
+      return response.json();
 
     }
 
 
-    return response.json();
+    /* ================================================================
+       OCTOPUS PRODUCT DISCOVERY
+       ================================================================ */
 
-}
+    async function findAgileProduct() {
 
-
-/* ================================================================
-   OCTOPUS PRODUCT DISCOVERY
-   ================================================================ */
-
-async function findAgileProduct() {
-
-    let url =
+      let url =
         OCTOPUS_PRODUCTS_URL;
 
 
-    const candidates =
+      const candidates =
         [];
 
 
-    for (
+      for (
         let page = 0;
         page < 5 && url;
         page++
-    ) {
+      ) {
 
         const data =
-            await fetchJson(
-                url,
-                "Octopus products API"
-            );
+          await fetchJson(
+            url,
+            "Octopus products API"
+          );
 
 
         const products =
-            Array.isArray(
-                data.results
-            )
-                ? data.results
-                : [];
+          Array.isArray(
+            data.results
+          )
+            ? data.results
+            : [];
 
 
         for (
-            const product
-            of products
+          const product
+          of products
         ) {
 
-            const code =
-                String(
-                    product.code || ""
-                ).toUpperCase();
+          const code =
+            String(
+              product.code || ""
+            ).toUpperCase();
 
 
-            const name =
-                String(
-                    product.display_name ||
-                    product.full_name ||
-                    ""
-                )
-                    .toLowerCase();
+          const name =
+            String(
+              product.display_name ||
+              product.full_name ||
+              ""
+            )
+              .toLowerCase();
 
 
-            const looksAgile =
-                code.startsWith(
-                    "AGILE-"
-                ) ||
-                name.includes(
-                    "agile octopus"
-                ) ||
-                name === "agile";
+          const looksAgile =
+            code.startsWith(
+              "AGILE-"
+            ) ||
+            name.includes(
+              "agile octopus"
+            ) ||
+            name === "agile";
 
 
-            if (!looksAgile) {
-                continue;
-            }
+          if (!looksAgile) {
+            continue;
+          }
 
 
-            /*
-             * Prefer products that have not
-             * ended yet.
-             */
+          /*
+           * Prefer products that have not
+           * ended yet.
+           */
 
-            const availableTo =
-                product.available_to;
-
-
-            const active =
-                !availableTo ||
-                luxon.DateTime
-                    .fromISO(
-                        availableTo
-                    )
-                    .toMillis() >
-                Date.now();
+          const availableTo =
+            product.available_to;
 
 
-            if (active) {
+          const active =
+            !availableTo ||
+            luxon.DateTime
+              .fromISO(
+                availableTo
+              )
+              .toMillis() >
+            Date.now();
 
-                candidates.push(
-                    product
-                );
 
-            }
+          if (active) {
+
+            candidates.push(
+              product
+            );
+
+          }
 
         }
 
 
         url =
-            data.next || null;
+          data.next || null;
 
-    }
+      }
 
 
-    if (!candidates.length) {
+      if (!candidates.length) {
 
         /*
          * Fallback to the tariff code from
@@ -956,175 +1386,175 @@ async function findAgileProduct() {
          */
 
         return {
-            code:
-                "AGILE-24-10-01",
+          code:
+            "AGILE-24-10-01",
 
-            discovered:
-                false
+          discovered:
+            false
 
         };
+
+      }
+
+
+      candidates.sort(
+        (
+          a,
+          b
+        ) => {
+
+          const da =
+            luxon.DateTime
+              .fromISO(
+                a.available_from ||
+                "1900-01-01"
+              )
+              .toMillis();
+
+
+          const db =
+            luxon.DateTime
+              .fromISO(
+                b.available_from ||
+                "1900-01-01"
+              )
+              .toMillis();
+
+
+          return db - da;
+
+        }
+      );
+
+
+      return {
+
+        code:
+          candidates[0].code,
+
+        discovered:
+          true
+
+      };
 
     }
 
 
-    candidates.sort(
-        (
-            a,
-            b
-        ) => {
+    /* ================================================================
+       OCTOPUS RATE URL
+       ================================================================ */
 
-            const da =
-                luxon.DateTime
-                    .fromISO(
-                        a.available_from ||
-                        "1900-01-01"
-                    )
-                    .toMillis();
+    function buildOctopusRatesUrl(
+      productCode,
+      actualStart,
+      forecastStart
+    ) {
 
+      /*
+       * Region G tariff:
+       *
+       * E-1R-{productCode}-G
+       */
 
-            const db =
-                luxon.DateTime
-                    .fromISO(
-                        b.available_from ||
-                        "1900-01-01"
-                    )
-                    .toMillis();
-
-
-            return db - da;
-
-        }
-    );
-
-
-    return {
-
-        code:
-            candidates[0].code,
-
-        discovered:
-            true
-
-    };
-
-}
-
-
-/* ================================================================
-   OCTOPUS RATE URL
-   ================================================================ */
-
-function buildOctopusRatesUrl(
-    productCode,
-    actualStart,
-    forecastStart
-) {
-
-    /*
-     * Region G tariff:
-     *
-     * E-1R-{productCode}-G
-     */
-
-    const tariffCode =
+      const tariffCode =
         `E-1R-${productCode}-${REGION}`;
 
 
-    const params =
+      const params =
         new URLSearchParams({
 
-            period_from:
-                actualStart
-                    .toUTC()
-                    .toISO({
-                        suppressMilliseconds:
-                            true
-                    }),
+          period_from:
+            actualStart
+              .toUTC()
+              .toISO({
+                suppressMilliseconds:
+                  true
+              }),
 
-            period_to:
-                forecastStart
-                    .toUTC()
-                    .toISO({
-                        suppressMilliseconds:
-                            true
-                    }),
+          period_to:
+            forecastStart
+              .toUTC()
+              .toISO({
+                suppressMilliseconds:
+                  true
+              }),
 
-            page_size:
-                "100"
+          page_size:
+            "100"
 
         });
 
 
-    return (
+      return (
         "https://api.octopus.energy/v1/products/" +
         encodeURIComponent(
-            productCode
+          productCode
         ) +
         "/electricity-tariffs/" +
         encodeURIComponent(
-            tariffCode
+          tariffCode
         ) +
         "/standard-unit-rates/?" +
         params.toString()
-    );
+      );
 
-}
+    }
 
 
-/* ================================================================
-   FETCH ALL OCTOPUS PAGES
-   ================================================================ */
+    /* ================================================================
+       FETCH ALL OCTOPUS PAGES
+       ================================================================ */
 
-async function fetchOctopusActual(
-    actualStart,
-    forecastStart
-) {
+    async function fetchOctopusActual(
+      actualStart,
+      forecastStart
+    ) {
 
-    const product =
+      const product =
         await findAgileProduct();
 
 
-    let url =
+      let url =
         buildOctopusRatesUrl(
-            product.code,
-            actualStart,
-            forecastStart
+          product.code,
+          actualStart,
+          forecastStart
         );
 
 
-    const allRows =
+      const allRows =
         [];
 
 
-    /*
-     * Follow the "next" URLs.
-     *
-     * The API returns up to 100 rows per page.
-     */
+      /*
+       * Follow the "next" URLs.
+       *
+       * The API returns up to 100 rows per page.
+       */
 
-    for (
+      for (
         let page = 0;
         page < MAX_OCTOPUS_PAGES && url;
         page++
-    ) {
+      ) {
 
         const data =
-            await fetchJson(
-                url,
-                "Octopus actual rates API"
-            );
+          await fetchJson(
+            url,
+            "Octopus actual rates API"
+          );
 
 
         const rows =
-            Array.isArray(
-                data.results
-            )
-                ? data.results
-                : [];
+          Array.isArray(
+            data.results
+          )
+            ? data.results
+            : [];
 
 
         allRows.push(
-            ...rows
+          ...rows
         );
 
 
@@ -1135,139 +1565,139 @@ async function fetchOctopusActual(
          */
 
         const validTimes =
-            rows
-                .map(
-                    row =>
-                        row.valid_from
-                )
-                .filter(Boolean)
-                .map(
-                    value =>
-                        luxon.DateTime
-                            .fromISO(
-                                value,
-                                {
-                                    zone: "utc"
-                                }
-                            )
-                            .toMillis()
-                )
-                .filter(
-                    Number.isFinite
-                );
+          rows
+            .map(
+              row =>
+                row.valid_from
+            )
+            .filter(Boolean)
+            .map(
+              value =>
+                luxon.DateTime
+                  .fromISO(
+                    value,
+                    {
+                      zone: "utc"
+                    }
+                  )
+                  .toMillis()
+            )
+            .filter(
+              Number.isFinite
+            );
 
 
         if (validTimes.length) {
 
-            const oldest =
-                Math.min(
-                    ...validTimes
-                );
+          const oldest =
+            Math.min(
+              ...validTimes
+            );
 
 
-            if (
-                oldest <=
-                actualStart
-                    .toUTC()
-                    .toMillis()
-            ) {
+          if (
+            oldest <=
+            actualStart
+              .toUTC()
+              .toMillis()
+          ) {
 
-                break;
+            break;
 
-            }
+          }
 
         }
 
 
         url =
-            data.next ||
-            null;
+          data.next ||
+          null;
+
+      }
+
+
+      return {
+
+        productCode:
+          product.code,
+
+        discovered:
+          product.discovered,
+
+        results:
+          allRows
+
+      };
 
     }
 
 
-    return {
+    /* ================================================================
+       PARSE ACTUAL
+       ================================================================ */
 
-        productCode:
-            product.code,
+    function parseActualJson(
+      json
+    ) {
 
-        discovered:
-            product.discovered,
-
-        results:
-            allRows
-
-    };
-
-}
-
-
-/* ================================================================
-   PARSE ACTUAL
-   ================================================================ */
-
-function parseActualJson(
-    json
-) {
-
-    const map =
+      const map =
         new Map();
 
 
-    if (!json) {
+      if (!json) {
         return map;
-    }
+      }
 
 
-    let rows;
+      let rows;
 
 
-    if (
+      if (
         Array.isArray(json)
-    ) {
+      ) {
 
         rows =
-            json;
+          json;
 
-    } else {
+      } else {
 
         rows =
-            Array.isArray(
-                json.results
-            )
-                ? json.results
-                : [];
+          Array.isArray(
+            json.results
+          )
+            ? json.results
+            : [];
 
-    }
+      }
 
 
-    for (
+      for (
         const row
         of rows
-    ) {
+      ) {
 
         if (
-            !row.valid_from
+          !row.valid_from
         ) {
-            continue;
+          continue;
         }
 
 
         const dt =
-            luxon.DateTime
-                .fromISO(
-                    row.valid_from,
-                    {
-                        zone: "utc"
-                    }
-                )
-                .setZone(
-                    TIMEZONE
-                );
+          luxon.DateTime
+            .fromISO(
+              row.valid_from,
+              {
+                zone: "utc"
+              }
+            )
+            .setZone(
+              TIMEZONE
+            );
 
 
         if (!dt.isValid) {
-            continue;
+          continue;
         }
 
 
@@ -1279,1702 +1709,3872 @@ function parseActualJson(
          */
 
         let price =
-            Number(
-                row.value_inc_vat
-            );
+          Number(
+            row.value_inc_vat
+          );
 
 
         if (
-            !Number.isFinite(
-                price
-            )
+          !Number.isFinite(
+            price
+          )
         ) {
 
-            price =
-                Number(
-                    row.value_exc_vat
-                );
+          price =
+            Number(
+              row.value_exc_vat
+            );
 
         }
 
 
         if (
-            !Number.isFinite(
-                price
-            )
+          !Number.isFinite(
+            price
+          )
         ) {
-            continue;
+          continue;
         }
 
 
         map.set(
-            timestamp(dt),
-            price
+          timestamp(dt),
+          price
         );
 
+      }
+
+
+      return map;
+
     }
 
 
-    return map;
+    /* ================================================================
+       PARSE FORECAST
+       ================================================================ */
 
-}
+    /* ================================================================
+       PARSE AGILEPREDICT FORECAST
+       Supports:
+       
+       NEW:
+       {
+           "prices": {
+               "forecast": [
+                   {
+                       "date": "...",
+                       "price": 9.064
+                   }
+               ]
+           }
+       }
+    
+       OLD:
+       [
+           {
+               "prices": [
+                   {
+                       "date_time": "...",
+                       "agile_pred": 20.33,
+                       "agile_low": 20.12,
+                       "agile_high": 20.54
+                   }
+               ]
+           }
+       ]
+       ================================================================ */
 
+    function parseForecastJson(json) {
 
-/* ================================================================
-   PARSE FORECAST
-   ================================================================ */
+      const map = new Map();
 
-function parseForecastJson(
-    json
-) {
-
-    const map =
-        new Map();
-
-
-    if (!json) {
+      if (!json) {
         return map;
-    }
+      }
 
 
-    let record;
+      /* =========================================================
+         NEW API FORMAT
+         ========================================================= */
+
+      if (
+        json &&
+        typeof json === "object" &&
+        !Array.isArray(json) &&
+        json.prices &&
+        typeof json.prices === "object" &&
+        Array.isArray(json.prices.forecast)
+      ) {
+
+        const forecastRows =
+          json.prices.forecast;
 
 
-    if (
+        /*
+         * Optional high/low arrays.
+         *
+         * If high_low=true produces separate arrays,
+         * support them automatically.
+         */
+
+        const lowRows =
+          Array.isArray(json.prices.low)
+            ? json.prices.low
+            : Array.isArray(json.prices.forecast_low)
+              ? json.prices.forecast_low
+              : [];
+
+        const highRows =
+          Array.isArray(json.prices.high)
+            ? json.prices.high
+            : Array.isArray(json.prices.forecast_high)
+              ? json.prices.forecast_high
+              : [];
+
+
+        /*
+         * Build lookup maps for low/high.
+         */
+
+        const lowMap =
+          new Map();
+
+        for (
+          const row
+          of lowRows
+        ) {
+
+          const rawDate =
+            row.date ??
+            row.date_time ??
+            row.datetime;
+
+          if (!rawDate) {
+            continue;
+          }
+
+
+          const dt =
+            luxon.DateTime
+              .fromISO(
+                rawDate,
+                {
+                  setZone: true
+                }
+              )
+              .setZone(
+                TIMEZONE
+              );
+
+
+          if (!dt.isValid) {
+            continue;
+          }
+
+
+          const value =
+            Number(
+              row.price ??
+              row.value ??
+              row.low
+            );
+
+
+          if (!Number.isFinite(value)) {
+            continue;
+          }
+
+
+          lowMap.set(
+            timestamp(dt),
+            value
+          );
+
+        }
+
+
+        const highMap =
+          new Map();
+
+        for (
+          const row
+          of highRows
+        ) {
+
+          const rawDate =
+            row.date ??
+            row.date_time ??
+            row.datetime;
+
+          if (!rawDate) {
+            continue;
+          }
+
+
+          const dt =
+            luxon.DateTime
+              .fromISO(
+                rawDate,
+                {
+                  setZone: true
+                }
+              )
+              .setZone(
+                TIMEZONE
+              );
+
+
+          if (!dt.isValid) {
+            continue;
+          }
+
+
+          const value =
+            Number(
+              row.price ??
+              row.value ??
+              row.high
+            );
+
+
+          if (!Number.isFinite(value)) {
+            continue;
+          }
+
+
+          highMap.set(
+            timestamp(dt),
+            value
+          );
+
+        }
+
+
+        /*
+         * Main forecast
+         */
+
+        for (
+          const row
+          of forecastRows
+        ) {
+
+          const rawDate =
+            row.date ??
+            row.date_time ??
+            row.datetime;
+
+
+          if (!rawDate) {
+            continue;
+          }
+
+
+          const dt =
+            luxon.DateTime
+              .fromISO(
+                rawDate,
+                {
+                  setZone: true
+                }
+              )
+              .setZone(
+                TIMEZONE
+              );
+
+
+          if (!dt.isValid) {
+            continue;
+          }
+
+
+          const price =
+            Number(
+              row.price ??
+              row.value ??
+              row.agile_pred
+            );
+
+
+          if (
+            !Number.isFinite(
+              price
+            )
+          ) {
+            continue;
+          }
+
+
+          const key =
+            timestamp(dt);
+
+
+          /*
+           * First try to get low/high from
+           * the separate arrays.
+           */
+
+          let low =
+            lowMap.get(
+              key
+            );
+
+          let high =
+            highMap.get(
+              key
+            );
+
+
+          /*
+           * Also support low/high directly
+           * inside each forecast row.
+           */
+
+          if (
+            low === undefined &&
+            Number.isFinite(
+              Number(
+                row.agile_low
+              )
+            )
+          ) {
+
+            low =
+              Number(
+                row.agile_low
+              );
+
+          }
+
+
+          if (
+            high === undefined &&
+            Number.isFinite(
+              Number(
+                row.agile_high
+              )
+            )
+          ) {
+
+            high =
+              Number(
+                row.agile_high
+              );
+
+          }
+
+
+          map.set(
+            key,
+            {
+
+              price,
+
+              low:
+                Number.isFinite(
+                  low
+                )
+                  ? low
+                  : null,
+
+              high:
+                Number.isFinite(
+                  high
+                )
+                  ? high
+                  : null
+
+            }
+          );
+
+        }
+
+
+        console.log(
+          "AgilePredict NEW format:",
+          map.size,
+          "forecast slots"
+        );
+
+
+        return map;
+
+      }
+
+
+      /* =========================================================
+         OLD API FORMAT
+         ========================================================= */
+
+      let record;
+
+
+      if (
         Array.isArray(json)
-    ) {
+      ) {
 
         record =
-            json[0];
+          json[0];
 
-    } else {
+      } else {
 
         record =
-            json;
+          json;
 
-    }
+      }
 
 
-    const rows =
+      const rows =
         Array.isArray(
-            record?.prices
+          record?.prices
         )
-            ? record.prices
-            : [];
+          ? record.prices
+          : [];
 
 
-    for (
+      for (
         const item
         of rows
-    ) {
+      ) {
 
-        if (
-            !item.date_time
-        ) {
-            continue;
+        const rawDate =
+          item.date_time ??
+          item.date;
+
+
+        if (!rawDate) {
+          continue;
         }
 
 
         const dt =
-            luxon.DateTime
-                .fromISO(
-                    item.date_time,
-                    {
-                        setZone:
-                            true
-                    }
-                )
-                .setZone(
-                    TIMEZONE
-                );
+          luxon.DateTime
+            .fromISO(
+              rawDate,
+              {
+                setZone:
+                  true
+              }
+            )
+            .setZone(
+              TIMEZONE
+            );
 
 
         if (!dt.isValid) {
-            continue;
+          continue;
         }
 
 
         const price =
-            Number(
-                item.agile_pred
-            );
+          Number(
+            item.agile_pred ??
+            item.price
+          );
+
+
+        if (
+          !Number.isFinite(
+            price
+          )
+        ) {
+          continue;
+        }
 
 
         const low =
-            Number(
-                item.agile_low
-            );
+          Number(
+            item.agile_low
+          );
 
 
         const high =
-            Number(
-                item.agile_high
-            );
-
-
-        if (
-            !Number.isFinite(
-                price
-            )
-        ) {
-            continue;
-        }
+          Number(
+            item.agile_high
+          );
 
 
         map.set(
-            timestamp(dt),
-            {
+          timestamp(dt),
+          {
 
-                price,
+            price,
 
-                low:
-                    Number.isFinite(
-                        low
-                    )
-                        ? low
-                        : null,
+            low:
+              Number.isFinite(
+                low
+              )
+                ? low
+                : null,
 
-                high:
-                    Number.isFinite(
-                        high
-                    )
-                        ? high
-                        : null
+            high:
+              Number.isFinite(
+                high
+              )
+                ? high
+                : null
 
-            }
+          }
         );
+
+      }
+
+
+      console.log(
+        "AgilePredict OLD format:",
+        map.size,
+        "forecast slots"
+      );
+
+
+      return map;
 
     }
 
+    /* ================================================================
+       DUMMY ACTUAL
+       ================================================================ */
 
-    return map;
+    function createDummyActual(
+      start,
+      endExclusive
+    ) {
 
-}
-
-
-/* ================================================================
-   DUMMY ACTUAL
-   ================================================================ */
-
-function createDummyActual(
-    start,
-    endExclusive
-) {
-
-    const map =
+      const map =
         new Map();
 
 
-    const slots =
+      const slots =
         makeSlotList(
-            start,
-            endExclusive
+          start,
+          endExclusive
         );
 
 
-    for (
+      for (
         const dt
         of slots
-    ) {
+      ) {
 
         const hour =
-            dt.hour +
-            dt.minute / 60;
+          dt.hour +
+          dt.minute / 60;
 
 
         let price =
-            12 +
-            Math.sin(
-                hour /
-                24 *
-                Math.PI *
-                2
-            ) * 5;
+          12 +
+          Math.sin(
+            hour /
+            24 *
+            Math.PI *
+            2
+          ) * 5;
 
 
         if (
-            hour >= 7 &&
-            hour < 10
+          hour >= 7 &&
+          hour < 10
         ) {
 
-            price += 8;
+          price += 8;
 
         }
 
 
         if (
-            hour >= 16 &&
-            hour < 20
+          hour >= 16 &&
+          hour < 20
         ) {
 
-            price += 14;
+          price += 14;
 
         }
 
 
         price +=
-            (dt.ordinal % 7) *
-            0.7;
+          (dt.ordinal % 7) *
+          0.7;
 
 
         map.set(
-            timestamp(dt),
-            Number(
-                price.toFixed(2)
-            )
+          timestamp(dt),
+          Number(
+            price.toFixed(2)
+          )
         );
+
+      }
+
+
+      return map;
 
     }
 
 
-    return map;
+    /* ================================================================
+       DUMMY FORECAST
+       ================================================================ */
 
-}
+    function createDummyForecast(
+      start,
+      endExclusive
+    ) {
 
-
-/* ================================================================
-   DUMMY FORECAST
-   ================================================================ */
-
-function createDummyForecast(
-    start,
-    endExclusive
-) {
-
-    const map =
+      const map =
         new Map();
 
 
-    const slots =
+      const slots =
         makeSlotList(
-            start,
-            endExclusive
+          start,
+          endExclusive
         );
 
 
-    for (
+      for (
         const dt
         of slots
-    ) {
+      ) {
 
         const hour =
-            dt.hour +
-            dt.minute / 60;
+          dt.hour +
+          dt.minute / 60;
 
 
         let price =
-            13 +
-            Math.sin(
-                hour /
-                24 *
-                Math.PI *
-                2
-            ) * 4;
+          13 +
+          Math.sin(
+            hour /
+            24 *
+            Math.PI *
+            2
+          ) * 4;
 
 
         if (
-            hour >= 7 &&
-            hour < 10
+          hour >= 7 &&
+          hour < 10
         ) {
 
-            price += 7;
+          price += 7;
 
         }
 
 
         if (
-            hour >= 16 &&
-            hour < 20
+          hour >= 16 &&
+          hour < 20
         ) {
 
-            price += 12;
+          price += 12;
 
         }
 
 
         price +=
-            ((dt.ordinal % 6) - 3) *
-            0.8;
+          ((dt.ordinal % 6) - 3) *
+          0.8;
 
 
         const uncertainty =
-            3 +
-            Math.abs(
-                Math.sin(
-                    hour /
-                    24 *
-                    Math.PI
-                )
-            ) * 2;
+          3 +
+          Math.abs(
+            Math.sin(
+              hour /
+              24 *
+              Math.PI
+            )
+          ) * 2;
 
 
         map.set(
-            timestamp(dt),
-            {
+          timestamp(dt),
+          {
 
-                price:
-                    Number(
-                        price.toFixed(2)
-                    ),
+            price:
+              Number(
+                price.toFixed(2)
+              ),
 
-                low:
-                    Number(
-                        (
-                            price -
-                            uncertainty
-                        ).toFixed(2)
-                    ),
+            low:
+              Number(
+                (
+                  price -
+                  uncertainty
+                ).toFixed(2)
+              ),
 
-                high:
-                    Number(
-                        (
-                            price +
-                            uncertainty
-                        ).toFixed(2)
-                    )
+            high:
+              Number(
+                (
+                  price +
+                  uncertainty
+                ).toFixed(2)
+              )
 
-            }
+          }
         );
+
+      }
+
+
+      return map;
 
     }
 
 
-    return map;
+    /* ================================================================
+       DATASET BUILDING
+       ================================================================ */
 
-}
+    function makeActualDataset(
+      slots,
+      map
+    ) {
 
-
-/* ================================================================
-   DATASET BUILDING
-   ================================================================ */
-
-function makeActualDataset(
-    slots,
-    map
-) {
-
-    return slots.map(
+      return slots.map(
         dt => {
 
-            const x =
-                timestamp(dt);
+          const x =
+            timestamp(dt);
 
 
-            const value =
-                map.get(x);
+          const value =
+            map.get(x);
 
 
-            return {
+          return {
 
-                x,
+            x,
 
-                y:
-                    value === undefined
-                        ? null
-                        : value
+            y:
+              value === undefined
+                ? null
+                : value
 
-            };
+          };
 
         }
-    );
+      );
 
-}
+    }
 
 
-function makeForecastDataset(
-    slots,
-    map,
-    property
-) {
+    function makeForecastDataset(
+      slots,
+      map,
+      property
+    ) {
 
-    return slots.map(
+      return slots.map(
         dt => {
 
-            const x =
-                timestamp(dt);
+          const x =
+            timestamp(dt);
 
 
-            const item =
-                map.get(x);
+          const item =
+            map.get(x);
 
 
-            if (!item) {
-
-                return {
-                    x,
-                    y: null
-                };
-
-            }
-
-
-            const value =
-                item[property];
-
+          if (!item) {
 
             return {
-
-                x,
-
-                y:
-                    Number.isFinite(
-                        value
-                    )
-                        ? value
-                        : null
-
+              x,
+              y: null
             };
 
+          }
+
+
+          const value =
+            item[property];
+
+
+          return {
+
+            x,
+
+            y:
+              Number.isFinite(
+                value
+              )
+                ? value
+                : null
+
+          };
+
         }
-    );
+      );
 
-}
+    }
 
 
-/* ================================================================
-   CHART
-   ================================================================ */
+    /* ================================================================
+       CHART
+       ================================================================ */
 
-function drawChart(
-    actualDataset,
-    forecastDataset,
-    lowDataset,
-    highDataset,
-    start,
-    endExclusive
-) {
+    function drawChart(
+      actualDataset,
+      forecastDataset,
+      lowDataset,
+      highDataset,
+      start,
+      endExclusive
+    ) {
 
-    if (chart) {
+      if (chart) {
 
         chart.destroy();
 
-    }
+      }
 
 
-    const canvas =
+      const canvas =
         document.getElementById(
-            "priceChart"
+          "priceChart"
         );
 
 
-    chart =
+      chart =
         new Chart(
-            canvas.getContext(
-                "2d"
-            ),
-            {
+          canvas.getContext(
+            "2d"
+          ),
+          {
 
-                type: "line",
-
-
-                data: {
-
-                    datasets: [
-
-                        {
-                            label:
-                                "Actual Prices",
-
-                            data:
-                                actualDataset,
-
-                            parsing:
-                                false,
-
-                            borderColor:
-                                "#4da3ff",
-
-                            backgroundColor:
-                                "#4da3ff",
-
-                            borderWidth:
-                                2.2,
-
-                            pointRadius:
-                                0,
-
-                            pointHoverRadius:
-                                5,
-
-                            pointHitRadius:
-                                10,
-
-                            tension:
-                                0,
-
-                            spanGaps:
-                                false,
-
-                            order:
-                                10
-                        },
+            type: "line",
 
 
-                        {
-                            label:
-                                "Forecast Low",
+            data: {
 
-                            data:
-                                lowDataset,
+              datasets: [
 
-                            parsing:
-                                false,
+                {
+                  label:
+                    "Actual Prices",
 
-                            borderColor:
-                                "rgba(255,159,67,0)",
+                  data:
+                    actualDataset,
 
-                            backgroundColor:
-                                "rgba(255,159,67,0)",
+                  parsing:
+                    false,
 
-                            borderWidth:
-                                0,
+                  borderColor:
+                    "#4da3ff",
 
-                            pointRadius:
-                                0,
+                  backgroundColor:
+                    "#4da3ff",
 
-                            pointHitRadius:
-                                0,
+                  borderWidth:
+                    2.2,
 
-                            fill:
-                                false,
+                  pointRadius:
+                    0,
 
-                            tension:
-                                0,
+                  pointHoverRadius:
+                    5,
 
-                            spanGaps:
-                                false,
+                  pointHitRadius:
+                    10,
 
-                            order:
-                                1
-                        },
+                  tension:
+                    0,
 
+                  spanGaps:
+                    false,
 
-                        {
-                            label:
-                                "Forecast Range",
-
-                            data:
-                                highDataset,
-
-                            parsing:
-                                false,
-
-                            borderColor:
-                                "rgba(255,159,67,0)",
-
-                            backgroundColor:
-                                "rgba(255,159,67,.18)",
-
-                            borderWidth:
-                                0,
-
-                            pointRadius:
-                                0,
-
-                            pointHitRadius:
-                                0,
-
-                            fill:
-                                1,
-
-                            tension:
-                                0,
-
-                            spanGaps:
-                                false,
-
-                            order:
-                                2
-                        },
+                  order:
+                    10
+                },
 
 
-                        {
-                            label:
-                                "Forecast Prices",
+                {
+                  label:
+                    "Forecast Low",
 
-                            data:
-                                forecastDataset,
+                  data:
+                    lowDataset,
 
-                            parsing:
-                                false,
+                  parsing:
+                    false,
 
-                            borderColor:
-                                "#ff9f43",
+                  borderColor:
+                    "rgba(255,159,67,0)",
 
-                            backgroundColor:
-                                "#ff9f43",
+                  backgroundColor:
+                    "rgba(255,159,67,0)",
 
-                            borderWidth:
-                                2.4,
+                  borderWidth:
+                    0,
 
-                            borderDash:
-                                [7,5],
+                  pointRadius:
+                    0,
 
-                            pointRadius:
-                                0,
+                  pointHitRadius:
+                    0,
 
-                            pointHoverRadius:
-                                5,
+                  fill:
+                    false,
 
-                            pointHitRadius:
-                                10,
+                  tension:
+                    0,
 
-                            tension:
-                                0,
+                  spanGaps:
+                    false,
 
-                            spanGaps:
-                                false,
+                  order:
+                    1
+                },
 
-                            order:
-                                5
-                        }
 
-                    ]
+                {
+                  label:
+                    "Forecast Range",
+
+                  data:
+                    highDataset,
+
+                  parsing:
+                    false,
+
+                  borderColor:
+                    "rgba(255,159,67,0)",
+
+                  backgroundColor:
+                    "rgba(255,159,67,.18)",
+
+                  borderWidth:
+                    0,
+
+                  pointRadius:
+                    0,
+
+                  pointHitRadius:
+                    0,
+
+                  fill:
+                    1,
+
+                  tension:
+                    0,
+
+                  spanGaps:
+                    false,
+
+                  order:
+                    2
+                },
+
+
+                {
+                  label:
+                    "Forecast Prices",
+
+                  data:
+                    forecastDataset,
+
+                  parsing:
+                    false,
+
+                  borderColor:
+                    "#ff9f43",
+
+                  backgroundColor:
+                    "#ff9f43",
+
+                  borderWidth:
+                    2.4,
+
+                  borderDash:
+                    [7, 5],
+
+                  pointRadius:
+                    0,
+
+                  pointHoverRadius:
+                    5,
+
+                  pointHitRadius:
+                    10,
+
+                  tension:
+                    0,
+
+                  spanGaps:
+                    false,
+
+                  order:
+                    5
+                }
+
+              ]
+
+            },
+
+
+            options: {
+
+              responsive:
+                true,
+
+              maintainAspectRatio:
+                false,
+
+              normalized:
+                true,
+
+
+              interaction: {
+
+                mode:
+                  "nearest",
+
+                intersect:
+                  false
+
+              },
+
+
+              plugins: {
+
+                title: {
+
+                  display:
+                    true,
+
+                  text:
+                    "Octopus Agile Region G — Electricity Prices",
+
+                  color:
+                    "#edf1f7",
+
+                  font: {
+
+                    size:
+                      18,
+
+                    weight:
+                      "600"
+
+                  },
+
+                  padding: {
+
+                    bottom:
+                      12
+
+                  }
 
                 },
 
 
-                options: {
+                legend: {
 
-                    responsive:
-                        true,
+                  display:
+                    true,
 
-                    maintainAspectRatio:
-                        false,
+                  position:
+                    "top",
 
-                    normalized:
-                        true,
+                  labels: {
 
+                    color:
+                      "#edf1f7",
 
-                    interaction: {
+                    usePointStyle:
+                      true,
 
-                        mode:
-                            "nearest",
+                    padding:
+                      16,
 
-                        intersect:
-                            false
+                    filter:
+                      item => {
 
-                    },
+                        return (
+                          item.datasetIndex === 0 ||
+                          item.datasetIndex === 3
+                        );
 
+                      }
 
-                    plugins: {
+                  },
 
-                        title: {
 
-                            display:
-                                true,
+                  onClick:
+                    (
+                      event,
+                      legendItem,
+                      legend
+                    ) => {
 
-                            text:
-                                "Octopus Agile Region G — Electricity Prices",
+                      const c =
+                        legend.chart;
 
-                            color:
-                                "#edf1f7",
 
-                            font: {
+                      if (
+                        legendItem.datasetIndex === 0
+                      ) {
 
-                                size:
-                                    18,
+                        const visible =
+                          c.isDatasetVisible(
+                            0
+                          );
 
-                                weight:
-                                    "600"
 
-                            },
+                        c.setDatasetVisibility(
+                          0,
+                          !visible
+                        );
 
-                            padding: {
+                      }
 
-                                bottom:
-                                    12
 
-                            }
+                      if (
+                        legendItem.datasetIndex === 3
+                      ) {
 
-                        },
+                        const visible =
+                          c.isDatasetVisible(
+                            3
+                          );
 
 
-                        legend: {
+                        c.setDatasetVisibility(
+                          1,
+                          !visible
+                        );
 
-                            display:
-                                true,
+                        c.setDatasetVisibility(
+                          2,
+                          !visible
+                        );
 
-                            position:
-                                "top",
+                        c.setDatasetVisibility(
+                          3,
+                          !visible
+                        );
 
-                            labels: {
+                      }
 
-                                color:
-                                    "#edf1f7",
 
-                                usePointStyle:
-                                    true,
-
-                                padding:
-                                    16,
-
-                                filter:
-                                    item => {
-
-                                        return (
-                                            item.datasetIndex === 0 ||
-                                            item.datasetIndex === 3
-                                        );
-
-                                    }
-
-                            },
-
-
-                            onClick:
-                                (
-                                    event,
-                                    legendItem,
-                                    legend
-                                ) => {
-
-                                    const c =
-                                        legend.chart;
-
-
-                                    if (
-                                        legendItem.datasetIndex === 0
-                                    ) {
-
-                                        const visible =
-                                            c.isDatasetVisible(
-                                                0
-                                            );
-
-
-                                        c.setDatasetVisibility(
-                                            0,
-                                            !visible
-                                        );
-
-                                    }
-
-
-                                    if (
-                                        legendItem.datasetIndex === 3
-                                    ) {
-
-                                        const visible =
-                                            c.isDatasetVisible(
-                                                3
-                                            );
-
-
-                                        c.setDatasetVisibility(
-                                            1,
-                                            !visible
-                                        );
-
-                                        c.setDatasetVisibility(
-                                            2,
-                                            !visible
-                                        );
-
-                                        c.setDatasetVisibility(
-                                            3,
-                                            !visible
-                                        );
-
-                                    }
-
-
-                                    c.update();
-
-                                }
-
-                        },
-
-
-                        tooltip: {
-
-                            enabled:
-                                true,
-
-
-                            callbacks: {
-
-                                title:
-                                    items => {
-
-                                        if (
-                                            !items ||
-                                            !items.length
-                                        ) {
-
-                                            return "";
-
-                                        }
-
-
-                                        const x =
-                                            Number(
-                                                items[0]
-                                                    .parsed
-                                                    .x
-                                            );
-
-
-                                        if (
-                                            !Number.isFinite(
-                                                x
-                                            )
-                                        ) {
-
-                                            return "";
-
-                                        }
-
-
-                                        return luxon.DateTime
-                                            .fromMillis(
-                                                x,
-                                                {
-                                                    zone:
-                                                        TIMEZONE
-                                                }
-                                            )
-                                            .toFormat(
-                                                "ccc d LLL yyyy, HH:mm"
-                                            );
-
-                                    },
-
-
-                                label:
-                                    context => {
-
-                                        const y =
-                                            context.parsed.y;
-
-
-                                        if (
-                                            y === null ||
-                                            !Number.isFinite(
-                                                y
-                                            )
-                                        ) {
-
-                                            return (
-                                                context.dataset.label +
-                                                ": missing"
-                                            );
-
-                                        }
-
-
-                                        return (
-                                            context.dataset.label +
-                                            ": " +
-                                            y.toFixed(2) +
-                                            " p/kWh"
-                                        );
-
-                                    }
-
-                            }
-
-                        }
-
-                    },
-
-
-                    scales: {
-
-                        x: {
-
-                            type:
-                                "time",
-
-                            min:
-                                timestamp(
-                                    start
-                                ),
-
-                            max:
-                                timestamp(
-                                    endExclusive.minus({
-                                        minutes:
-                                            30
-                                    })
-                                ),
-
-
-                            adapters: {
-
-                                date: {
-
-                                    zone:
-                                        TIMEZONE
-
-                                }
-
-                            },
-
-
-                            time: {
-
-                                unit:
-                                    "day",
-
-                                displayFormats: {
-
-                                    day:
-                                        "ccc d LLL",
-
-                                    hour:
-                                        "HH:mm"
-
-                                },
-
-                                tooltipFormat:
-                                    "ccc d LLL yyyy, HH:mm"
-
-                            },
-
-
-                            ticks: {
-
-                                color:
-                                    "#9da6b5",
-
-                                maxRotation:
-                                    0,
-
-                                autoSkip:
-                                    true,
-
-                                autoSkipPadding:
-                                    20
-
-                            },
-
-
-                            grid: {
-
-                                color:
-                                    "rgba(255,255,255,.07)"
-
-                            },
-
-
-                            title: {
-
-                                display:
-                                    true,
-
-                                text:
-                                    "Date / Time (Europe/London)",
-
-                                color:
-                                    "#9da6b5"
-
-                            }
-
-                        },
-
-
-                        y: {
-
-                            ticks: {
-
-                                color:
-                                    "#9da6b5",
-
-                                callback:
-                                    value =>
-                                        value +
-                                        " p"
-
-                            },
-
-
-                            grid: {
-
-                                color:
-                                    "rgba(255,255,255,.07)"
-
-                            },
-
-
-                            title: {
-
-                                display:
-                                    true,
-
-                                text:
-                                    "Price (p/kWh)",
-
-                                color:
-                                    "#9da6b5"
-
-                            },
-
-                            beginAtZero:
-                                false
-
-                        }
+                      c.update();
 
                     }
 
+                },
+
+
+                tooltip: {
+
+                  enabled:
+                    true,
+
+
+                  callbacks: {
+
+                    title:
+                      items => {
+
+                        if (
+                          !items ||
+                          !items.length
+                        ) {
+
+                          return "";
+
+                        }
+
+
+                        const x =
+                          Number(
+                            items[0]
+                              .parsed
+                              .x
+                          );
+
+
+                        if (
+                          !Number.isFinite(
+                            x
+                          )
+                        ) {
+
+                          return "";
+
+                        }
+
+
+                        return luxon.DateTime
+                          .fromMillis(
+                            x,
+                            {
+                              zone:
+                                TIMEZONE
+                            }
+                          )
+                          .toFormat(
+                            "ccc d LLL yyyy, HH:mm"
+                          );
+
+                      },
+
+
+                    label:
+                      context => {
+
+                        const y =
+                          context.parsed.y;
+
+
+                        if (
+                          y === null ||
+                          !Number.isFinite(
+                            y
+                          )
+                        ) {
+
+                          return (
+                            context.dataset.label +
+                            ": missing"
+                          );
+
+                        }
+
+
+                        return (
+                          context.dataset.label +
+                          ": " +
+                          y.toFixed(2) +
+                          " p/kWh"
+                        );
+
+                      }
+
+                  }
+
                 }
 
+              },
+
+
+              scales: {
+
+                x: {
+
+                  type:
+                    "time",
+
+                  min:
+                    timestamp(
+                      start
+                    ),
+
+                  max:
+                    timestamp(
+                      endExclusive.minus({
+                        minutes:
+                          30
+                      })
+                    ),
+
+
+                  adapters: {
+
+                    date: {
+
+                      zone:
+                        TIMEZONE
+
+                    }
+
+                  },
+
+
+                  time: {
+
+                    unit:
+                      "day",
+
+                    displayFormats: {
+
+                      day:
+                        "ccc d LLL",
+
+                      hour:
+                        "HH:mm"
+
+                    },
+
+                    tooltipFormat:
+                      "ccc d LLL yyyy, HH:mm"
+
+                  },
+
+
+                  ticks: {
+
+                    color:
+                      "#9da6b5",
+
+                    maxRotation:
+                      0,
+
+                    autoSkip:
+                      true,
+
+                    autoSkipPadding:
+                      20
+
+                  },
+
+
+                  grid: {
+
+                    color:
+                      "rgba(255,255,255,.07)"
+
+                  },
+
+
+                  title: {
+
+                    display:
+                      true,
+
+                    text:
+                      "Date / Time (Europe/London)",
+
+                    color:
+                      "#9da6b5"
+
+                  }
+
+                },
+
+
+                y: {
+
+                  ticks: {
+
+                    color:
+                      "#9da6b5",
+
+                    callback:
+                      value =>
+                        value +
+                        " p"
+
+                  },
+
+
+                  grid: {
+
+                    color:
+                      "rgba(255,255,255,.07)"
+
+                  },
+
+
+                  title: {
+
+                    display:
+                      true,
+
+                    text:
+                      "Price (p/kWh)",
+
+                    color:
+                      "#9da6b5"
+
+                  },
+
+                  beginAtZero:
+                    false
+
+                }
+
+              }
+
             }
+
+          }
         );
 
-}
+    }
+
+    /* ================================================================
+       PRICE ANALYSIS
+       ================================================================ */
+
+    const ANALYSIS_MIN_BASELINE_SLOTS = 4;
 
 
-/* ================================================================
-   COUNT
-   ================================================================ */
+    /*
+     * Analysis uses:
+     *
+     * today remaining published Actual
+     *
+     * as the reference price for every
+     * selected future date.
+     */
 
-function countPresent(
-    dataset
-) {
+    let analysisContext = {
 
-    return dataset.filter(
-        item =>
-            item.y !== null &&
-            Number.isFinite(
-                item.y
-            )
-    ).length;
+      actualMap:
+        new Map(),
 
-}
+      forecastMap:
+        new Map()
+
+    };
 
 
-/* ================================================================
-   DRAW USING MAPS
-   ================================================================ */
+    /* ================================================================
+       DATE HELPERS
+       ================================================================ */
 
-function renderMaps(
-    actualMap,
-    forecastMap,
-    sourceInfo
-) {
+    function ceilToNextHalfHour(dt) {
 
-    const today =
+      const floor =
+        dt
+          .startOf("hour")
+          .plus({
+            minutes:
+              dt.minute >= 30
+                ? 30
+                : 0
+          });
+
+
+      if (
+        dt.toMillis() ===
+        floor.toMillis()
+      ) {
+
+        return floor;
+
+      }
+
+
+      return floor.plus({
+        minutes:
+          30
+      });
+
+    }
+
+
+    /*
+     * Returns the actual/current half-hour
+     * containing "now".
+     *
+     * Used for today's baseline.
+     */
+
+    function currentHalfHourStart() {
+
+      const now =
+        luxon.DateTime
+          .now()
+          .setZone(
+            TIMEZONE
+          );
+
+
+      return now
+        .startOf("hour")
+        .plus({
+          minutes:
+            now.minute >= 30
+              ? 30
+              : 0
+        });
+
+    }
+
+
+    /* ================================================================
+       ANALYSIS DATE DROPDOWN
+       ================================================================ */
+
+    function populateAnalysisDates() {
+
+      const select =
+        document.getElementById(
+          "analysisDate"
+        );
+
+
+      if (!select) {
+        return;
+      }
+
+
+      const today =
         londonToday();
 
 
-    /*
-     * User changed this to -2.
-     *
-     * This gives:
-     *
-     * D-2
-     * D-1
-     * Today
-     *
-     * = 3 actual days
-     */
+      /*
+       * Preserve the user's current selection.
+       */
 
-    const actualStart =
+      const previous =
+        select.value;
+
+
+      select.innerHTML =
+        "";
+
+
+      /*
+       * Today + next 6 forecast days.
+       */
+
+      for (
+        let i = 0;
+        i <= 6;
+        i++
+      ) {
+
+        const date =
+          today.plus({
+            days:
+              i
+          });
+
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+
+        option.value =
+          date.toISODate();
+
+
+        let label =
+          date.toFormat(
+            "ccc d LLL"
+          );
+
+
+        if (i === 0) {
+
+          label +=
+            "（今天）";
+
+        } else if (i === 1) {
+
+          label +=
+            "（明天）";
+
+        }
+
+
+        option.textContent =
+          label;
+
+
+        select.appendChild(
+          option
+        );
+
+      }
+
+
+      const todayValue =
+        today.toISODate();
+
+
+      /*
+       * Keep previous selection if
+       * still available.
+       */
+
+      if (
+        previous &&
+        [...select.options]
+          .some(
+            option =>
+              option.value ===
+              previous
+          )
+      ) {
+
+        select.value =
+          previous;
+
+      } else {
+
+        select.value =
+          todayValue;
+
+      }
+
+    }
+
+
+    /* ================================================================
+       GET PRICE FOR SLOT
+       ================================================================ */
+
+    function getAnalysisSlot(
+      dt
+    ) {
+
+      const key =
+        timestamp(dt);
+
+
+      /*
+       * Actual takes priority.
+       */
+
+      const actual =
+        analysisContext
+          .actualMap
+          .get(key);
+
+
+      if (
+        actual !== undefined &&
+        Number.isFinite(actual)
+      ) {
+
+        return {
+
+          dt,
+
+          price:
+            actual,
+
+          source:
+            "Actual",
+
+          low:
+            null,
+
+          high:
+            null
+
+        };
+
+      }
+
+
+      const forecast =
+        analysisContext
+          .forecastMap
+          .get(key);
+
+
+      if (
+        forecast &&
+        Number.isFinite(
+          forecast.price
+        )
+      ) {
+
+        return {
+
+          dt,
+
+          price:
+            forecast.price,
+
+          source:
+            "Forecast",
+
+          low:
+            Number.isFinite(
+              forecast.low
+            )
+              ? forecast.low
+              : null,
+
+          high:
+            Number.isFinite(
+              forecast.high
+            )
+              ? forecast.high
+              : null
+
+        };
+
+      }
+
+
+      return null;
+
+    }
+
+
+    /* ================================================================
+       GET SELECTED DATE SLOTS
+       ================================================================ */
+
+    function getSelectedDateSlots(
+      dateString
+    ) {
+
+      const dayStart =
+        luxon.DateTime
+          .fromISO(
+            dateString,
+            {
+              zone:
+                TIMEZONE
+            }
+          )
+          .startOf("day");
+
+
+      const dayEnd =
+        dayStart.plus({
+          days:
+            1
+        });
+
+
+      const today =
+        londonToday();
+
+
+      const now =
+        luxon.DateTime
+          .now()
+          .setZone(
+            TIMEZONE
+          );
+
+
+      let start;
+
+
+      /*
+       * Today:
+       *
+       * only analyse future complete
+       * half-hour slots.
+       */
+
+      if (
+        dayStart.hasSame(
+          today,
+          "day"
+        )
+      ) {
+
+        start =
+          ceilToNextHalfHour(
+            now
+          );
+
+      } else if (
+        dayStart >
+        today
+      ) {
+
+        start =
+          dayStart;
+
+      } else {
+
+        /*
+         * Past date.
+         *
+         * There should normally be no
+         * option for it, but handle it safely.
+         */
+
+        return [];
+
+      }
+
+
+      if (
+        start >=
+        dayEnd
+      ) {
+
+        return [];
+
+      }
+
+
+      return makeSlotList(
+        start,
+        dayEnd
+      );
+
+    }
+
+
+    /* ================================================================
+       BASELINE
+       ================================================================ */
+
+    function calculateBaseline() {
+
+      const today =
+        londonToday();
+
+
+      const currentSlot =
+        currentHalfHourStart();
+
+
+      const dayEnd =
+        today.plus({
+          days:
+            1
+        });
+
+
+      const allTodaySlots =
+        makeSlotList(
+          today,
+          dayEnd
+        );
+
+
+      /*
+       * Remaining Actual:
+       *
+       * current half-hour onward
+       */
+
+      const remainingActual = [];
+
+
+      for (
+        const dt
+        of allTodaySlots
+      ) {
+
+        if (
+          dt < currentSlot
+        ) {
+
+          continue;
+
+        }
+
+
+        const value =
+          analysisContext
+            .actualMap
+            .get(
+              timestamp(dt)
+            );
+
+
+        if (
+          Number.isFinite(value)
+        ) {
+
+          remainingActual.push(
+            value
+          );
+
+        }
+
+      }
+
+
+      /*
+       * All currently published
+       * Actual prices for today.
+       */
+
+      const allTodayActual = [];
+
+
+      for (
+        const dt
+        of allTodaySlots
+      ) {
+
+        const value =
+          analysisContext
+            .actualMap
+            .get(
+              timestamp(dt)
+            );
+
+
+        if (
+          Number.isFinite(value)
+        ) {
+
+          allTodayActual.push(
+            value
+          );
+
+        }
+
+      }
+
+
+      /*
+       * Preferred:
+       *
+       * remaining actual >= 4 slots.
+       */
+
+      if (
+        remainingActual.length >=
+        ANALYSIS_MIN_BASELINE_SLOTS
+      ) {
+
+        const average =
+          remainingActual
+            .reduce(
+              (a, b) =>
+                a + b,
+              0
+            ) /
+          remainingActual.length;
+
+
+        return {
+
+          available:
+            true,
+
+          average,
+
+          mode:
+            "remaining",
+
+          remainingCount:
+            remainingActual.length,
+
+          totalPublishedCount:
+            allTodayActual.length
+
+        };
+
+      }
+
+
+      /*
+       * Fallback:
+       *
+       * today's all published Actual.
+       */
+
+      if (
+        allTodayActual.length > 0
+      ) {
+
+        const average =
+          allTodayActual
+            .reduce(
+              (a, b) =>
+                a + b,
+              0
+            ) /
+          allTodayActual.length;
+
+
+        return {
+
+          available:
+            true,
+
+          average,
+
+          mode:
+            "fallback",
+
+          remainingCount:
+            remainingActual.length,
+
+          totalPublishedCount:
+            allTodayActual.length
+
+        };
+
+      }
+
+
+      return {
+
+        available:
+          false,
+
+        average:
+          null,
+
+        mode:
+          "none",
+
+        remainingCount:
+          remainingActual.length,
+
+        totalPublishedCount:
+          0
+
+      };
+
+    }
+
+
+    /* ================================================================
+       CONTIGUOUS WINDOWS
+       ================================================================ */
+
+    function generateWindowCandidates(
+      slots,
+      baseline,
+      minSlots,
+      maxSlots
+    ) {
+
+      const candidates = [];
+
+
+      for (
+        let startIndex = 0;
+        startIndex < slots.length;
+        startIndex++
+      ) {
+
+        for (
+          let length =
+            minSlots;
+          length <=
+          maxSlots;
+          length++
+        ) {
+
+          const endIndex =
+            startIndex +
+            length;
+
+
+          if (
+            endIndex >
+            slots.length
+          ) {
+
+            break;
+
+          }
+
+
+          const windowSlots =
+            [];
+
+
+          let complete =
+            true;
+
+
+          for (
+            let i =
+              startIndex;
+            i <
+            endIndex;
+            i++
+          ) {
+
+            const item =
+              getAnalysisSlot(
+                slots[i]
+              );
+
+
+            /*
+             * A missing half-hour
+             * breaks continuity.
+             */
+
+            if (!item) {
+
+              complete =
+                false;
+
+              break;
+
+            }
+
+
+            windowSlots.push(
+              item
+            );
+
+          }
+
+
+          if (!complete) {
+            continue;
+          }
+
+
+          const average =
+            windowSlots
+              .reduce(
+                (
+                  sum,
+                  item
+                ) =>
+                  sum +
+                  item.price,
+                0
+              ) /
+            windowSlots.length;
+
+
+          const saving =
+            baseline -
+            average;
+
+
+          /*
+           * Only recommend prices
+           * below the baseline.
+           */
+
+          if (
+            saving <= 0
+          ) {
+
+            continue;
+
+          }
+
+
+          const actualCount =
+            windowSlots.filter(
+              item =>
+                item.source ===
+                "Actual"
+            ).length;
+
+
+          const forecastCount =
+            windowSlots.length -
+            actualCount;
+
+
+          let intervalSum =
+            0;
+
+
+          let intervalCount =
+            0;
+
+
+          let missingInterval =
+            false;
+
+
+          for (
+            const item
+            of windowSlots
+          ) {
+
+            if (
+              item.source ===
+              "Forecast"
+            ) {
+
+              if (
+                Number.isFinite(
+                  item.low
+                ) &&
+                Number.isFinite(
+                  item.high
+                )
+              ) {
+
+                intervalSum +=
+                  item.high -
+                  item.low;
+
+                intervalCount++;
+
+              } else {
+
+                missingInterval =
+                  true;
+
+              }
+
+            }
+
+          }
+
+
+          const avgInterval =
+            intervalCount > 0
+              ? intervalSum /
+              intervalCount
+              : null;
+
+
+          let source;
+
+
+          if (
+            actualCount ===
+            windowSlots.length
+          ) {
+
+            source =
+              "Actual";
+
+          } else if (
+            forecastCount ===
+            windowSlots.length
+          ) {
+
+            source =
+              "Forecast";
+
+          } else {
+
+            source =
+              "Actual + Forecast";
+
+          }
+
+
+          let confidence;
+
+
+          if (
+            forecastCount === 0
+          ) {
+
+            confidence =
+              "高";
+
+          } else if (
+            missingInterval
+          ) {
+
+            confidence =
+              "低";
+
+          } else if (
+            avgInterval <=
+            1
+          ) {
+
+            confidence =
+              actualCount > 0
+                ? "中"
+                : "高";
+
+          } else if (
+            avgInterval <=
+            2.5
+          ) {
+
+            confidence =
+              "中";
+
+          } else {
+
+            confidence =
+              "低";
+
+          }
+
+
+          candidates.push({
+
+            start:
+              windowSlots[0].dt,
+
+            end:
+              windowSlots[
+                windowSlots.length - 1
+              ].dt.plus({
+                minutes:
+                  30
+              }),
+
+            slots:
+              windowSlots.length,
+
+            average,
+
+            saving,
+
+            source,
+
+            confidence,
+
+            actualCount,
+
+            forecastCount,
+
+            avgInterval
+
+          });
+
+        }
+
+      }
+
+
+      /*
+       * Biggest saving first.
+       *
+       * Duration is only a tie breaker.
+       */
+
+      candidates.sort(
+        (a, b) => {
+
+          if (
+            b.saving !==
+            a.saving
+          ) {
+
+            return (
+              b.saving -
+              a.saving
+            );
+
+          }
+
+
+          return (
+            b.slots -
+            a.slots
+          );
+
+        }
+      );
+
+
+      return candidates;
+
+    }
+
+
+    /* ================================================================
+       OVERLAP FILTER
+       ================================================================ */
+
+    function selectDistinctWindows(
+      candidates,
+      maxResults
+    ) {
+
+      const selected = [];
+
+
+      for (
+        const candidate
+        of candidates
+      ) {
+
+        let duplicate =
+          false;
+
+
+        for (
+          const existing
+          of selected
+        ) {
+
+          const overlapStart =
+            Math.max(
+              candidate.start.toMillis(),
+              existing.start.toMillis()
+            );
+
+
+          const overlapEnd =
+            Math.min(
+              candidate.end.toMillis(),
+              existing.end.toMillis()
+            );
+
+
+          if (
+            overlapEnd <=
+            overlapStart
+          ) {
+
+            continue;
+
+          }
+
+
+          const overlap =
+            overlapEnd -
+            overlapStart;
+
+
+          const candidateLength =
+            candidate.end.toMillis() -
+            candidate.start.toMillis();
+
+
+          const existingLength =
+            existing.end.toMillis() -
+            existing.start.toMillis();
+
+
+          const ratio =
+            overlap /
+            Math.min(
+              candidateLength,
+              existingLength
+            );
+
+
+          /*
+           * Avoid showing several
+           * almost-identical windows.
+           */
+
+          if (
+            ratio >=
+            0.5
+          ) {
+
+            duplicate =
+              true;
+
+            break;
+
+          }
+
+        }
+
+
+        if (
+          !duplicate
+        ) {
+
+          selected.push(
+            candidate
+          );
+
+        }
+
+
+        if (
+          selected.length >=
+          maxResults
+        ) {
+
+          break;
+
+        }
+
+      }
+
+
+      return selected;
+
+    }
+
+
+    /* ================================================================
+       LOWEST HALF-HOUR FALLBACK
+       ================================================================ */
+
+    function findLowestHalfHours(
+      slots,
+      baseline,
+      count,
+      excludedWindows = []
+    ) {
+
+      const candidates = [];
+
+
+      for (
+        const dt
+        of slots
+      ) {
+
+        const item =
+          getAnalysisSlot(
+            dt
+          );
+
+
+        if (!item) {
+          continue;
+        }
+
+
+        if (
+          excludedWindows.some(
+            window =>
+              dt >= window.start &&
+              dt < window.end
+          )
+        ) {
+
+          continue;
+
+        }
+
+
+        const saving =
+          baseline -
+          item.price;
+
+
+        if (
+          saving <= 0
+        ) {
+
+          continue;
+
+        }
+
+
+        candidates.push({
+
+          dt,
+
+          price:
+            item.price,
+
+          saving,
+
+          source:
+            item.source
+
+        });
+
+      }
+
+
+      candidates.sort(
+        (a, b) =>
+          b.saving -
+          a.saving
+      );
+
+
+      /*
+       * If everything was excluded,
+       * return lowest prices overall.
+       */
+
+      if (
+        candidates.length === 0 &&
+        excludedWindows.length > 0
+      ) {
+
+        return findLowestHalfHours(
+          slots,
+          baseline,
+          count,
+          []
+        );
+
+      }
+
+
+      return candidates.slice(
+        0,
+        count
+      );
+
+    }
+
+
+    /* ================================================================
+       FORMATTING
+       ================================================================ */
+
+    function formatWindowTime(
+      window
+    ) {
+
+      const date =
+        window.start.toFormat(
+          "d LLL"
+        );
+
+
+      const start =
+        window.start.toFormat(
+          "HH:mm"
+        );
+
+
+      const end =
+        window.end.toFormat(
+          "HH:mm"
+        );
+
+
+      return (
+        `${date} · ${start}–${end}`
+      );
+
+    }
+
+
+    function formatHalfHour(
+      item
+    ) {
+
+      return (
+        `${item.dt.toFormat("d LLL")} · ` +
+        `${item.dt.toFormat("HH:mm")}–` +
+        `${item.dt.plus({
+          minutes:
+            30
+        }).toFormat("HH:mm")}`
+      );
+
+    }
+
+
+    /* ================================================================
+       RENDER WINDOW
+       ================================================================ */
+
+    function renderWindow(
+      window
+    ) {
+
+      return `
+
+        <div class="window-card">
+
+            <div class="window-top">
+
+                <div class="window-time">
+                    ${formatWindowTime(window)}
+                </div>
+
+                <div class="window-source">
+                    ${window.source}
+                </div>
+
+            </div>
+
+            <div class="window-details">
+
+                <span class="window-price">
+                    ${window.average.toFixed(2)}
+                    p/kWh
+                </span>
+
+                <span>
+                    ·
+                </span>
+
+                <span class="window-saving">
+                    比基準便宜
+                    ${window.saving.toFixed(2)}
+                    p/kWh
+                </span>
+
+                <span>
+                    ·
+                </span>
+
+                <span>
+                    ${window.slots * 0.5}
+                    h
+                </span>
+
+                <span class="window-confidence">
+                    · 信心 ${window.confidence}
+                </span>
+
+            </div>
+
+        </div>
+
+    `;
+
+    }
+
+
+    /* ================================================================
+       RENDER LOWEST HALF-HOUR
+       ================================================================ */
+
+    function renderHalfHour(
+      item
+    ) {
+
+      return `
+
+        <div class="cheap-slot">
+
+            <div class="cheap-slot-left">
+
+                <span class="cheap-slot-time">
+                    ${formatHalfHour(item)}
+                </span>
+
+                <span class="cheap-slot-source">
+                    ${item.source}
+                </span>
+
+            </div>
+
+            <div class="cheap-slot-price">
+
+                ${item.price.toFixed(2)}
+                p/kWh
+
+                <span
+                    style="color:var(--good);margin-left:5px"
+                >
+                    −${item.saving.toFixed(2)}
+                </span>
+
+            </div>
+
+        </div>
+
+    `;
+
+    }
+
+
+    /* ================================================================
+       ANALYSIS HTML HELPER
+       ================================================================ */
+
+    function renderWindowList(
+      containerId,
+      windows,
+      fallbackSlots,
+      baseline,
+      emptyText
+    ) {
+
+      const element =
+        document.getElementById(
+          containerId
+        );
+
+
+      if (!element) {
+        return;
+      }
+
+
+      if (
+        windows.length > 0
+      ) {
+
+        element.innerHTML =
+          windows
+            .map(
+              renderWindow
+            )
+            .join("");
+
+        return;
+
+      }
+
+
+      /*
+       * If there isn't a sufficiently
+       * long practical window, use
+       * the lowest half-hour.
+       */
+
+      if (
+        fallbackSlots &&
+        fallbackSlots.length
+      ) {
+
+        element.innerHTML =
+          fallbackSlots
+            .map(
+              renderHalfHour
+            )
+            .join("") +
+
+          `
+                <div class="analysis-muted">
+                    沒有足夠長的連續低價窗口，已退回最低價 half-hour。
+                </div>
+            `;
+
+      } else {
+
+        element.innerHTML =
+          `
+                <div class="analysis-empty">
+                    ${emptyText}
+                </div>
+            `;
+
+      }
+
+    }
+
+
+    /* ================================================================
+       RENDER ANALYSIS
+       ================================================================ */
+
+    function renderAnalysis() {
+
+      const select =
+        document.getElementById(
+          "analysisDate"
+        );
+
+
+      if (!select) {
+        return;
+      }
+
+
+      const selectedDate =
+        select.value;
+
+
+      const baseline =
+        calculateBaseline();
+
+
+      const now =
+        luxon.DateTime
+          .now()
+          .setZone(
+            TIMEZONE
+          );
+
+
+      document.getElementById(
+        "analysisExecutionTime"
+      ).textContent =
+        `提醒執行時間：${now.toFormat(
+          "yyyy-LL-dd HH:mm"
+        )} · 基準以今天已公布 Actual 計算`;
+
+
+      /* =========================================================
+         BASELINE
+         ========================================================= */
+
+      if (
+        !baseline.available
+      ) {
+
+        document.getElementById(
+          "baselineText"
+        ).textContent =
+          "無法計算基準";
+
+
+        document.getElementById(
+          "baselineDetail"
+        ).innerHTML =
+          `
+                <span class="analysis-error">
+                    今天尚未有足夠的已公布 Actual 價格。
+                </span>
+            `;
+
+
+        document.getElementById(
+          "bestWindows"
+        ).innerHTML =
+          `
+                <div class="analysis-empty">
+                    無法計算節省幅度。
+                </div>
+            `;
+
+
+        document.getElementById(
+          "laundryWindows"
+        ).innerHTML =
+          "";
+
+
+        document.getElementById(
+          "dishwasherWindows"
+        ).innerHTML =
+          "";
+
+
+        document.getElementById(
+          "chargingWindows"
+        ).innerHTML =
+          "";
+
+
+        document.getElementById(
+          "otherCheapSlots"
+        ).innerHTML =
+          "";
+
+
+        return;
+
+      }
+
+
+      document.getElementById(
+        "baselineText"
+      ).textContent =
+        `今天基準：${baseline.average.toFixed(2)} p/kWh`;
+
+
+      if (
+        baseline.mode ===
+        "remaining"
+      ) {
+
+        document.getElementById(
+          "baselineDetail"
+        ).textContent =
+          `今天剩餘已公布 Actual：${baseline.remainingCount} 個 half-hour。基準直接使用這些剩餘時段的平均值。`;
+
+      } else {
+
+        document.getElementById(
+          "baselineDetail"
+        ).innerHTML =
+          `
+                <span class="analysis-fallback">
+                    剩餘已公布 Actual 只有
+                    ${baseline.remainingCount}
+                    個 half-hour，少於可靠計算門檻
+                    ${ANALYSIS_MIN_BASELINE_SLOTS}
+                    個，因此改用今天目前所有已公布 Actual
+                    共 ${baseline.totalPublishedCount}
+                    個的平均值。
+                </span>
+            `;
+
+      }
+
+
+      /* =========================================================
+         SELECTED DATE
+         ========================================================= */
+
+      const slots =
+        getSelectedDateSlots(
+          selectedDate
+        );
+
+
+      if (
+        slots.length === 0
+      ) {
+
+        document.getElementById(
+          "bestWindows"
+        ).innerHTML =
+          `
+                <div class="analysis-empty">
+                    沒有可分析的未來 half-hour。
+                </div>
+            `;
+
+        return;
+
+      }
+
+
+      /* =========================================================
+         GENERAL WINDOWS
+         ========================================================= */
+
+      const generalCandidates =
+        generateWindowCandidates(
+          slots,
+          baseline.average,
+          2,
+          12
+        );
+
+
+      const bestWindows =
+        selectDistinctWindows(
+          generalCandidates,
+          5
+        );
+
+
+      const generalFallback =
+        bestWindows.length === 0
+          ? findLowestHalfHours(
+            slots,
+            baseline.average,
+            5
+          )
+          : [];
+
+
+      renderWindowList(
+        "bestWindows",
+        bestWindows,
+        generalFallback,
+        baseline.average,
+        "沒有低於今天基準的價格窗口。"
+      );
+
+
+      /* =========================================================
+         LAUNDRY
+         1–2 hours
+         2–4 half-hours
+         ========================================================= */
+
+      const laundryCandidates =
+        generateWindowCandidates(
+          slots,
+          baseline.average,
+          2,
+          4
+        );
+
+
+      const laundryWindows =
+        selectDistinctWindows(
+          laundryCandidates,
+          2
+        );
+
+
+      const laundryFallback =
+        laundryWindows.length === 0
+          ? findLowestHalfHours(
+            slots,
+            baseline.average,
+            2
+          )
+          : [];
+
+
+      renderWindowList(
+        "laundryWindows",
+        laundryWindows,
+        laundryFallback,
+        baseline.average,
+        "沒有找到低於基準的洗衣機窗口。"
+      );
+
+
+      /* =========================================================
+         DISHWASHER
+         2–3 hours
+         4–6 half-hours
+         ========================================================= */
+
+      const dishwasherCandidates =
+        generateWindowCandidates(
+          slots,
+          baseline.average,
+          4,
+          6
+        );
+
+
+      const dishwasherWindows =
+        selectDistinctWindows(
+          dishwasherCandidates,
+          2
+        );
+
+
+      const dishwasherFallback =
+        dishwasherWindows.length === 0
+          ? findLowestHalfHours(
+            slots,
+            baseline.average,
+            2
+          )
+          : [];
+
+
+      renderWindowList(
+        "dishwasherWindows",
+        dishwasherWindows,
+        dishwasherFallback,
+        baseline.average,
+        "沒有找到低於基準的洗碗碟機窗口。"
+      );
+
+
+      /* =========================================================
+         CHARGING
+         Longer window:
+         2–6 hours
+         4–12 half-hours
+         ========================================================= */
+
+      const chargingCandidates =
+        generateWindowCandidates(
+          slots,
+          baseline.average,
+          4,
+          12
+        );
+
+
+      const chargingWindows =
+        selectDistinctWindows(
+          chargingCandidates,
+          2
+        );
+
+
+      const chargingFallback =
+        chargingWindows.length === 0
+          ? findLowestHalfHours(
+            slots,
+            baseline.average,
+            2
+          )
+          : [];
+
+
+      renderWindowList(
+        "chargingWindows",
+        chargingWindows,
+        chargingFallback,
+        baseline.average,
+        "沒有找到足夠長的低價充電窗口。"
+      );
+
+
+      /* =========================================================
+         OTHER CHEAP HALF-HOURS
+         ========================================================= */
+
+      const otherSlots =
+        findLowestHalfHours(
+          slots,
+          baseline.average,
+          8,
+          bestWindows
+        );
+
+
+      const otherElement =
+        document.getElementById(
+          "otherCheapSlots"
+        );
+
+
+      if (
+        otherSlots.length === 0
+      ) {
+
+        otherElement.innerHTML =
+          `
+                <div class="analysis-empty">
+                    沒有其他低於今天基準的 half-hour。
+                </div>
+            `;
+
+      } else {
+
+        otherElement.innerHTML =
+          otherSlots
+            .map(
+              renderHalfHour
+            )
+            .join("");
+
+      }
+
+    }
+
+
+    /* ================================================================
+       ANALYSIS DATE EVENT
+       ================================================================ */
+
+    document
+      .getElementById(
+        "analysisDate"
+      )
+      .addEventListener(
+        "change",
+        renderAnalysis
+      );
+
+    /* ================================================================
+       COUNT
+       ================================================================ */
+
+    function countPresent(
+      dataset
+    ) {
+
+      return dataset.filter(
+        item =>
+          item.y !== null &&
+          Number.isFinite(
+            item.y
+          )
+      ).length;
+
+    }
+
+
+    /* ================================================================
+       DRAW USING MAPS
+       ================================================================ */
+
+    function renderMaps(
+      actualMap,
+      forecastMap,
+      sourceInfo
+    ) {
+
+      const today =
+        londonToday();
+
+
+      /*
+       * User changed this to -2.
+       *
+       * This gives:
+       *
+       * D-2
+       * D-1
+       * Today
+       *
+       * = 3 actual days
+       */
+
+      const actualStart =
         today.minus({
-            days:
-                2
+          days:
+            2
         });
 
 
-    const forecastStart =
+      const forecastStart =
         today.plus({
-            days:
-                1
+          days:
+            1
         });
 
 
-    /*
-     * 6 forecast days:
-     *
-     * tomorrow through D+6
-     */
+      /*
+       * 6 forecast days:
+       *
+       * tomorrow through D+6
+       */
 
-    const chartEnd =
+      const chartEnd =
         today.plus({
-            days:
-                7
+          days:
+            7
         });
 
 
-    const actualSlots =
+      const actualSlots =
         makeSlotList(
-            actualStart,
-            forecastStart
+          actualStart,
+          forecastStart
         );
 
 
-    const forecastSlots =
+      const forecastSlots =
         makeSlotList(
-            forecastStart,
-            chartEnd
+          forecastStart,
+          chartEnd
         );
 
 
-    const actualDataset =
+      const actualDataset =
         makeActualDataset(
-            actualSlots,
-            actualMap
+          actualSlots,
+          actualMap
         );
 
 
-    const forecastDataset =
+      const forecastDataset =
         makeForecastDataset(
-            forecastSlots,
-            forecastMap,
-            "price"
+          forecastSlots,
+          forecastMap,
+          "price"
         );
 
 
-    const lowDataset =
+      const lowDataset =
         makeForecastDataset(
-            forecastSlots,
-            forecastMap,
-            "low"
+          forecastSlots,
+          forecastMap,
+          "low"
         );
 
 
-    const highDataset =
+      const highDataset =
         makeForecastDataset(
-            forecastSlots,
-            forecastMap,
-            "high"
+          forecastSlots,
+          forecastMap,
+          "high"
         );
 
 
-    drawChart(
+      drawChart(
         actualDataset,
         forecastDataset,
         lowDataset,
         highDataset,
         actualStart,
         chartEnd
-    );
+      );
 
+      /* =========================================================
+         UPDATE ANALYSIS
+         ========================================================= */
 
-    const actualPresent =
+      analysisContext.actualMap =
+        actualMap;
+
+      analysisContext.forecastMap =
+        forecastMap;
+
+      populateAnalysisDates();
+
+      renderAnalysis();
+
+      const actualPresent =
         countPresent(
-            actualDataset
+          actualDataset
         );
 
 
-    const forecastPresent =
+      const forecastPresent =
         countPresent(
-            forecastDataset
+          forecastDataset
         );
 
 
-    const lowPresent =
+      const lowPresent =
         countPresent(
-            lowDataset
+          lowDataset
         );
 
 
-    const highPresent =
+      const highPresent =
         countPresent(
-            highDataset
+          highDataset
         );
 
 
-    const actualMissing =
+      const actualMissing =
         actualSlots.length -
         actualPresent;
 
 
-    const forecastMissing =
+      const forecastMissing =
         forecastSlots.length -
         forecastPresent;
 
 
-    document.getElementById(
+      document.getElementById(
         "actualInfo"
-    ).textContent =
+      ).textContent =
         `${actualPresent}/${actualSlots.length} slots · ${sourceInfo.actual}`;
 
 
-    document.getElementById(
+      document.getElementById(
         "forecastInfo"
-    ).textContent =
+      ).textContent =
         `${forecastPresent}/${forecastSlots.length} slots · ${sourceInfo.forecast}`;
 
 
-    document.getElementById(
+      document.getElementById(
         "missingActual"
-    ).textContent =
+      ).textContent =
         actualMissing;
 
 
-    document.getElementById(
+      document.getElementById(
         "missingForecast"
-    ).textContent =
+      ).textContent =
         forecastMissing;
 
 
-    const warnings = [];
+      const warnings = [];
 
 
-    // at least missing 10 half-hour slots
-    if (
+      // at least missing 10 half-hour slots
+      if (
         actualMissing > 10
-    ) {
+      ) {
 
         warnings.push(
-            `Actual missing ${actualMissing} of ${actualSlots.length} slots.`
+          `Actual missing ${actualMissing} of ${actualSlots.length} slots.`
         );
 
-    }
+      }
 
 
-    if (
+      if (
         forecastMissing > 0
-    ) {
+      ) {
 
         warnings.push(
-            `Forecast missing ${forecastMissing} of ${forecastSlots.length} slots.`
+          `Forecast missing ${forecastMissing} of ${forecastSlots.length} slots.`
         );
 
-    }
+      }
 
 
-    if (
+      if (
         forecastPresent > 0 &&
         (
-            lowPresent === 0 ||
-            highPresent === 0
+          lowPresent === 0 ||
+          highPresent === 0
         )
-    ) {
+      ) {
 
         warnings.push(
-            "Forecast price loaded, but agile_low/agile_high was not found."
+          "Forecast price loaded, but agile_low/agile_high was not found."
         );
 
-    }
+      }
 
 
-    if (warnings.length) {
+      if (warnings.length) {
 
         showWarning(
-            warnings.join(" ")
+          warnings.join(" ")
         );
 
         setStatus(
-            "Chart loaded with warnings. " +
-            warnings.join(" "),
-            "warning"
+          "Chart loaded with warnings. " +
+          warnings.join(" "),
+          "warning"
         );
 
-    } else {
+      } else {
 
         showWarning("");
 
         setStatus(
-            `Chart loaded successfully. Actual ${actualPresent}/${actualSlots.length}; Forecast ${forecastPresent}/${forecastSlots.length}.`,
-            "ok"
+          `Chart loaded successfully. Actual ${actualPresent}/${actualSlots.length}; Forecast ${forecastPresent}/${forecastSlots.length}.`,
+          "ok"
         );
+
+      }
 
     }
 
-}
 
+    /* ================================================================
+       PARSE MANUAL OR DUMMY
+       ================================================================ */
 
-/* ================================================================
-   PARSE MANUAL OR DUMMY
-   ================================================================ */
+    function parseTextJson(
+      text,
+      label
+    ) {
 
-function parseTextJson(
-    text,
-    label
-) {
-
-    if (!text.trim()) {
+      if (!text.trim()) {
 
         return null;
 
-    }
+      }
 
 
-    try {
+      try {
 
         return JSON.parse(
-            text
+          text
         );
 
-    } catch (error) {
+      } catch (error) {
 
         throw new Error(
-            `${label} JSON is invalid: ${error.message}`
+          `${label} JSON is invalid: ${error.message}`
         );
+
+      }
 
     }
 
-}
 
+    /* ================================================================
+       FETCH BOTH APIs
+       ================================================================ */
 
-/* ================================================================
-   FETCH BOTH APIs
-   ================================================================ */
+    async function fetchAllApis() {
 
-async function fetchAllApis() {
-
-    fetchButton.disabled =
+      fetchButton.disabled =
         true;
 
 
-    showWarning("");
+      showWarning("");
 
 
-    setStatus(
+      setStatus(
         "Fetching APIs...",
         ""
-    );
+      );
 
 
-    const today =
+      const today =
         londonToday();
 
 
-    const actualStart =
+      const actualStart =
         today.minus({
-            days:
-                2
+          days:
+            2
         });
 
 
-    const forecastStart =
+      const forecastStart =
         today.plus({
-            days:
-                1
+          days:
+            1
         });
 
 
-    /*
-     * IMPORTANT:
-     *
-     * Actual and Forecast are fetched
-     * independently.
-     *
-     * One can fail while the other succeeds.
-     */
+      /*
+       * IMPORTANT:
+       *
+       * Actual and Forecast are fetched
+       * independently.
+       *
+       * One can fail while the other succeeds.
+       */
 
-    const forecastPromise =
+      const forecastPromise =
         (async () => {
 
-            try {
+          try {
 
-                const json =
-                    await fetchJson(
-                        AGILE_PREDICT_URL,
-                        "AgilePredict API"
-                    );
-
-
-                const map =
-                    parseForecastJson(
-                        json
-                    );
+            const json =
+              await fetchJson(
+                AGILE_PREDICT_URL,
+                "AgilePredict API"
+              );
 
 
-                if (
-                    map.size === 0
-                ) {
-
-                    throw new Error(
-                        "AgilePredict returned no usable forecast rows."
-                    );
-
-                }
+            const map =
+              parseForecastJson(
+                json
+              );
 
 
-                forecastInput.value =
-                    JSON.stringify(
-                        json,
-                        null,
-                        2
-                    );
+            if (
+              map.size === 0
+            ) {
 
-
-                setBadge(
-                    forecastBadge,
-                    "API loaded",
-                    "api"
-                );
-
-
-                return {
-
-                    map,
-
-                    source:
-                        "API"
-
-                };
-
-            } catch (error) {
-
-                console.warn(
-                    "Forecast API failed:",
-                    error
-                );
-
-
-                setBadge(
-                    forecastBadge,
-                    "Manual required",
-                    "error"
-                );
-
-
-                forecastInput.classList.add(
-                    "manual-required"
-                );
-
-
-                const manualJson =
-                    parseTextJson(
-                        forecastInput.value,
-                        "Forecast"
-                    );
-
-
-                if (manualJson) {
-
-                    return {
-
-                        map:
-                            parseForecastJson(
-                                manualJson
-                            ),
-
-                        source:
-                            "manual JSON"
-
-                    };
-
-                }
-
-
-                return {
-
-                    map:
-                        createDummyForecast(
-                            forecastStart,
-                            today.plus({
-                                days:
-                                    7
-                            })
-                        ),
-
-                    source:
-                        "dummy"
-
-                };
+              throw new Error(
+                "AgilePredict returned no usable forecast rows."
+              );
 
             }
+
+
+            forecastInput.value =
+              JSON.stringify(
+                json,
+                null,
+                2
+              );
+
+
+            setBadge(
+              forecastBadge,
+              "API loaded",
+              "api"
+            );
+
+
+            return {
+
+              map,
+
+              source:
+                "API"
+
+            };
+
+          } catch (error) {
+
+            console.warn(
+              "Forecast API failed:",
+              error
+            );
+
+
+            setBadge(
+              forecastBadge,
+              "Manual required",
+              "error"
+            );
+
+
+            forecastInput.classList.add(
+              "manual-required"
+            );
+
+
+            const manualJson =
+              parseTextJson(
+                forecastInput.value,
+                "Forecast"
+              );
+
+
+            if (manualJson) {
+
+              return {
+
+                map:
+                  parseForecastJson(
+                    manualJson
+                  ),
+
+                source:
+                  "manual JSON"
+
+              };
+
+            }
+
+
+            return {
+
+              map:
+                createDummyForecast(
+                  forecastStart,
+                  today.plus({
+                    days:
+                      7
+                  })
+                ),
+
+              source:
+                "dummy"
+
+            };
+
+          }
 
         })();
 
 
-    const actualPromise =
+      const actualPromise =
         (async () => {
 
-            try {
+          try {
 
-                const apiData =
-                    await fetchOctopusActual(
-                        actualStart,
-                        forecastStart
-                    );
-
-
-                const map =
-                    parseActualJson(
-                        apiData
-                    );
+            const apiData =
+              await fetchOctopusActual(
+                actualStart,
+                forecastStart
+              );
 
 
-                if (
-                    map.size === 0
-                ) {
-
-                    throw new Error(
-                        "Octopus API returned no usable actual rows."
-                    );
-
-                }
+            const map =
+              parseActualJson(
+                apiData
+              );
 
 
-                /*
-                 * Do not discard the pagination:
-                 * put all fetched rows into one JSON object
-                 * so it can also be manually saved/reused.
-                 */
+            if (
+              map.size === 0
+            ) {
 
-                actualInput.value =
-                    JSON.stringify(
-                        {
-                            count:
-                                apiData.results.length,
-
-                            results:
-                                apiData.results
-                        },
-                        null,
-                        2
-                    );
-
-
-                setBadge(
-                    actualBadge,
-                    `API loaded · ${map.size} slots`,
-                    "api"
-                );
-
-
-                return {
-
-                    map,
-
-                    source:
-                        `API · ${apiData.productCode}`
-
-                };
-
-            } catch (error) {
-
-                console.warn(
-                    "Actual API failed:",
-                    error
-                );
-
-
-                setBadge(
-                    actualBadge,
-                    "Manual required",
-                    "error"
-                );
-
-
-                actualInput.classList.add(
-                    "manual-required"
-                );
-
-
-                const manualJson =
-                    parseTextJson(
-                        actualInput.value,
-                        "Actual"
-                    );
-
-
-                if (manualJson) {
-
-                    return {
-
-                        map:
-                            parseActualJson(
-                                manualJson
-                            ),
-
-                        source:
-                            "manual JSON"
-
-                    };
-
-                }
-
-
-                return {
-
-                    map:
-                        createDummyActual(
-                            actualStart,
-                            forecastStart
-                        ),
-
-                    source:
-                        "dummy"
-
-                };
+              throw new Error(
+                "Octopus API returned no usable actual rows."
+              );
 
             }
+
+
+            /*
+             * Do not discard the pagination:
+             * put all fetched rows into one JSON object
+             * so it can also be manually saved/reused.
+             */
+
+            actualInput.value =
+              JSON.stringify(
+                {
+                  count:
+                    apiData.results.length,
+
+                  results:
+                    apiData.results
+                },
+                null,
+                2
+              );
+
+
+            setBadge(
+              actualBadge,
+              `API loaded · ${map.size} slots`,
+              "api"
+            );
+
+
+            return {
+
+              map,
+
+              source:
+                `API · ${apiData.productCode}`
+
+            };
+
+          } catch (error) {
+
+            console.warn(
+              "Actual API failed:",
+              error
+            );
+
+
+            setBadge(
+              actualBadge,
+              "Manual required",
+              "error"
+            );
+
+
+            actualInput.classList.add(
+              "manual-required"
+            );
+
+
+            const manualJson =
+              parseTextJson(
+                actualInput.value,
+                "Actual"
+              );
+
+
+            if (manualJson) {
+
+              return {
+
+                map:
+                  parseActualJson(
+                    manualJson
+                  ),
+
+                source:
+                  "manual JSON"
+
+              };
+
+            }
+
+
+            return {
+
+              map:
+                createDummyActual(
+                  actualStart,
+                  forecastStart
+                ),
+
+              source:
+                "dummy"
+
+            };
+
+          }
 
         })();
 
 
-    const [
+      const [
         actualResult,
         forecastResult
-    ] =
+      ] =
         await Promise.all([
-            actualPromise,
-            forecastPromise
+          actualPromise,
+          forecastPromise
         ]);
 
 
-    renderMaps(
+      renderMaps(
         actualResult.map,
         forecastResult.map,
         {
-            actual:
-                actualResult.source,
+          actual:
+            actualResult.source,
 
-            forecast:
-                forecastResult.source
+          forecast:
+            forecastResult.source
         }
-    );
+      );
 
 
-    fetchButton.disabled =
+      fetchButton.disabled =
         false;
 
-}
+    }
 
 
-/* ================================================================
-   DRAW FROM MANUAL JSON
-   ================================================================ */
+    /* ================================================================
+       DRAW FROM MANUAL JSON
+       ================================================================ */
 
-function drawFromJson() {
+    function drawFromJson() {
 
-    try {
+      try {
 
         const today =
-            londonToday();
+          londonToday();
 
 
         const actualStart =
-            today.minus({
-                days:
-                    2
-            });
+          today.minus({
+            days:
+              2
+          });
 
 
         const forecastStart =
-            today.plus({
-                days:
-                    1
-            });
+          today.plus({
+            days:
+              1
+          });
 
 
         const chartEnd =
-            today.plus({
-                days:
-                    7
-            });
+          today.plus({
+            days:
+              7
+          });
 
 
         const actualJson =
-            parseTextJson(
-                actualInput.value,
-                "Actual"
-            );
+          parseTextJson(
+            actualInput.value,
+            "Actual"
+          );
 
 
         const forecastJson =
-            parseTextJson(
-                forecastInput.value,
-                "Forecast"
-            );
+          parseTextJson(
+            forecastInput.value,
+            "Forecast"
+          );
 
 
         let actualMap;
@@ -2983,310 +5583,311 @@ function drawFromJson() {
 
         if (actualJson) {
 
-            actualMap =
-                parseActualJson(
-                    actualJson
-                );
-
-            setBadge(
-                actualBadge,
-                "Manual JSON",
-                "manual"
+          actualMap =
+            parseActualJson(
+              actualJson
             );
+
+          setBadge(
+            actualBadge,
+            "Manual JSON",
+            "manual"
+          );
 
         } else {
 
-            actualMap =
-                createDummyActual(
-                    actualStart,
-                    forecastStart
-                );
-
-            setBadge(
-                actualBadge,
-                "Dummy",
-                "dummy"
+          actualMap =
+            createDummyActual(
+              actualStart,
+              forecastStart
             );
+
+          setBadge(
+            actualBadge,
+            "Dummy",
+            "dummy"
+          );
 
         }
 
 
         if (forecastJson) {
 
-            forecastMap =
-                parseForecastJson(
-                    forecastJson
-                );
-
-            setBadge(
-                forecastBadge,
-                "Manual JSON",
-                "manual"
+          forecastMap =
+            parseForecastJson(
+              forecastJson
             );
+
+          setBadge(
+            forecastBadge,
+            "Manual JSON",
+            "manual"
+          );
 
         } else {
 
-            forecastMap =
-                createDummyForecast(
-                    forecastStart,
-                    chartEnd
-                );
-
-            setBadge(
-                forecastBadge,
-                "Dummy",
-                "dummy"
+          forecastMap =
+            createDummyForecast(
+              forecastStart,
+              chartEnd
             );
+
+          setBadge(
+            forecastBadge,
+            "Dummy",
+            "dummy"
+          );
 
         }
 
 
         actualInput.classList.remove(
-            "manual-required"
+          "manual-required"
         );
 
         forecastInput.classList.remove(
-            "manual-required"
+          "manual-required"
         );
 
 
         renderMaps(
-            actualMap,
-            forecastMap,
-            {
-                actual:
-                    actualJson
-                        ? "manual JSON"
-                        : "dummy",
+          actualMap,
+          forecastMap,
+          {
+            actual:
+              actualJson
+                ? "manual JSON"
+                : "dummy",
 
-                forecast:
-                    forecastJson
-                        ? "manual JSON"
-                        : "dummy"
+            forecast:
+              forecastJson
+                ? "manual JSON"
+                : "dummy"
 
-            }
+          }
         );
 
-    } catch (error) {
+      } catch (error) {
 
         console.error(
-            error
+          error
         );
 
 
         setStatus(
-            error.message ||
-            String(error),
-            "error"
+          error.message ||
+          String(error),
+          "error"
         );
 
 
         showWarning(
-            "Could not parse the pasted JSON."
+          "Could not parse the pasted JSON."
         );
+
+      }
 
     }
 
-}
 
+    /* ================================================================
+       DUMMY
+       ================================================================ */
 
-/* ================================================================
-   DUMMY
-   ================================================================ */
+    function useDummyData() {
 
-function useDummyData() {
-
-    actualInput.value =
+      actualInput.value =
         "";
 
-    forecastInput.value =
+      forecastInput.value =
         "";
 
-    actualInput.classList.remove(
+      actualInput.classList.remove(
         "manual-required"
-    );
+      );
 
-    forecastInput.classList.remove(
+      forecastInput.classList.remove(
         "manual-required"
-    );
+      );
 
 
-    const today =
+      const today =
         londonToday();
 
 
-    const actualStart =
+      const actualStart =
         today.minus({
-            days:
-                2
+          days:
+            2
         });
 
 
-    const forecastStart =
+      const forecastStart =
         today.plus({
-            days:
-                1
+          days:
+            1
         });
 
 
-    const chartEnd =
+      const chartEnd =
         today.plus({
-            days:
-                7
+          days:
+            7
         });
 
 
-    renderMaps(
+      renderMaps(
 
         createDummyActual(
-            actualStart,
-            forecastStart
+          actualStart,
+          forecastStart
         ),
 
         createDummyForecast(
-            forecastStart,
-            chartEnd
+          forecastStart,
+          chartEnd
         ),
 
         {
-            actual:
-                "dummy",
+          actual:
+            "dummy",
 
-            forecast:
-                "dummy"
+          forecast:
+            "dummy"
         }
 
-    );
+      );
 
 
-    setBadge(
+      setBadge(
         actualBadge,
         "Dummy",
         "dummy"
-    );
+      );
 
 
-    setBadge(
+      setBadge(
         forecastBadge,
         "Dummy",
         "dummy"
-    );
+      );
 
 
-    setStatus(
+      setStatus(
         "Using dummy actual and forecast data.",
         "warning"
-    );
+      );
 
-}
+    }
 
 
-/* ================================================================
-   CLEAR
-   ================================================================ */
+    /* ================================================================
+       CLEAR
+       ================================================================ */
 
-function clearAll() {
+    function clearAll() {
 
-    actualInput.value =
+      actualInput.value =
         "";
 
-    forecastInput.value =
+      forecastInput.value =
         "";
 
-    actualInput.classList.remove(
+      actualInput.classList.remove(
         "manual-required"
-    );
+      );
 
-    forecastInput.classList.remove(
+      forecastInput.classList.remove(
         "manual-required"
-    );
+      );
 
 
-    setBadge(
+      setBadge(
         actualBadge,
         "Not loaded"
-    );
+      );
 
 
-    setBadge(
+      setBadge(
         forecastBadge,
         "Not loaded"
-    );
+      );
 
 
-    setStatus(
+      setStatus(
         "Inputs cleared.",
         ""
-    );
+      );
 
 
-    showWarning("");
+      showWarning("");
 
-}
+    }
 
 
-/* ================================================================
-   EVENTS
-   ================================================================ */
+    /* ================================================================
+       EVENTS
+       ================================================================ */
 
-document
-    .getElementById(
+    document
+      .getElementById(
         "fetchButton"
-    )
-    .addEventListener(
+      )
+      .addEventListener(
         "click",
         fetchAllApis
-    );
+      );
 
 
-document
-    .getElementById(
+    document
+      .getElementById(
         "drawButton"
-    )
-    .addEventListener(
+      )
+      .addEventListener(
         "click",
         drawFromJson
-    );
+      );
 
 
-document
-    .getElementById(
+    document
+      .getElementById(
         "dummyButton"
-    )
-    .addEventListener(
+      )
+      .addEventListener(
         "click",
         useDummyData
-    );
+      );
 
 
-document
-    .getElementById(
+    document
+      .getElementById(
         "clearButton"
-    )
-    .addEventListener(
+      )
+      .addEventListener(
         "click",
         clearAll
-    );
+      );
 
 
-/* ================================================================
-   START
-   ================================================================ */
+    /* ================================================================
+       START
+       ================================================================ */
 
-/*
- * Automatically try APIs when page opens.
- *
- * If either one is blocked by CORS:
- *
- * Actual  -> manual textarea
- * Forecast -> manual textarea
- *
- * The other API can still succeed normally.
- */
+    /*
+     * Automatically try APIs when page opens.
+     *
+     * If either one is blocked by CORS:
+     *
+     * Actual  -> manual textarea
+     * Forecast -> manual textarea
+     *
+     * The other API can still succeed normally.
+     */
 
-fetchAllApis();
+    fetchAllApis();
 
-</script>
+  </script>
 
 </body>
+
 </html>
