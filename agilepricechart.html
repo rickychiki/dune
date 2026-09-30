@@ -1,38 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Octopus Agile Region G — 10 Day Price Chart</title>
+<title>Octopus Agile Region G — 10 Day Price Chart</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
 
-  <style>
-    :root {
-      --bg: #101218;
-      --panel: #181b23;
-      --panel2: #20242e;
-      --border: #303642;
-      --text: #edf1f7;
-      --muted: #9da6b5;
-      --actual: #4da3ff;
-      --forecast: #ff9f43;
-      --warning: #ffd166;
-    }
+<style>
+:root {
+    --bg: #101218;
+    --panel: #181b23;
+    --panel2: #20242e;
+    --border: #303642;
+    --text: #edf1f7;
+    --muted: #9da6b5;
+    --actual: #4da3ff;
+    --forecast: #ff9f43;
+    --good: #69d391;
+    --warning: #ffd166;
+    --error: #ff7373;
+}
 
-    * {
-      box-sizing: border-box;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family:
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+
+    font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
@@ -40,2065 +42,3251 @@
         Helvetica,
         Arial,
         sans-serif;
-    }
+}
 
-    .container {
-      max-width: 1500px;
-      margin: auto;
-      padding: 20px;
-    }
+.container {
+    max-width: 1500px;
+    margin: auto;
+    padding: 20px;
+}
 
-    h1 {
-      margin: 0;
-      font-size: 28px;
-    }
+h1 {
+    margin: 0;
+    font-size: 28px;
+}
 
-    .subtitle {
-      color: var(--muted);
-      margin-top: 5px;
-      font-size: 14px;
-    }
+.subtitle {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 14px;
+}
 
-    .panel {
-      margin-top: 16px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 15px;
-    }
+/* =========================================================
+   SOURCE PANELS
+   ========================================================= */
 
-    .input-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
+.source-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 16px;
+}
 
-    label {
-      display: block;
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 7px;
-    }
+.source-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 15px;
+}
 
-    textarea {
-      width: 100%;
-      height: 170px;
-      resize: vertical;
+.source-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
 
-      background: #0e1015;
-      color: #e8edf5;
+.source-title strong {
+    font-size: 15px;
+}
 
-      border: 1px solid var(--border);
-      border-radius: 7px;
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: #12151b;
+}
 
-      padding: 10px;
+.badge.api {
+    color: var(--good);
+    border-color: rgba(105,211,145,.35);
+}
 
-      font-family:
+.badge.manual {
+    color: var(--warning);
+    border-color: rgba(255,209,102,.35);
+}
+
+.badge.dummy {
+    color: var(--muted);
+}
+
+.badge.error {
+    color: var(--error);
+    border-color: rgba(255,115,115,.35);
+}
+
+.description {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+textarea {
+    display: block;
+    width: 100%;
+    min-height: 170px;
+    resize: vertical;
+
+    background: #0e1015;
+    color: #e8edf5;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    padding: 10px;
+
+    font-family:
         ui-monospace,
         SFMono-Regular,
         Menlo,
         Consolas,
         monospace;
 
-      font-size: 12px;
-      line-height: 1.45;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #4da3ff;
+}
+
+textarea.manual-required {
+    border-color: rgba(255,209,102,.7);
+}
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
+.controls {
+    margin-top: 14px;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+button {
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    background: var(--panel2);
+    color: var(--text);
+
+    padding: 9px 15px;
+
+    cursor: pointer;
+}
+
+button:hover {
+    background: #292e39;
+}
+
+button.primary {
+    background: #245f91;
+    border-color: #327bb7;
+}
+
+button:disabled {
+    opacity: .55;
+    cursor: wait;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+    margin-top: 14px;
+
+    padding: 10px 12px;
+
+    border-radius: 7px;
+
+    background: #12151b;
+    border: 1px solid var(--border);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.status.ok {
+    color: var(--good);
+}
+
+.status.warning {
+    color: var(--warning);
+}
+
+.status.error {
+    color: var(--error);
+}
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+.chart-panel {
+    position: relative;
+
+    margin-top: 16px;
+
+    height: min(70vh, 750px);
+    min-height: 450px;
+
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    padding: 15px;
+}
+
+.chart-wrapper {
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.warning-overlay {
+    display: none;
+
+    position: absolute;
+
+    z-index: 5;
+
+    left: 25px;
+    right: 25px;
+    top: 25px;
+
+    padding: 9px 12px;
+
+    border-radius: 7px;
+
+    background: rgba(65,50,20,.94);
+    border: 1px solid rgba(255,209,102,.4);
+
+    color: #ffd166;
+
+    font-size: 12px;
+
+    pointer-events: none;
+}
+
+/* =========================================================
+   INFO
+   ========================================================= */
+
+.info-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+
+    margin-top: 12px;
+}
+
+.info {
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+
+    border-radius: 7px;
+
+    padding: 10px 12px;
+}
+
+.info-title {
+    color: var(--muted);
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+}
+
+.info-value {
+    margin-top: 4px;
+
+    font-size: 14px;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width: 850px) {
+
+    .container {
+        padding: 12px;
     }
 
-    textarea:focus {
-      outline: none;
-      border-color: #4da3ff;
-    }
-
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      background: var(--panel2);
-      color: var(--text);
-      padding: 9px 15px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #292e39;
-    }
-
-    button.primary {
-      background: #245f91;
-      border-color: #327bb7;
-    }
-
-    .status {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 7px;
-      background: #12151b;
-      border: 1px solid var(--border);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .status.warning {
-      color: var(--warning);
-    }
-
-    .status.error {
-      color: #ff7373;
-    }
-
-    .status.ok {
-      color: #69d391;
-    }
-
-    .chart-panel {
-      position: relative;
-      height: min(70vh, 750px);
-      min-height: 450px;
-    }
-
-    .chart-wrapper {
-      width: 100%;
-      height: 100%;
-    }
-
-    canvas {
-      width: 100% !important;
-      height: 100% !important;
+    .source-grid {
+        grid-template-columns: 1fr;
     }
 
     .info-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .info {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 10px 12px;
-    }
-
-    .info-title {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .info-value {
-      margin-top: 4px;
-      font-size: 14px;
-    }
-
-    .warning-overlay {
-      display: none;
-
-      position: absolute;
-      z-index: 5;
-
-      left: 20px;
-      right: 20px;
-      top: 20px;
-
-      padding: 9px 12px;
-
-      border-radius: 7px;
-
-      background: rgba(65, 50, 20, .94);
-      border: 1px solid rgba(255, 209, 102, .4);
-
-      color: #ffd166;
-
-      font-size: 12px;
-    }
-
-    @media(max-width: 800px) {
-
-      .container {
-        padding: 12px;
-      }
-
-      .input-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .info-grid {
         grid-template-columns: 1fr 1fr;
-      }
+    }
 
-      .chart-panel {
+    .chart-panel {
         height: 60vh;
         min-height: 400px;
-      }
     }
-  </style>
+}
+</style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <header>
-      <h1>Octopus Agile — Region G</h1>
+    <h1>
+        Octopus Agile — Region G
+    </h1>
 
-      <div class="subtitle">
-        North West England · 10 calendar days · Europe/London · p/kWh
-      </div>
-    </header>
+    <div class="subtitle">
+        North West England · Europe/London · p/kWh
+    </div>
 
 
-    <!-- =========================================================
-         JSON INPUT
-         ========================================================= -->
+    <!-- =====================================================
+         SOURCE INPUTS
+         ===================================================== -->
 
-    <div class="panel">
+    <div class="source-grid">
 
-      <div class="input-grid">
+        <!-- ACTUAL -->
 
-        <div>
-          <label>
-            Actual JSON
-            <br>
+        <section class="source-panel">
+
+            <div class="source-title">
+
+                <strong>
+                    Actual Prices
+                </strong>
+
+                <span
+                    id="actualBadge"
+                    class="badge"
+                >
+                    Not loaded
+                </span>
+
+            </div>
+
             <a href="https://api.octopus.energy/v1/products/AGILE-24-10-01/electricity-tariffs/E-1R-AGILE-24-10-01-G/standard-unit-rates/" target="_blank" rel="noopener noreferrer"
               class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 underline my-1 transition-colors">
               Open Octopus api link
             </a>
             <br>
-            <small>
-              Paste the JSON returned by the Octopus API.
-              Leave empty to use dummy actual data.
-            </small>
-          </label>
+            <div class="description">
 
-          <textarea id="actualJson" placeholder="Paste Octopus API JSON here...
+                First tries the Octopus API automatically.
+                If fetch/CORS fails, paste the Octopus JSON here.
 
-Leave empty for dummy actual prices."></textarea>
-        </div>
+                Empty input uses dummy data.
+
+            </div>
 
 
-        <div>
-          <label>
-            Forecast JSON
-            <br>
+            <textarea
+                id="actualJson"
+                placeholder="Paste Octopus API JSON here if automatic fetch fails..."
+            ></textarea>
+
+        </section>
+
+
+        <!-- FORECAST -->
+
+        <section class="source-panel">
+
+            <div class="source-title">
+
+                <strong>
+                    Forecast Prices
+                </strong>
+
+                <span
+                    id="forecastBadge"
+                    class="badge"
+                >
+                    Not loaded
+                </span>
+
+            </div>
+
             <a href="https://agilepredict.com/api/G/?days=10&forecast_count=1&format=json&high_low=true" target="_blank" rel="noopener noreferrer"
               class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 underline my-1 transition-colors">
               Open AgilePredict api link
             </a>
             <br>
-            <small>
-              Paste the JSON returned by AgilePredict.
-              Leave empty to use dummy forecast data.
-            </small>
-          </label>
+            <div class="description">
 
-          <textarea id="forecastJson" placeholder="Paste AgilePredict JSON here...
+                First tries AgilePredict automatically.
+                If fetch/CORS fails, paste the AgilePredict JSON here.
 
-Leave empty for dummy forecast prices."></textarea>
+                Empty input uses dummy data.
+
+            </div>
+
+
+            <textarea
+                id="forecastJson"
+                placeholder="Paste AgilePredict JSON here if automatic fetch fails..."
+            ></textarea>
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         BUTTONS
+         ===================================================== -->
+
+    <div class="controls">
+
+        <button
+            id="fetchButton"
+            class="primary"
+        >
+            Fetch APIs
+        </button>
+
+
+        <button
+            id="drawButton"
+        >
+            Draw From JSON
+        </button>
+
+
+        <button
+            id="dummyButton"
+        >
+            Use Dummy Data
+        </button>
+
+
+        <button
+            id="clearButton"
+        >
+            Clear
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATUS
+         ===================================================== -->
+
+    <div
+        id="status"
+        class="status"
+    >
+        Ready.
+    </div>
+
+
+    <!-- =====================================================
+         CHART
+         ===================================================== -->
+
+    <section class="chart-panel">
+
+        <div
+            id="warningOverlay"
+            class="warning-overlay"
+        ></div>
+
+        <div class="chart-wrapper">
+            <canvas id="priceChart"></canvas>
         </div>
 
-      </div>
+    </section>
 
 
-      <div class="controls">
-
-        <button class="primary" id="drawButton">
-          Draw Chart
-        </button>
-
-        <button id="clearButton">
-          Clear JSON
-        </button>
-
-        <button id="dummyButton">
-          Load Dummy Data
-        </button>
-
-      </div>
-
-
-      <div id="status" class="status">
-        Ready. Paste JSON into either box and press "Draw Chart".
-        Empty boxes automatically use dummy data.
-      </div>
-
-    </div>
-
-
-    <!-- =========================================================
-         CHART
-         ========================================================= -->
-
-    <div class="panel chart-panel">
-
-      <div id="warningOverlay" class="warning-overlay"></div>
-
-      <div class="chart-wrapper">
-        <canvas id="priceChart"></canvas>
-      </div>
-
-    </div>
-
-
-    <!-- =========================================================
+    <!-- =====================================================
          INFO
-         ========================================================= -->
+         ===================================================== -->
 
     <div class="info-grid">
 
-      <div class="info">
-        <div class="info-title">
-          Actual
+        <div class="info">
+
+            <div class="info-title">
+                Actual
+            </div>
+
+            <div
+                id="actualInfo"
+                class="info-value"
+            >
+                —
+            </div>
+
         </div>
 
-        <div id="actualInfo" class="info-value">
-          —
-        </div>
-      </div>
 
+        <div class="info">
 
-      <div class="info">
-        <div class="info-title">
-          Forecast
-        </div>
+            <div class="info-title">
+                Forecast
+            </div>
 
-        <div id="forecastInfo" class="info-value">
-          —
-        </div>
-      </div>
+            <div
+                id="forecastInfo"
+                class="info-value"
+            >
+                —
+            </div>
 
-
-      <div class="info">
-        <div class="info-title">
-          Missing actual
         </div>
 
-        <div id="missingActual" class="info-value">
-          —
+
+        <div class="info">
+
+            <div class="info-title">
+                Missing actual
+            </div>
+
+            <div
+                id="missingActual"
+                class="info-value"
+            >
+                —
+            </div>
+
         </div>
-      </div>
 
 
-      <div class="info">
-        <div class="info-title">
-          Missing forecast
-        </div>
+        <div class="info">
 
-        <div id="missingForecast" class="info-value">
-          —
+            <div class="info-title">
+                Missing forecast
+            </div>
+
+            <div
+                id="missingForecast"
+                class="info-value"
+            >
+                —
+            </div>
+
         </div>
-      </div>
 
     </div>
 
-  </div>
+</div>
 
 
-  <script>
+<script>
 
-    "use strict";
-
-
-    /* ================================================================
-       CONSTANTS
-       ================================================================ */
-
-    const TIMEZONE = "Europe/London";
-
-    let chart = null;
+"use strict";
 
 
-    /* ================================================================
-       DOM
-       ================================================================ */
+/* ================================================================
+   CONFIG
+   ================================================================ */
 
-    const actualInput =
-      document.getElementById("actualJson");
-
-    const forecastInput =
-      document.getElementById("forecastJson");
-
-    const statusElement =
-      document.getElementById("status");
-
-    const warningElement =
-      document.getElementById("warningOverlay");
+const TIMEZONE =
+    "Europe/London";
 
 
-    /* ================================================================
-       DATE HELPERS
-       ================================================================ */
+const AGILE_PREDICT_URL =
+    "https://agilepredict.com/api/G?days=10&forecast_count=1&high_low=true";
 
-    function londonToday() {
 
-      return luxon.DateTime
+const OCTOPUS_PRODUCTS_URL =
+    "https://api.octopus.energy/v1/products/?brand=OCTOPUS_ENERGY&is_variable=true&page_size=100";
+
+
+const REGION =
+    "G";
+
+
+const MAX_OCTOPUS_PAGES =
+    10;
+
+
+let chart =
+    null;
+
+
+/* ================================================================
+   DOM
+   ================================================================ */
+
+const actualInput =
+    document.getElementById("actualJson");
+
+const forecastInput =
+    document.getElementById("forecastJson");
+
+const actualBadge =
+    document.getElementById("actualBadge");
+
+const forecastBadge =
+    document.getElementById("forecastBadge");
+
+const statusElement =
+    document.getElementById("status");
+
+const warningElement =
+    document.getElementById("warningOverlay");
+
+const fetchButton =
+    document.getElementById("fetchButton");
+
+
+/* ================================================================
+   STATUS / BADGES
+   ================================================================ */
+
+function setStatus(
+    message,
+    type = ""
+) {
+
+    statusElement.textContent =
+        message;
+
+    statusElement.className =
+        "status " + type;
+
+}
+
+
+function setBadge(
+    element,
+    text,
+    type = ""
+) {
+
+    element.textContent =
+        text;
+
+    element.className =
+        "badge " + type;
+
+}
+
+
+function showWarning(text) {
+
+    if (!text) {
+
+        warningElement.style.display =
+            "none";
+
+        warningElement.textContent =
+            "";
+
+        return;
+
+    }
+
+
+    warningElement.textContent =
+        text;
+
+    warningElement.style.display =
+        "block";
+
+}
+
+
+/* ================================================================
+   TIME
+   ================================================================ */
+
+function londonToday() {
+
+    return luxon.DateTime
         .now()
         .setZone(TIMEZONE)
         .startOf("day");
 
+}
+
+
+/*
+ * IMPORTANT
+ *
+ * Chart.js receives milliseconds.
+ */
+
+function timestamp(dt) {
+
+    return dt.toMillis();
+
+}
+
+
+/* ================================================================
+   SLOTS
+   ================================================================ */
+
+function makeSlotList(
+    start,
+    endExclusive
+) {
+
+    const result = [];
+
+    let current =
+        start;
+
+
+    while (
+        current < endExclusive
+    ) {
+
+        result.push(current);
+
+        current =
+            current.plus({
+                minutes: 30
+            });
+
     }
+
+
+    return result;
+
+}
+
+
+/* ================================================================
+   GENERIC FETCH
+   ================================================================ */
+
+async function fetchJson(
+    url,
+    label
+) {
+
+    let response;
+
+    try {
+
+        response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    cache: "no-store",
+
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    }
+                }
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            `${label} fetch failed. This may be CORS or a network error.`
+        );
+
+    }
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            `${label} returned HTTP ${response.status}.`
+        );
+
+    }
+
+
+    const contentType =
+        response.headers.get(
+            "content-type"
+        ) || "";
+
+
+    if (
+        !contentType
+            .toLowerCase()
+            .includes("json")
+    ) {
+
+        throw new Error(
+            `${label} did not return JSON.`
+        );
+
+    }
+
+
+    return response.json();
+
+}
+
+
+/* ================================================================
+   OCTOPUS PRODUCT DISCOVERY
+   ================================================================ */
+
+async function findAgileProduct() {
+
+    let url =
+        OCTOPUS_PRODUCTS_URL;
+
+
+    const candidates =
+        [];
+
+
+    for (
+        let page = 0;
+        page < 5 && url;
+        page++
+    ) {
+
+        const data =
+            await fetchJson(
+                url,
+                "Octopus products API"
+            );
+
+
+        const products =
+            Array.isArray(
+                data.results
+            )
+                ? data.results
+                : [];
+
+
+        for (
+            const product
+            of products
+        ) {
+
+            const code =
+                String(
+                    product.code || ""
+                ).toUpperCase();
+
+
+            const name =
+                String(
+                    product.display_name ||
+                    product.full_name ||
+                    ""
+                )
+                    .toLowerCase();
+
+
+            const looksAgile =
+                code.startsWith(
+                    "AGILE-"
+                ) ||
+                name.includes(
+                    "agile octopus"
+                ) ||
+                name === "agile";
+
+
+            if (!looksAgile) {
+                continue;
+            }
+
+
+            /*
+             * Prefer products that have not
+             * ended yet.
+             */
+
+            const availableTo =
+                product.available_to;
+
+
+            const active =
+                !availableTo ||
+                luxon.DateTime
+                    .fromISO(
+                        availableTo
+                    )
+                    .toMillis() >
+                Date.now();
+
+
+            if (active) {
+
+                candidates.push(
+                    product
+                );
+
+            }
+
+        }
+
+
+        url =
+            data.next || null;
+
+    }
+
+
+    if (!candidates.length) {
+
+        /*
+         * Fallback to the tariff code from
+         * the API example / current Agile product.
+         */
+
+        return {
+            code:
+                "AGILE-24-10-01",
+
+            discovered:
+                false
+
+        };
+
+    }
+
+
+    candidates.sort(
+        (
+            a,
+            b
+        ) => {
+
+            const da =
+                luxon.DateTime
+                    .fromISO(
+                        a.available_from ||
+                        "1900-01-01"
+                    )
+                    .toMillis();
+
+
+            const db =
+                luxon.DateTime
+                    .fromISO(
+                        b.available_from ||
+                        "1900-01-01"
+                    )
+                    .toMillis();
+
+
+            return db - da;
+
+        }
+    );
+
+
+    return {
+
+        code:
+            candidates[0].code,
+
+        discovered:
+            true
+
+    };
+
+}
+
+
+/* ================================================================
+   OCTOPUS RATE URL
+   ================================================================ */
+
+function buildOctopusRatesUrl(
+    productCode,
+    actualStart,
+    forecastStart
+) {
+
+    /*
+     * Region G tariff:
+     *
+     * E-1R-{productCode}-G
+     */
+
+    const tariffCode =
+        `E-1R-${productCode}-${REGION}`;
+
+
+    const params =
+        new URLSearchParams({
+
+            period_from:
+                actualStart
+                    .toUTC()
+                    .toISO({
+                        suppressMilliseconds:
+                            true
+                    }),
+
+            period_to:
+                forecastStart
+                    .toUTC()
+                    .toISO({
+                        suppressMilliseconds:
+                            true
+                    }),
+
+            page_size:
+                "100"
+
+        });
+
+
+    return (
+        "https://api.octopus.energy/v1/products/" +
+        encodeURIComponent(
+            productCode
+        ) +
+        "/electricity-tariffs/" +
+        encodeURIComponent(
+            tariffCode
+        ) +
+        "/standard-unit-rates/?" +
+        params.toString()
+    );
+
+}
+
+
+/* ================================================================
+   FETCH ALL OCTOPUS PAGES
+   ================================================================ */
+
+async function fetchOctopusActual(
+    actualStart,
+    forecastStart
+) {
+
+    const product =
+        await findAgileProduct();
+
+
+    let url =
+        buildOctopusRatesUrl(
+            product.code,
+            actualStart,
+            forecastStart
+        );
+
+
+    const allRows =
+        [];
+
+
+    /*
+     * Follow the "next" URLs.
+     *
+     * The API returns up to 100 rows per page.
+     */
+
+    for (
+        let page = 0;
+        page < MAX_OCTOPUS_PAGES && url;
+        page++
+    ) {
+
+        const data =
+            await fetchJson(
+                url,
+                "Octopus actual rates API"
+            );
+
+
+        const rows =
+            Array.isArray(
+                data.results
+            )
+                ? data.results
+                : [];
+
+
+        allRows.push(
+            ...rows
+        );
+
+
+        /*
+         * We already have enough information
+         * when the oldest returned slot is
+         * at or before actualStart.
+         */
+
+        const validTimes =
+            rows
+                .map(
+                    row =>
+                        row.valid_from
+                )
+                .filter(Boolean)
+                .map(
+                    value =>
+                        luxon.DateTime
+                            .fromISO(
+                                value,
+                                {
+                                    zone: "utc"
+                                }
+                            )
+                            .toMillis()
+                )
+                .filter(
+                    Number.isFinite
+                );
+
+
+        if (validTimes.length) {
+
+            const oldest =
+                Math.min(
+                    ...validTimes
+                );
+
+
+            if (
+                oldest <=
+                actualStart
+                    .toUTC()
+                    .toMillis()
+            ) {
+
+                break;
+
+            }
+
+        }
+
+
+        url =
+            data.next ||
+            null;
+
+    }
+
+
+    return {
+
+        productCode:
+            product.code,
+
+        discovered:
+            product.discovered,
+
+        results:
+            allRows
+
+    };
+
+}
+
+
+/* ================================================================
+   PARSE ACTUAL
+   ================================================================ */
+
+function parseActualJson(
+    json
+) {
+
+    const map =
+        new Map();
+
+
+    if (!json) {
+        return map;
+    }
+
+
+    let rows;
+
+
+    if (
+        Array.isArray(json)
+    ) {
+
+        rows =
+            json;
+
+    } else {
+
+        rows =
+            Array.isArray(
+                json.results
+            )
+                ? json.results
+                : [];
+
+    }
+
+
+    for (
+        const row
+        of rows
+    ) {
+
+        if (
+            !row.valid_from
+        ) {
+            continue;
+        }
+
+
+        const dt =
+            luxon.DateTime
+                .fromISO(
+                    row.valid_from,
+                    {
+                        zone: "utc"
+                    }
+                )
+                .setZone(
+                    TIMEZONE
+                );
+
+
+        if (!dt.isValid) {
+            continue;
+        }
+
+
+        /*
+         * Octopus value_inc_vat is already
+         * p/kWh.
+         *
+         * DO NOT multiply by 100.
+         */
+
+        let price =
+            Number(
+                row.value_inc_vat
+            );
+
+
+        if (
+            !Number.isFinite(
+                price
+            )
+        ) {
+
+            price =
+                Number(
+                    row.value_exc_vat
+                );
+
+        }
+
+
+        if (
+            !Number.isFinite(
+                price
+            )
+        ) {
+            continue;
+        }
+
+
+        map.set(
+            timestamp(dt),
+            price
+        );
+
+    }
+
+
+    return map;
+
+}
+
+
+/* ================================================================
+   PARSE FORECAST
+   ================================================================ */
+
+function parseForecastJson(
+    json
+) {
+
+    const map =
+        new Map();
+
+
+    if (!json) {
+        return map;
+    }
+
+
+    let record;
+
+
+    if (
+        Array.isArray(json)
+    ) {
+
+        record =
+            json[0];
+
+    } else {
+
+        record =
+            json;
+
+    }
+
+
+    const rows =
+        Array.isArray(
+            record?.prices
+        )
+            ? record.prices
+            : [];
+
+
+    for (
+        const item
+        of rows
+    ) {
+
+        if (
+            !item.date_time
+        ) {
+            continue;
+        }
+
+
+        const dt =
+            luxon.DateTime
+                .fromISO(
+                    item.date_time,
+                    {
+                        setZone:
+                            true
+                    }
+                )
+                .setZone(
+                    TIMEZONE
+                );
+
+
+        if (!dt.isValid) {
+            continue;
+        }
+
+
+        const price =
+            Number(
+                item.agile_pred
+            );
+
+
+        const low =
+            Number(
+                item.agile_low
+            );
+
+
+        const high =
+            Number(
+                item.agile_high
+            );
+
+
+        if (
+            !Number.isFinite(
+                price
+            )
+        ) {
+            continue;
+        }
+
+
+        map.set(
+            timestamp(dt),
+            {
+
+                price,
+
+                low:
+                    Number.isFinite(
+                        low
+                    )
+                        ? low
+                        : null,
+
+                high:
+                    Number.isFinite(
+                        high
+                    )
+                        ? high
+                        : null
+
+            }
+        );
+
+    }
+
+
+    return map;
+
+}
+
+
+/* ================================================================
+   DUMMY ACTUAL
+   ================================================================ */
+
+function createDummyActual(
+    start,
+    endExclusive
+) {
+
+    const map =
+        new Map();
+
+
+    const slots =
+        makeSlotList(
+            start,
+            endExclusive
+        );
+
+
+    for (
+        const dt
+        of slots
+    ) {
+
+        const hour =
+            dt.hour +
+            dt.minute / 60;
+
+
+        let price =
+            12 +
+            Math.sin(
+                hour /
+                24 *
+                Math.PI *
+                2
+            ) * 5;
+
+
+        if (
+            hour >= 7 &&
+            hour < 10
+        ) {
+
+            price += 8;
+
+        }
+
+
+        if (
+            hour >= 16 &&
+            hour < 20
+        ) {
+
+            price += 14;
+
+        }
+
+
+        price +=
+            (dt.ordinal % 7) *
+            0.7;
+
+
+        map.set(
+            timestamp(dt),
+            Number(
+                price.toFixed(2)
+            )
+        );
+
+    }
+
+
+    return map;
+
+}
+
+
+/* ================================================================
+   DUMMY FORECAST
+   ================================================================ */
+
+function createDummyForecast(
+    start,
+    endExclusive
+) {
+
+    const map =
+        new Map();
+
+
+    const slots =
+        makeSlotList(
+            start,
+            endExclusive
+        );
+
+
+    for (
+        const dt
+        of slots
+    ) {
+
+        const hour =
+            dt.hour +
+            dt.minute / 60;
+
+
+        let price =
+            13 +
+            Math.sin(
+                hour /
+                24 *
+                Math.PI *
+                2
+            ) * 4;
+
+
+        if (
+            hour >= 7 &&
+            hour < 10
+        ) {
+
+            price += 7;
+
+        }
+
+
+        if (
+            hour >= 16 &&
+            hour < 20
+        ) {
+
+            price += 12;
+
+        }
+
+
+        price +=
+            ((dt.ordinal % 6) - 3) *
+            0.8;
+
+
+        const uncertainty =
+            3 +
+            Math.abs(
+                Math.sin(
+                    hour /
+                    24 *
+                    Math.PI
+                )
+            ) * 2;
+
+
+        map.set(
+            timestamp(dt),
+            {
+
+                price:
+                    Number(
+                        price.toFixed(2)
+                    ),
+
+                low:
+                    Number(
+                        (
+                            price -
+                            uncertainty
+                        ).toFixed(2)
+                    ),
+
+                high:
+                    Number(
+                        (
+                            price +
+                            uncertainty
+                        ).toFixed(2)
+                    )
+
+            }
+        );
+
+    }
+
+
+    return map;
+
+}
+
+
+/* ================================================================
+   DATASET BUILDING
+   ================================================================ */
+
+function makeActualDataset(
+    slots,
+    map
+) {
+
+    return slots.map(
+        dt => {
+
+            const x =
+                timestamp(dt);
+
+
+            const value =
+                map.get(x);
+
+
+            return {
+
+                x,
+
+                y:
+                    value === undefined
+                        ? null
+                        : value
+
+            };
+
+        }
+    );
+
+}
+
+
+function makeForecastDataset(
+    slots,
+    map,
+    property
+) {
+
+    return slots.map(
+        dt => {
+
+            const x =
+                timestamp(dt);
+
+
+            const item =
+                map.get(x);
+
+
+            if (!item) {
+
+                return {
+                    x,
+                    y: null
+                };
+
+            }
+
+
+            const value =
+                item[property];
+
+
+            return {
+
+                x,
+
+                y:
+                    Number.isFinite(
+                        value
+                    )
+                        ? value
+                        : null
+
+            };
+
+        }
+    );
+
+}
+
+
+/* ================================================================
+   CHART
+   ================================================================ */
+
+function drawChart(
+    actualDataset,
+    forecastDataset,
+    lowDataset,
+    highDataset,
+    start,
+    endExclusive
+) {
+
+    if (chart) {
+
+        chart.destroy();
+
+    }
+
+
+    const canvas =
+        document.getElementById(
+            "priceChart"
+        );
+
+
+    chart =
+        new Chart(
+            canvas.getContext(
+                "2d"
+            ),
+            {
+
+                type: "line",
+
+
+                data: {
+
+                    datasets: [
+
+                        {
+                            label:
+                                "Actual Prices",
+
+                            data:
+                                actualDataset,
+
+                            parsing:
+                                false,
+
+                            borderColor:
+                                "#4da3ff",
+
+                            backgroundColor:
+                                "#4da3ff",
+
+                            borderWidth:
+                                2.2,
+
+                            pointRadius:
+                                0,
+
+                            pointHoverRadius:
+                                5,
+
+                            pointHitRadius:
+                                10,
+
+                            tension:
+                                0,
+
+                            spanGaps:
+                                false,
+
+                            order:
+                                10
+                        },
+
+
+                        {
+                            label:
+                                "Forecast Low",
+
+                            data:
+                                lowDataset,
+
+                            parsing:
+                                false,
+
+                            borderColor:
+                                "rgba(255,159,67,0)",
+
+                            backgroundColor:
+                                "rgba(255,159,67,0)",
+
+                            borderWidth:
+                                0,
+
+                            pointRadius:
+                                0,
+
+                            pointHitRadius:
+                                0,
+
+                            fill:
+                                false,
+
+                            tension:
+                                0,
+
+                            spanGaps:
+                                false,
+
+                            order:
+                                1
+                        },
+
+
+                        {
+                            label:
+                                "Forecast Range",
+
+                            data:
+                                highDataset,
+
+                            parsing:
+                                false,
+
+                            borderColor:
+                                "rgba(255,159,67,0)",
+
+                            backgroundColor:
+                                "rgba(255,159,67,.18)",
+
+                            borderWidth:
+                                0,
+
+                            pointRadius:
+                                0,
+
+                            pointHitRadius:
+                                0,
+
+                            fill:
+                                1,
+
+                            tension:
+                                0,
+
+                            spanGaps:
+                                false,
+
+                            order:
+                                2
+                        },
+
+
+                        {
+                            label:
+                                "Forecast Prices",
+
+                            data:
+                                forecastDataset,
+
+                            parsing:
+                                false,
+
+                            borderColor:
+                                "#ff9f43",
+
+                            backgroundColor:
+                                "#ff9f43",
+
+                            borderWidth:
+                                2.4,
+
+                            borderDash:
+                                [7,5],
+
+                            pointRadius:
+                                0,
+
+                            pointHoverRadius:
+                                5,
+
+                            pointHitRadius:
+                                10,
+
+                            tension:
+                                0,
+
+                            spanGaps:
+                                false,
+
+                            order:
+                                5
+                        }
+
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive:
+                        true,
+
+                    maintainAspectRatio:
+                        false,
+
+                    normalized:
+                        true,
+
+
+                    interaction: {
+
+                        mode:
+                            "nearest",
+
+                        intersect:
+                            false
+
+                    },
+
+
+                    plugins: {
+
+                        title: {
+
+                            display:
+                                true,
+
+                            text:
+                                "Octopus Agile Region G — Electricity Prices",
+
+                            color:
+                                "#edf1f7",
+
+                            font: {
+
+                                size:
+                                    18,
+
+                                weight:
+                                    "600"
+
+                            },
+
+                            padding: {
+
+                                bottom:
+                                    12
+
+                            }
+
+                        },
+
+
+                        legend: {
+
+                            display:
+                                true,
+
+                            position:
+                                "top",
+
+                            labels: {
+
+                                color:
+                                    "#edf1f7",
+
+                                usePointStyle:
+                                    true,
+
+                                padding:
+                                    16,
+
+                                filter:
+                                    item => {
+
+                                        return (
+                                            item.datasetIndex === 0 ||
+                                            item.datasetIndex === 3
+                                        );
+
+                                    }
+
+                            },
+
+
+                            onClick:
+                                (
+                                    event,
+                                    legendItem,
+                                    legend
+                                ) => {
+
+                                    const c =
+                                        legend.chart;
+
+
+                                    if (
+                                        legendItem.datasetIndex === 0
+                                    ) {
+
+                                        const visible =
+                                            c.isDatasetVisible(
+                                                0
+                                            );
+
+
+                                        c.setDatasetVisibility(
+                                            0,
+                                            !visible
+                                        );
+
+                                    }
+
+
+                                    if (
+                                        legendItem.datasetIndex === 3
+                                    ) {
+
+                                        const visible =
+                                            c.isDatasetVisible(
+                                                3
+                                            );
+
+
+                                        c.setDatasetVisibility(
+                                            1,
+                                            !visible
+                                        );
+
+                                        c.setDatasetVisibility(
+                                            2,
+                                            !visible
+                                        );
+
+                                        c.setDatasetVisibility(
+                                            3,
+                                            !visible
+                                        );
+
+                                    }
+
+
+                                    c.update();
+
+                                }
+
+                        },
+
+
+                        tooltip: {
+
+                            enabled:
+                                true,
+
+
+                            callbacks: {
+
+                                title:
+                                    items => {
+
+                                        if (
+                                            !items ||
+                                            !items.length
+                                        ) {
+
+                                            return "";
+
+                                        }
+
+
+                                        const x =
+                                            Number(
+                                                items[0]
+                                                    .parsed
+                                                    .x
+                                            );
+
+
+                                        if (
+                                            !Number.isFinite(
+                                                x
+                                            )
+                                        ) {
+
+                                            return "";
+
+                                        }
+
+
+                                        return luxon.DateTime
+                                            .fromMillis(
+                                                x,
+                                                {
+                                                    zone:
+                                                        TIMEZONE
+                                                }
+                                            )
+                                            .toFormat(
+                                                "ccc d LLL yyyy, HH:mm"
+                                            );
+
+                                    },
+
+
+                                label:
+                                    context => {
+
+                                        const y =
+                                            context.parsed.y;
+
+
+                                        if (
+                                            y === null ||
+                                            !Number.isFinite(
+                                                y
+                                            )
+                                        ) {
+
+                                            return (
+                                                context.dataset.label +
+                                                ": missing"
+                                            );
+
+                                        }
+
+
+                                        return (
+                                            context.dataset.label +
+                                            ": " +
+                                            y.toFixed(2) +
+                                            " p/kWh"
+                                        );
+
+                                    }
+
+                            }
+
+                        }
+
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            type:
+                                "time",
+
+                            min:
+                                timestamp(
+                                    start
+                                ),
+
+                            max:
+                                timestamp(
+                                    endExclusive.minus({
+                                        minutes:
+                                            30
+                                    })
+                                ),
+
+
+                            adapters: {
+
+                                date: {
+
+                                    zone:
+                                        TIMEZONE
+
+                                }
+
+                            },
+
+
+                            time: {
+
+                                unit:
+                                    "day",
+
+                                displayFormats: {
+
+                                    day:
+                                        "ccc d LLL",
+
+                                    hour:
+                                        "HH:mm"
+
+                                },
+
+                                tooltipFormat:
+                                    "ccc d LLL yyyy, HH:mm"
+
+                            },
+
+
+                            ticks: {
+
+                                color:
+                                    "#9da6b5",
+
+                                maxRotation:
+                                    0,
+
+                                autoSkip:
+                                    true,
+
+                                autoSkipPadding:
+                                    20
+
+                            },
+
+
+                            grid: {
+
+                                color:
+                                    "rgba(255,255,255,.07)"
+
+                            },
+
+
+                            title: {
+
+                                display:
+                                    true,
+
+                                text:
+                                    "Date / Time (Europe/London)",
+
+                                color:
+                                    "#9da6b5"
+
+                            }
+
+                        },
+
+
+                        y: {
+
+                            ticks: {
+
+                                color:
+                                    "#9da6b5",
+
+                                callback:
+                                    value =>
+                                        value +
+                                        " p"
+
+                            },
+
+
+                            grid: {
+
+                                color:
+                                    "rgba(255,255,255,.07)"
+
+                            },
+
+
+                            title: {
+
+                                display:
+                                    true,
+
+                                text:
+                                    "Price (p/kWh)",
+
+                                color:
+                                    "#9da6b5"
+
+                            },
+
+                            beginAtZero:
+                                false
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+}
+
+
+/* ================================================================
+   COUNT
+   ================================================================ */
+
+function countPresent(
+    dataset
+) {
+
+    return dataset.filter(
+        item =>
+            item.y !== null &&
+            Number.isFinite(
+                item.y
+            )
+    ).length;
+
+}
+
+
+/* ================================================================
+   DRAW USING MAPS
+   ================================================================ */
+
+function renderMaps(
+    actualMap,
+    forecastMap,
+    sourceInfo
+) {
+
+    const today =
+        londonToday();
+
+
+    /*
+     * User changed this to -2.
+     *
+     * This gives:
+     *
+     * D-2
+     * D-1
+     * Today
+     *
+     * = 3 actual days
+     */
+
+    const actualStart =
+        today.minus({
+            days:
+                2
+        });
+
+
+    const forecastStart =
+        today.plus({
+            days:
+                1
+        });
+
+
+    /*
+     * 6 forecast days:
+     *
+     * tomorrow through D+6
+     */
+
+    const chartEnd =
+        today.plus({
+            days:
+                7
+        });
+
+
+    const actualSlots =
+        makeSlotList(
+            actualStart,
+            forecastStart
+        );
+
+
+    const forecastSlots =
+        makeSlotList(
+            forecastStart,
+            chartEnd
+        );
+
+
+    const actualDataset =
+        makeActualDataset(
+            actualSlots,
+            actualMap
+        );
+
+
+    const forecastDataset =
+        makeForecastDataset(
+            forecastSlots,
+            forecastMap,
+            "price"
+        );
+
+
+    const lowDataset =
+        makeForecastDataset(
+            forecastSlots,
+            forecastMap,
+            "low"
+        );
+
+
+    const highDataset =
+        makeForecastDataset(
+            forecastSlots,
+            forecastMap,
+            "high"
+        );
+
+
+    drawChart(
+        actualDataset,
+        forecastDataset,
+        lowDataset,
+        highDataset,
+        actualStart,
+        chartEnd
+    );
+
+
+    const actualPresent =
+        countPresent(
+            actualDataset
+        );
+
+
+    const forecastPresent =
+        countPresent(
+            forecastDataset
+        );
+
+
+    const lowPresent =
+        countPresent(
+            lowDataset
+        );
+
+
+    const highPresent =
+        countPresent(
+            highDataset
+        );
+
+
+    const actualMissing =
+        actualSlots.length -
+        actualPresent;
+
+
+    const forecastMissing =
+        forecastSlots.length -
+        forecastPresent;
+
+
+    document.getElementById(
+        "actualInfo"
+    ).textContent =
+        `${actualPresent}/${actualSlots.length} slots · ${sourceInfo.actual}`;
+
+
+    document.getElementById(
+        "forecastInfo"
+    ).textContent =
+        `${forecastPresent}/${forecastSlots.length} slots · ${sourceInfo.forecast}`;
+
+
+    document.getElementById(
+        "missingActual"
+    ).textContent =
+        actualMissing;
+
+
+    document.getElementById(
+        "missingForecast"
+    ).textContent =
+        forecastMissing;
+
+
+    const warnings = [];
+
+
+    // at least missing 10 half-hour slots
+    if (
+        actualMissing > 10
+    ) {
+
+        warnings.push(
+            `Actual missing ${actualMissing} of ${actualSlots.length} slots.`
+        );
+
+    }
+
+
+    if (
+        forecastMissing > 0
+    ) {
+
+        warnings.push(
+            `Forecast missing ${forecastMissing} of ${forecastSlots.length} slots.`
+        );
+
+    }
+
+
+    if (
+        forecastPresent > 0 &&
+        (
+            lowPresent === 0 ||
+            highPresent === 0
+        )
+    ) {
+
+        warnings.push(
+            "Forecast price loaded, but agile_low/agile_high was not found."
+        );
+
+    }
+
+
+    if (warnings.length) {
+
+        showWarning(
+            warnings.join(" ")
+        );
+
+        setStatus(
+            "Chart loaded with warnings. " +
+            warnings.join(" "),
+            "warning"
+        );
+
+    } else {
+
+        showWarning("");
+
+        setStatus(
+            `Chart loaded successfully. Actual ${actualPresent}/${actualSlots.length}; Forecast ${forecastPresent}/${forecastSlots.length}.`,
+            "ok"
+        );
+
+    }
+
+}
+
+
+/* ================================================================
+   PARSE MANUAL OR DUMMY
+   ================================================================ */
+
+function parseTextJson(
+    text,
+    label
+) {
+
+    if (!text.trim()) {
+
+        return null;
+
+    }
+
+
+    try {
+
+        return JSON.parse(
+            text
+        );
+
+    } catch (error) {
+
+        throw new Error(
+            `${label} JSON is invalid: ${error.message}`
+        );
+
+    }
+
+}
+
+
+/* ================================================================
+   FETCH BOTH APIs
+   ================================================================ */
+
+async function fetchAllApis() {
+
+    fetchButton.disabled =
+        true;
+
+
+    showWarning("");
+
+
+    setStatus(
+        "Fetching APIs...",
+        ""
+    );
+
+
+    const today =
+        londonToday();
+
+
+    const actualStart =
+        today.minus({
+            days:
+                2
+        });
+
+
+    const forecastStart =
+        today.plus({
+            days:
+                1
+        });
 
 
     /*
      * IMPORTANT:
      *
-     * Chart.js receives NUMBER timestamps.
+     * Actual and Forecast are fetched
+     * independently.
      *
-     * Do NOT give Chart.js Date objects here.
-     *
-     * This fixes:
-     *
-     * "fromMillis requires a numerical input,
-     * but received a object with value Tue..."
+     * One can fail while the other succeeds.
      */
-    function timestamp(dt) {
 
-      return dt.toMillis();
+    const forecastPromise =
+        (async () => {
 
-    }
+            try {
 
+                const json =
+                    await fetchJson(
+                        AGILE_PREDICT_URL,
+                        "AgilePredict API"
+                    );
 
-    function makeSlotList(start, endExclusive) {
 
-      const result = [];
+                const map =
+                    parseForecastJson(
+                        json
+                    );
 
-      let current = start;
 
-      while (current < endExclusive) {
+                if (
+                    map.size === 0
+                ) {
 
-        result.push(current);
-
-        current = current.plus({
-          minutes: 30
-        });
-
-      }
-
-      return result;
-
-    }
-
-
-    /* ================================================================
-       STATUS
-       ================================================================ */
-
-    function setStatus(text, type = "") {
-
-      statusElement.textContent = text;
-
-      statusElement.className =
-        "status " + type;
-
-    }
-
-
-    function showWarning(text) {
-
-      if (!text) {
-
-        warningElement.style.display = "none";
-        warningElement.textContent = "";
-
-        return;
-      }
-
-      warningElement.textContent = text;
-      warningElement.style.display = "block";
-
-    }
-
-
-    /* ================================================================
-       JSON
-       ================================================================ */
-
-    function parseJson(text, name) {
-
-      if (!text.trim()) {
-
-        return null;
-
-      }
-
-      try {
-
-        return JSON.parse(text);
-
-      } catch (error) {
-
-        throw new Error(
-          `${name} contains invalid JSON: ${error.message}`
-        );
-
-      }
-
-    }
-
-
-    /* ================================================================
-       ACTUAL DATA
-       ================================================================ */
-
-    function parseActualJson(json) {
-
-      const map = new Map();
-
-      if (!json) {
-
-        return map;
-
-      }
-
-
-      /*
-       * Official Octopus response:
-       *
-       * {
-       *   "results": [
-       *      {
-       *          "valid_from": "...",
-       *          "value_inc_vat": ...
-       *      }
-       *   ]
-       * }
-       */
-
-      const rows =
-        Array.isArray(json)
-          ? json
-          : Array.isArray(json.results)
-            ? json.results
-            : [];
-
-
-      for (const row of rows) {
-
-        if (!row.valid_from) {
-          continue;
-        }
-
-
-        const dt =
-          luxon.DateTime
-            .fromISO(
-              row.valid_from,
-              {
-                zone: "utc"
-              }
-            )
-            .setZone(TIMEZONE);
-
-
-        if (!dt.isValid) {
-          continue;
-        }
-
-
-        /*
-         * Octopus returns £/kWh.
-         *
-         * Convert:
-         *
-         * £/kWh × 100 = p/kWh
-         */
-
-        let price =
-          Number(row.value_inc_vat);
-
-
-        if (!Number.isFinite(price)) {
-
-          price =
-            Number(row.value_exc_vat);
-
-        }
-
-
-        if (!Number.isFinite(price)) {
-          continue;
-        }
-
-        /*
-         * Octopus API already returns electricity unit prices
-         * in p/kWh.
-         *
-         * DO NOT multiply by 100.
-         */
-
-        map.set(
-          timestamp(dt),
-          price
-        );
-
-      }
-
-
-      return map;
-
-    }
-
-
-    /* ================================================================
-       FORECAST DATA
-       ================================================================ */
-
-    function getNumber(object, names) {
-
-      for (const name of names) {
-
-        const value =
-          Number(object?.[name]);
-
-
-        if (Number.isFinite(value)) {
-
-          return value;
-
-        }
-
-      }
-
-      return null;
-
-    }
-
-
-    function extractLow(item) {
-
-      let value =
-        getNumber(
-          item,
-          [
-            "agile_low",
-            "agile_pred_low",
-            "agile_pred_lower",
-            "forecast_low",
-            "forecast_lower",
-            "prediction_low",
-            "prediction_lower",
-            "low",
-            "lower",
-            "p10"
-          ]
-        );
-
-
-      /*
-       * Also check nested objects.
-       */
-
-      if (value === null) {
-
-        const objects = [
-
-          item.high_low,
-          item.bounds,
-          item.interval,
-          item.prediction_interval,
-          item.confidence_interval
-
-        ];
-
-
-        for (const object of objects) {
-
-          if (!object) {
-            continue;
-          }
-
-
-          value =
-            getNumber(
-              object,
-              [
-                "low",
-                "lower",
-                "min",
-                "lower_bound",
-                "p10"
-              ]
-            );
-
-
-          if (value !== null) {
-            break;
-          }
-
-        }
-
-      }
-
-
-      return value;
-
-    }
-
-
-    function extractHigh(item) {
-
-      let value =
-        getNumber(
-          item,
-          [
-            "agile_high",
-            "agile_pred_high",
-            "agile_pred_upper",
-            "forecast_high",
-            "forecast_upper",
-            "prediction_high",
-            "prediction_upper",
-            "high",
-            "upper",
-            "p90"
-          ]
-        );
-
-
-      if (value === null) {
-
-        const objects = [
-
-          item.high_low,
-          item.bounds,
-          item.interval,
-          item.prediction_interval,
-          item.confidence_interval
-
-        ];
-
-
-        for (const object of objects) {
-
-          if (!object) {
-            continue;
-          }
-
-
-          value =
-            getNumber(
-              object,
-              [
-                "high",
-                "upper",
-                "max",
-                "upper_bound",
-                "p90"
-              ]
-            );
-
-
-          if (value !== null) {
-            break;
-          }
-
-        }
-
-      }
-
-
-      return value;
-
-    }
-
-
-    function parseForecastJson(json) {
-
-      const map = new Map();
-
-      if (!json) {
-        return map;
-      }
-
-      let record = null;
-
-      if (Array.isArray(json)) {
-        record = json[0];
-      } else if (json && typeof json === "object") {
-        record = json;
-      }
-
-      let rows = [];
-
-      if (Array.isArray(record?.prices)) {
-        rows = record.prices;
-      }
-
-      for (const item of rows) {
-
-        if (!item.date_time) {
-          continue;
-        }
-
-        const dt =
-          luxon.DateTime
-            .fromISO(
-              item.date_time,
-              {
-                setZone: true
-              }
-            )
-            .setZone(TIMEZONE);
-
-        if (!dt.isValid) {
-          continue;
-        }
-
-        const price = Number(item.agile_pred);
-        const low = Number(item.agile_low);
-        const high = Number(item.agile_high);
-
-        if (!Number.isFinite(price)) {
-          continue;
-        }
-
-        map.set(
-          timestamp(dt),
-          {
-            price: price,
-
-            low:
-              Number.isFinite(low)
-                ? low
-                : null,
-
-            high:
-              Number.isFinite(high)
-                ? high
-                : null
-          }
-        );
-      }
-
-      return map;
-    }
-    /* ================================================================
-       DUMMY ACTUAL DATA
-       ================================================================ */
-
-    function createDummyActual(start, endExclusive) {
-
-      const map = new Map();
-
-      const slots =
-        makeSlotList(
-          start,
-          endExclusive
-        );
-
-
-      for (const dt of slots) {
-
-        const hour =
-          dt.hour +
-          dt.minute / 60;
-
-
-        /*
-         * Artificial daily price shape.
-         */
-
-        let price =
-          12 +
-          Math.sin(
-            (hour / 24) *
-            Math.PI * 2
-          ) * 5;
-
-
-        /*
-         * Morning peak.
-         */
-
-        if (
-          hour >= 7 &&
-          hour < 10
-        ) {
-
-          price += 8;
-
-        }
-
-
-        /*
-         * Evening peak.
-         */
-
-        if (
-          hour >= 16 &&
-          hour < 20
-        ) {
-
-          price += 14;
-
-        }
-
-
-        /*
-         * Small day-to-day variation.
-         */
-
-        price +=
-          (dt.ordinal % 7) * 0.7;
-
-
-        map.set(
-          timestamp(dt),
-          Number(price.toFixed(2))
-        );
-
-      }
-
-
-      return map;
-
-    }
-
-
-    /* ================================================================
-       DUMMY FORECAST DATA
-       ================================================================ */
-
-    function createDummyForecast(start, endExclusive) {
-
-      const map = new Map();
-
-      const slots =
-        makeSlotList(
-          start,
-          endExclusive
-        );
-
-
-      for (const dt of slots) {
-
-        const hour =
-          dt.hour +
-          dt.minute / 60;
-
-
-        let price =
-          13 +
-          Math.sin(
-            (hour / 24) *
-            Math.PI * 2
-          ) * 4;
-
-
-        if (
-          hour >= 7 &&
-          hour < 10
-        ) {
-
-          price += 7;
-
-        }
-
-
-        if (
-          hour >= 16 &&
-          hour < 20
-        ) {
-
-          price += 12;
-
-        }
-
-
-        /*
-         * Different forecast level each day.
-         */
-
-        price +=
-          ((dt.ordinal % 6) - 3) * 0.8;
-
-
-        const uncertainty =
-          3 +
-          Math.abs(
-            Math.sin(hour / 24 * Math.PI)
-          ) * 2;
-
-
-        map.set(
-          timestamp(dt),
-          {
-            price:
-              Number(price.toFixed(2)),
-
-            low:
-              Number(
-                (price - uncertainty)
-                  .toFixed(2)
-              ),
-
-            high:
-              Number(
-                (price + uncertainty)
-                  .toFixed(2)
-              )
-          }
-        );
-
-      }
-
-
-      return map;
-
-    }
-
-
-    /* ================================================================
-       DATASET BUILDING
-       ================================================================ */
-
-    function makeActualDataset(slots, map) {
-
-      return slots.map(dt => {
-
-        const x =
-          timestamp(dt);
-
-        const value =
-          map.get(x);
-
-
-        return {
-          x,
-          y:
-            value === undefined
-              ? null
-              : value
-        };
-
-      });
-
-    }
-
-
-    function makeForecastDataset(
-      slots,
-      map,
-      property
-    ) {
-
-      return slots.map(dt => {
-
-        const x =
-          timestamp(dt);
-
-        const item =
-          map.get(x);
-
-
-        if (!item) {
-
-          return {
-            x,
-            y: null
-          };
-
-        }
-
-
-        const value =
-          item[property];
-
-
-        return {
-          x,
-          y:
-            Number.isFinite(value)
-              ? value
-              : null
-        };
-
-      });
-
-    }
-
-
-    /* ================================================================
-       CHART
-       ================================================================ */
-
-    function drawChart(
-      actualDataset,
-      forecastDataset,
-      lowDataset,
-      highDataset,
-      start,
-      endExclusive
-    ) {
-
-      const canvas =
-        document
-          .getElementById("priceChart");
-
-
-      if (chart) {
-
-        chart.destroy();
-
-      }
-
-
-      chart =
-        new Chart(
-          canvas.getContext("2d"),
-          {
-
-            type: "line",
-
-            data: {
-
-              datasets: [
-
-                /* =====================================
-                   ACTUAL
-                   ===================================== */
-
-                {
-                  label:
-                    "Actual Prices",
-
-                  data:
-                    actualDataset,
-
-                  parsing: false,
-
-                  borderColor:
-                    "#4da3ff",
-
-                  backgroundColor:
-                    "#4da3ff",
-
-                  borderWidth: 2.2,
-
-                  pointRadius: 0,
-
-                  pointHoverRadius: 5,
-
-                  pointHitRadius: 10,
-
-                  tension: 0,
-
-                  spanGaps: false,
-
-                  order: 10
-                },
-
-
-                /* =====================================
-                   FORECAST LOW
-                   ===================================== */
-
-                {
-                  label:
-                    "Forecast Low",
-
-                  data:
-                    lowDataset,
-
-                  parsing: false,
-
-                  borderColor:
-                    "rgba(255,159,67,0)",
-
-                  backgroundColor:
-                    "rgba(255,159,67,0)",
-
-                  borderWidth: 0,
-
-                  pointRadius: 0,
-
-                  pointHitRadius: 0,
-
-                  tension: 0,
-
-                  spanGaps: false,
-
-                  order: 1
-                },
-
-
-                /* =====================================
-                   FORECAST HIGH / SHADED BAND
-                   ===================================== */
-
-                {
-                  label:
-                    "Forecast Range",
-
-                  data:
-                    highDataset,
-
-                  parsing: false,
-
-                  borderColor:
-                    "rgba(255,159,67,0)",
-
-                  backgroundColor:
-                    "rgba(255,159,67,0.18)",
-
-                  borderWidth: 0,
-
-                  pointRadius: 0,
-
-                  pointHitRadius: 0,
-
-                  fill: 1,
-
-                  tension: 0,
-
-                  spanGaps: false,
-
-                  order: 2
-                },
-
-
-                /* =====================================
-                   FORECAST
-                   ===================================== */
-
-                {
-                  label:
-                    "Forecast Prices",
-
-                  data:
-                    forecastDataset,
-
-                  parsing: false,
-
-                  borderColor:
-                    "#ff9f43",
-
-                  backgroundColor:
-                    "#ff9f43",
-
-                  borderWidth: 2.4,
-
-                  borderDash:
-                    [7, 5],
-
-                  pointRadius: 0,
-
-                  pointHoverRadius: 5,
-
-                  pointHitRadius: 10,
-
-                  tension: 0,
-
-                  spanGaps: false,
-
-                  order: 5
-                }
-
-              ]
-
-            },
-
-
-            options: {
-
-              responsive: true,
-
-              maintainAspectRatio: false,
-
-              normalized: true,
-
-
-              interaction: {
-
-                mode: "nearest",
-
-                intersect: false
-
-              },
-
-
-              plugins: {
-
-                title: {
-
-                  display: true,
-
-                  text:
-                    "Octopus Agile Region G — 10-Day Prices",
-
-                  color:
-                    "#edf1f7",
-
-                  font: {
-
-                    size: 18,
-
-                    weight: "600"
-
-                  },
-
-                  padding: {
-
-                    bottom: 12
-
-                  }
-
-                },
-
-
-                legend: {
-
-                  display: true,
-
-                  position: "top",
-
-                  labels: {
-
-                    color:
-                      "#edf1f7",
-
-                    usePointStyle: true,
-
-                    padding: 16,
-
-                    filter:
-                      item => {
-
-                        /*
-                         * Only show:
-                         *
-                         * Actual
-                         * Forecast
-                         */
-
-                        return (
-                          item.datasetIndex === 0 ||
-                          item.datasetIndex === 3
-                        );
-
-                      }
-
-                  },
-
-
-                  onClick:
-                    (event, legendItem, legend) => {
-
-                      const chart =
-                        legend.chart;
-
-                      if (
-                        legendItem.datasetIndex === 0
-                      ) {
-
-                        chart.setDatasetVisibility(
-                          0,
-                          !chart.isDatasetVisible(0)
-                        );
-
-                      }
-
-
-                      if (
-                        legendItem.datasetIndex === 3
-                      ) {
-
-                        const visible =
-                          chart.isDatasetVisible(3);
-
-                        chart.setDatasetVisibility(
-                          1,
-                          !visible
-                        );
-
-                        chart.setDatasetVisibility(
-                          2,
-                          !visible
-                        );
-
-                        chart.setDatasetVisibility(
-                          3,
-                          !visible
-                        );
-
-                      }
-
-
-                      chart.update();
-
-                    }
-
-                },
-
-
-                tooltip: {
-
-                  enabled: true,
-
-                  callbacks: {
-
-                    /*
-                     * x is now ALWAYS a number.
-                     *
-                     * This is the direct fix for:
-                     *
-                     * fromMillis requires a numerical input
-                     */
-
-                    title:
-                      items => {
-
-                        if (
-                          !items ||
-                          !items.length
-                        ) {
-
-                          return "";
-
-                        }
-
-
-                        const milliseconds =
-                          Number(
-                            items[0].parsed.x
-                          );
-
-
-                        if (
-                          !Number.isFinite(
-                            milliseconds
-                          )
-                        ) {
-
-                          return "";
-
-                        }
-
-
-                        return luxon.DateTime
-                          .fromMillis(
-                            milliseconds,
-                            {
-                              zone:
-                                TIMEZONE
-                            }
-                          )
-                          .toFormat(
-                            "ccc d LLL yyyy, HH:mm"
-                          );
-
-                      },
-
-
-                    label:
-                      context => {
-
-                        const value =
-                          context.parsed.y;
-
-
-                        if (
-                          value === null ||
-                          !Number.isFinite(value)
-                        ) {
-
-                          return (
-                            context.dataset.label +
-                            ": missing"
-                          );
-
-                        }
-
-
-                        return (
-                          context.dataset.label +
-                          ": " +
-                          value.toFixed(2) +
-                          " p/kWh"
-                        );
-
-                      }
-
-                  }
+                    throw new Error(
+                        "AgilePredict returned no usable forecast rows."
+                    );
 
                 }
 
-              },
+
+                forecastInput.value =
+                    JSON.stringify(
+                        json,
+                        null,
+                        2
+                    );
 
 
-              scales: {
-
-                x: {
-
-                  type: "time",
-
-                  min:
-                    timestamp(start),
-
-                  max:
-                    timestamp(
-                      endExclusive.minus({
-                        minutes: 30
-                      })
-                    ),
+                setBadge(
+                    forecastBadge,
+                    "API loaded",
+                    "api"
+                );
 
 
-                  adapters: {
+                return {
 
-                    date: {
+                    map,
 
-                      zone:
-                        TIMEZONE
+                    source:
+                        "API"
 
-                    }
+                };
 
-                  },
+            } catch (error) {
 
-
-                  time: {
-
-                    unit: "day",
-
-                    displayFormats: {
-
-                      day:
-                        "ccc d LLL",
-
-                      hour:
-                        "HH:mm"
-
-                    },
-
-                    tooltipFormat:
-                      "ccc d LLL yyyy, HH:mm"
-
-                  },
+                console.warn(
+                    "Forecast API failed:",
+                    error
+                );
 
 
-                  ticks: {
-
-                    color:
-                      "#9da6b5",
-
-                    maxRotation: 0,
-
-                    autoSkip: true,
-
-                    autoSkipPadding: 20
-
-                  },
+                setBadge(
+                    forecastBadge,
+                    "Manual required",
+                    "error"
+                );
 
 
-                  grid: {
-
-                    color:
-                      "rgba(255,255,255,0.07)"
-
-                  },
+                forecastInput.classList.add(
+                    "manual-required"
+                );
 
 
-                  title: {
-
-                    display: true,
-
-                    text:
-                      "Date / Time (Europe/London)",
-
-                    color:
-                      "#9da6b5"
-
-                  }
-
-                },
+                const manualJson =
+                    parseTextJson(
+                        forecastInput.value,
+                        "Forecast"
+                    );
 
 
-                y: {
+                if (manualJson) {
 
-                  ticks: {
+                    return {
 
-                    color:
-                      "#9da6b5",
+                        map:
+                            parseForecastJson(
+                                manualJson
+                            ),
 
-                    callback:
-                      value =>
-                        value +
-                        " p"
+                        source:
+                            "manual JSON"
 
-                  },
-
-
-                  grid: {
-
-                    color:
-                      "rgba(255,255,255,0.07)"
-
-                  },
-
-
-                  title: {
-
-                    display: true,
-
-                    text:
-                      "Price (p/kWh)",
-
-                    color:
-                      "#9da6b5"
-
-                  },
-
-
-                  beginAtZero: false
+                    };
 
                 }
 
-              }
+
+                return {
+
+                    map:
+                        createDummyForecast(
+                            forecastStart,
+                            today.plus({
+                                days:
+                                    7
+                            })
+                        ),
+
+                    source:
+                        "dummy"
+
+                };
 
             }
 
-          }
-        );
-
-    }
+        })();
 
 
-    /* ================================================================
-       MAIN
-       ================================================================ */
+    const actualPromise =
+        (async () => {
 
-    function render() {
+            try {
 
-      try {
+                const apiData =
+                    await fetchOctopusActual(
+                        actualStart,
+                        forecastStart
+                    );
 
-        showWarning("");
 
-        setStatus(
-          "Processing JSON...",
-          ""
-        );
+                const map =
+                    parseActualJson(
+                        apiData
+                    );
 
+
+                if (
+                    map.size === 0
+                ) {
+
+                    throw new Error(
+                        "Octopus API returned no usable actual rows."
+                    );
+
+                }
+
+
+                /*
+                 * Do not discard the pagination:
+                 * put all fetched rows into one JSON object
+                 * so it can also be manually saved/reused.
+                 */
+
+                actualInput.value =
+                    JSON.stringify(
+                        {
+                            count:
+                                apiData.results.length,
+
+                            results:
+                                apiData.results
+                        },
+                        null,
+                        2
+                    );
+
+
+                setBadge(
+                    actualBadge,
+                    `API loaded · ${map.size} slots`,
+                    "api"
+                );
+
+
+                return {
+
+                    map,
+
+                    source:
+                        `API · ${apiData.productCode}`
+
+                };
+
+            } catch (error) {
+
+                console.warn(
+                    "Actual API failed:",
+                    error
+                );
+
+
+                setBadge(
+                    actualBadge,
+                    "Manual required",
+                    "error"
+                );
+
+
+                actualInput.classList.add(
+                    "manual-required"
+                );
+
+
+                const manualJson =
+                    parseTextJson(
+                        actualInput.value,
+                        "Actual"
+                    );
+
+
+                if (manualJson) {
+
+                    return {
+
+                        map:
+                            parseActualJson(
+                                manualJson
+                            ),
+
+                        source:
+                            "manual JSON"
+
+                    };
+
+                }
+
+
+                return {
+
+                    map:
+                        createDummyActual(
+                            actualStart,
+                            forecastStart
+                        ),
+
+                    source:
+                        "dummy"
+
+                };
+
+            }
+
+        })();
+
+
+    const [
+        actualResult,
+        forecastResult
+    ] =
+        await Promise.all([
+            actualPromise,
+            forecastPromise
+        ]);
+
+
+    renderMaps(
+        actualResult.map,
+        forecastResult.map,
+        {
+            actual:
+                actualResult.source,
+
+            forecast:
+                forecastResult.source
+        }
+    );
+
+
+    fetchButton.disabled =
+        false;
+
+}
+
+
+/* ================================================================
+   DRAW FROM MANUAL JSON
+   ================================================================ */
+
+function drawFromJson() {
+
+    try {
 
         const today =
-          londonToday();
+            londonToday();
 
-
-        /*
-         * Actual:
-         *
-         * D-3
-         * D-2
-         * D-1
-         * Today
-         *
-         * 4 days
-         */
 
         const actualStart =
-          today.minus({
-            days: 2
-          });
+            today.minus({
+                days:
+                    2
+            });
 
 
         const forecastStart =
-          today.plus({
-            days: 1
-          });
+            today.plus({
+                days:
+                    1
+            });
 
-
-        /*
-         * Forecast:
-         *
-         * Tomorrow
-         * +2
-         * +3
-         * +4
-         * +5
-         * +6
-         *
-         * 6 days
-         */
 
         const chartEnd =
-          today.plus({
-            days: 7
-          });
+            today.plus({
+                days:
+                    7
+            });
 
-
-        const actualSlots =
-          makeSlotList(
-            actualStart,
-            forecastStart
-          );
-
-
-        const forecastSlots =
-          makeSlotList(
-            forecastStart,
-            chartEnd
-          );
-
-
-        /* =========================================
-           READ USER JSON
-           ========================================= */
 
         const actualJson =
-          parseJson(
-            actualInput.value,
-            "Actual JSON"
-          );
+            parseTextJson(
+                actualInput.value,
+                "Actual"
+            );
 
 
         const forecastJson =
-          parseJson(
-            forecastInput.value,
-            "Forecast JSON"
-          );
+            parseTextJson(
+                forecastInput.value,
+                "Forecast"
+            );
 
-
-        /* =========================================
-           ACTUAL
-           ========================================= */
 
         let actualMap;
-
-        let usingDummyActual =
-          !actualJson;
-
-
-        if (usingDummyActual) {
-
-          actualMap =
-            createDummyActual(
-              actualStart,
-              forecastStart
-            );
-
-        } else {
-
-          actualMap =
-            parseActualJson(
-              actualJson
-            );
-
-        }
-
-
-        /* =========================================
-           FORECAST
-           ========================================= */
-
         let forecastMap;
 
-        let usingDummyForecast =
-          !forecastJson;
 
+        if (actualJson) {
 
-        if (usingDummyForecast) {
+            actualMap =
+                parseActualJson(
+                    actualJson
+                );
 
-          forecastMap =
-            createDummyForecast(
-              forecastStart,
-              chartEnd
+            setBadge(
+                actualBadge,
+                "Manual JSON",
+                "manual"
             );
 
         } else {
 
-          forecastMap =
-            parseForecastJson(
-              forecastJson
+            actualMap =
+                createDummyActual(
+                    actualStart,
+                    forecastStart
+                );
+
+            setBadge(
+                actualBadge,
+                "Dummy",
+                "dummy"
             );
 
         }
 
 
-        /* =========================================
-           DATASETS
-           ========================================= */
+        if (forecastJson) {
 
-        const actualDataset =
-          makeActualDataset(
-            actualSlots,
-            actualMap
-          );
+            forecastMap =
+                parseForecastJson(
+                    forecastJson
+                );
 
+            setBadge(
+                forecastBadge,
+                "Manual JSON",
+                "manual"
+            );
 
-        const forecastDataset =
-          makeForecastDataset(
-            forecastSlots,
-            forecastMap,
-            "price"
-          );
+        } else {
 
+            forecastMap =
+                createDummyForecast(
+                    forecastStart,
+                    chartEnd
+                );
 
-        const lowDataset =
-          makeForecastDataset(
-            forecastSlots,
-            forecastMap,
-            "low"
-          );
+            setBadge(
+                forecastBadge,
+                "Dummy",
+                "dummy"
+            );
 
-
-        const highDataset =
-          makeForecastDataset(
-            forecastSlots,
-            forecastMap,
-            "high"
-          );
+        }
 
 
-        /* =========================================
-           COUNTS
-           ========================================= */
+        actualInput.classList.remove(
+            "manual-required"
+        );
 
-        const actualPresent =
-          actualDataset.filter(
-            item =>
-              item.y !== null
-          ).length;
-
-
-        const forecastPresent =
-          forecastDataset.filter(
-            item =>
-              item.y !== null
-          ).length;
-
-
-        const lowPresent =
-          lowDataset.filter(
-            item =>
-              item.y !== null
-          ).length;
-
-
-        const highPresent =
-          highDataset.filter(
-            item =>
-              item.y !== null
-          ).length;
-
-
-        const actualMissing =
-          actualSlots.length -
-          actualPresent;
-
-
-        const forecastMissing =
-          forecastSlots.length -
-          forecastPresent;
-
-
-        /* =========================================
-           DRAW
-           ========================================= */
-
-        drawChart(
-          actualDataset,
-          forecastDataset,
-          lowDataset,
-          highDataset,
-          actualStart,
-          chartEnd
+        forecastInput.classList.remove(
+            "manual-required"
         );
 
 
-        /* =========================================
-           INFO
-           ========================================= */
+        renderMaps(
+            actualMap,
+            forecastMap,
+            {
+                actual:
+                    actualJson
+                        ? "manual JSON"
+                        : "dummy",
 
-        document.getElementById(
-          "actualInfo"
-        ).textContent =
-          `${actualPresent}/${actualSlots.length} slots` +
-          (
-            usingDummyActual
-              ? " · dummy"
-              : " · pasted JSON"
-          );
+                forecast:
+                    forecastJson
+                        ? "manual JSON"
+                        : "dummy"
 
+            }
+        );
 
-        document.getElementById(
-          "forecastInfo"
-        ).textContent =
-          `${forecastPresent}/${forecastSlots.length} slots` +
-          (
-            usingDummyForecast
-              ? " · dummy"
-              : " · pasted JSON"
-          );
+    } catch (error) {
 
-
-        document.getElementById(
-          "missingActual"
-        ).textContent =
-          actualMissing;
-
-
-        document.getElementById(
-          "missingForecast"
-        ).textContent =
-          forecastMissing;
-
-
-        /* =========================================
-           WARNINGS
-           ========================================= */
-
-        const warnings = [];
-
-
-        // missing at least 1 whole day data (48 half-hour slots)
-        if (actualMissing > 48) {
-
-          warnings.push(
-            `Actual data missing ${actualMissing} of ${actualSlots.length} half-hour slots.`
-          );
-
-        }
-
-
-        if (forecastMissing > 0) {
-
-          warnings.push(
-            `Forecast data missing ${forecastMissing} slots.`
-          );
-
-        }
-
-
-        if (
-          !usingDummyForecast &&
-          (lowPresent === 0 || highPresent === 0)
-        ) {
-
-          warnings.push(
-            "Forecast price loaded, but no high/low interval was found in the pasted JSON."
-          );
-
-        }
-
-
-        if (warnings.length) {
-
-          showWarning(
-            warnings.join(" ")
-          );
-
-
-          setStatus(
-            "Chart loaded with warnings. " +
-            warnings.join(" "),
-            "warning"
-          );
-
-        } else {
-
-          setStatus(
-            "Chart loaded successfully. " +
-            (
-              usingDummyActual
-                ? "Actual data is dummy data. "
-                : "Actual data is from pasted JSON. "
-            ) +
-            (
-              usingDummyForecast
-                ? "Forecast data is dummy data."
-                : "Forecast data is from pasted JSON."
-            ),
-            "ok"
-          );
-
-        }
-
-      } catch (error) {
-
-        console.error(error);
+        console.error(
+            error
+        );
 
 
         setStatus(
-          error.message ||
-          String(error),
-          "error"
+            error.message ||
+            String(error),
+            "error"
         );
 
 
         showWarning(
-          "Could not draw the chart. Check the JSON format."
+            "Could not parse the pasted JSON."
         );
-
-      }
 
     }
 
-
-    /* ================================================================
-       BUTTONS
-       ================================================================ */
-
-    document
-      .getElementById("drawButton")
-      .addEventListener(
-        "click",
-        render
-      );
+}
 
 
-    document
-      .getElementById("clearButton")
-      .addEventListener(
-        "click",
-        () => {
+/* ================================================================
+   DUMMY
+   ================================================================ */
 
-          actualInput.value = "";
-          forecastInput.value = "";
+function useDummyData() {
 
-          render();
+    actualInput.value =
+        "";
 
+    forecastInput.value =
+        "";
+
+    actualInput.classList.remove(
+        "manual-required"
+    );
+
+    forecastInput.classList.remove(
+        "manual-required"
+    );
+
+
+    const today =
+        londonToday();
+
+
+    const actualStart =
+        today.minus({
+            days:
+                2
+        });
+
+
+    const forecastStart =
+        today.plus({
+            days:
+                1
+        });
+
+
+    const chartEnd =
+        today.plus({
+            days:
+                7
+        });
+
+
+    renderMaps(
+
+        createDummyActual(
+            actualStart,
+            forecastStart
+        ),
+
+        createDummyForecast(
+            forecastStart,
+            chartEnd
+        ),
+
+        {
+            actual:
+                "dummy",
+
+            forecast:
+                "dummy"
         }
-      );
+
+    );
 
 
-    document
-      .getElementById("dummyButton")
-      .addEventListener(
+    setBadge(
+        actualBadge,
+        "Dummy",
+        "dummy"
+    );
+
+
+    setBadge(
+        forecastBadge,
+        "Dummy",
+        "dummy"
+    );
+
+
+    setStatus(
+        "Using dummy actual and forecast data.",
+        "warning"
+    );
+
+}
+
+
+/* ================================================================
+   CLEAR
+   ================================================================ */
+
+function clearAll() {
+
+    actualInput.value =
+        "";
+
+    forecastInput.value =
+        "";
+
+    actualInput.classList.remove(
+        "manual-required"
+    );
+
+    forecastInput.classList.remove(
+        "manual-required"
+    );
+
+
+    setBadge(
+        actualBadge,
+        "Not loaded"
+    );
+
+
+    setBadge(
+        forecastBadge,
+        "Not loaded"
+    );
+
+
+    setStatus(
+        "Inputs cleared.",
+        ""
+    );
+
+
+    showWarning("");
+
+}
+
+
+/* ================================================================
+   EVENTS
+   ================================================================ */
+
+document
+    .getElementById(
+        "fetchButton"
+    )
+    .addEventListener(
         "click",
-        () => {
-
-          actualInput.value = "";
-          forecastInput.value = "";
-
-          render();
-
-        }
-      );
+        fetchAllApis
+    );
 
 
-    /* ================================================================
-       INITIAL DRAW
-       ================================================================ */
+document
+    .getElementById(
+        "drawButton"
+    )
+    .addEventListener(
+        "click",
+        drawFromJson
+    );
 
-    /*
-     * Both inputs are empty on first load.
-     *
-     * Therefore:
-     *
-     * Actual    → dummy
-     * Forecast  → dummy
-     *
-     * The chart should immediately show all 10 days.
-     */
 
-    render();
+document
+    .getElementById(
+        "dummyButton"
+    )
+    .addEventListener(
+        "click",
+        useDummyData
+    );
 
-  </script>
+
+document
+    .getElementById(
+        "clearButton"
+    )
+    .addEventListener(
+        "click",
+        clearAll
+    );
+
+
+/* ================================================================
+   START
+   ================================================================ */
+
+/*
+ * Automatically try APIs when page opens.
+ *
+ * If either one is blocked by CORS:
+ *
+ * Actual  -> manual textarea
+ * Forecast -> manual textarea
+ *
+ * The other API can still succeed normally.
+ */
+
+fetchAllApis();
+
+</script>
 
 </body>
-
 </html>
