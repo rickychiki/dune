@@ -1,4 +1,3 @@
-# Simple workflow for deploying static content to Pages
 name: Deploy static content to Pages
 
 on:
@@ -27,14 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Fetch latest Agile API data and prepare site
         run: |
           mkdir -p _site
-          # 把所有非隱藏檔案複製到 _site（自動排除 .git 和 .github）
-          cp -r $(ls -A | grep -vE '^\.git|^\.github|^_site$') _site/
-          curl -fsSL "https://agilepredict.com/api/G/?days=10&forecast_count=1&format=json&high_low=true" -o _site/agile.json
+          rsync -av --exclude='.git' --exclude='.github' --exclude='_site' ./ _site/
+          curl -fsSL "https://agilepredict.com" -o _site/agile.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
