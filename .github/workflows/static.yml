@@ -25,7 +25,6 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
@@ -34,16 +33,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Fetch latest Agile API data
         run: |
-          curl -s "https://agilepredict.com/api/G/?days=10&forecast_count=1&format=json&high_low=true" -o agile.json
+          curl -fsSL "https://agilepredict.com/api/G/?days=10&forecast_count=1&format=json&high_low=true" -o agile.json
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
-          # Upload entire repository
           path: '.'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
