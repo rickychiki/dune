@@ -1,25 +1,20 @@
-# Simple workflow for deploying static content to GitHub Pages
+# Simple workflow for deploying static content to Pages
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["master"]
 
   schedule:
-      - cron: '0 * * * *'
+    - cron: '0 * * * *'
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -34,9 +29,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch latest Agile API data
+      - name: Fetch latest Agile API data and prepare site
         run: |
-          curl -fsSL "https://agilepredict.com/api/G/?days=10&forecast_count=1&format=json&high_low=true" -o agile.json
+          mkdir -p _site
+          # 把所有非隱藏檔案複製到 _site（自動排除 .git 和 .github）
+          cp -r $(ls -A | grep -vE '^\.git|^\.github|^_site$') _site/
+          curl -fsSL "https://agilepredict.com/api/G/?days=10&forecast_count=1&format=json&high_low=true" -o _site/agile.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -44,9 +42,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.'
+          path: '_site'
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
